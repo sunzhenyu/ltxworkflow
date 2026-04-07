@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:ltx.io)",
+      "WebSearch",
+      "Read(//Users/sunhaoyu/haoyu/CodeX/**)",
+      "Bash(npx create-next-app@latest ltxworkflow --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes)"
+    ]
+  }
+}
