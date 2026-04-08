@@ -51,6 +51,20 @@ const steps = [
 export default function GuidePage() {
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to Install LTX-2.3 with ComfyUI",
+        "description": "Step-by-step guide to install LTX-2.3 with ComfyUI and generate AI videos.",
+        "url": "https://ltxworkflow.com/guide",
+        "step": [
+          { "@type": "HowToStep", "name": "Install ComfyUI", "text": "Clone ComfyUI and install dependencies." },
+          { "@type": "HowToStep", "name": "Install ComfyUI-LTXVideo nodes", "text": "Install official Lightricks nodes via ComfyUI Manager." },
+          { "@type": "HowToStep", "name": "Download LTX-2.3 model", "text": "Download the appropriate checkpoint for your VRAM." },
+          { "@type": "HowToStep", "name": "Download VAE", "text": "Download taeltx2_3.safetensors and place in models/vae/." },
+          { "@type": "HowToStep", "name": "Load workflow", "text": "Generate or download a workflow JSON and drag into ComfyUI." },
+        ],
+      })}} />
       <Nav activeHref="/guide" />
 
       <section className="space-y-2">

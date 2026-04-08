@@ -13,6 +13,16 @@ export default async function Home() {
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "ltx workflow",
+        "url": "https://ltxworkflow.com",
+        "description": "Generate ComfyUI workflow JSON for LTX-2.3 video model. Match GPU VRAM, download models, enhance prompts with AI.",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Web",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      })}} />
       <Nav />
 
       <section className="text-center space-y-4">
