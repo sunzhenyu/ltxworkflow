@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 
 export default function FeedbackPage() {
   return (
-    <main className="max-w-2xl mx-auto px-4 py-8 space-y-8">
-      <Nav />
+    <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      <Nav activeHref="/feedback" />
 
       <section className="space-y-2">
         <h1 className="text-3xl font-extrabold">Feedback</h1>

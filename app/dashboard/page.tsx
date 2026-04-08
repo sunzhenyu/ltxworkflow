@@ -12,7 +12,7 @@ export default async function DashboardPage() {
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
-      <Nav rightSlot={<UserMenu email={session.user?.email!} name={session.user?.name} />} />
+      <Nav />
 
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-gray-900 rounded-xl p-5">

@@ -11,7 +11,7 @@ export default async function ProfilePage() {
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8 space-y-8">
-      <Nav rightSlot={<UserMenu email={session.user?.email!} name={session.user?.name} />} />
+      <Nav />
 
       <section className="bg-gray-900 rounded-xl p-6 space-y-6">
         <h1 className="text-xl font-bold">Profile</h1>

@@ -37,8 +37,8 @@ const workflows = [
 
 export default function WorkflowsPage() {
   return (
-    <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-      <Nav />
+    <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      <Nav activeHref="/workflows" />
 
       <section className="space-y-2">
         <h1 className="text-3xl font-extrabold">LTX 2.3 ComfyUI Workflow Templates</h1>

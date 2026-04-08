@@ -14,8 +14,8 @@ export default function ModelsPage() {
   const extras = MODELS.filter((m) => m.type === "lora");
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-      <Nav />
+    <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      <Nav activeHref="/models" />
 
       <section className="space-y-2">
         <h1 className="text-3xl font-extrabold">LTX 2.3 Model Downloads</h1>
