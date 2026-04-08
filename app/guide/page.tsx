@@ -114,6 +114,17 @@ export default function GuidePage() {
         </ul>
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <Link href="/models" className="bg-gray-900 rounded-xl px-4 py-3 hover:bg-gray-800 transition-colors group">
+          <p className="text-sm font-medium text-violet-400 group-hover:text-violet-300">LTX-2.3 Model Downloads →</p>
+          <p className="text-xs text-gray-500 mt-0.5">All official checkpoints and FP8 variants</p>
+        </Link>
+        <Link href="/workflows" className="bg-gray-900 rounded-xl px-4 py-3 hover:bg-gray-800 transition-colors group">
+          <p className="text-sm font-medium text-violet-400 group-hover:text-violet-300">Workflow Templates →</p>
+          <p className="text-xs text-gray-500 mt-0.5">Official T2V, I2V, ICLoRA workflow JSON files</p>
+        </Link>
+      </div>
+
       <div className="text-center pt-4">
         <Link href="/">
           <button className="bg-violet-600 hover:bg-violet-500 text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors">

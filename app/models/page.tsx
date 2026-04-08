@@ -71,6 +71,17 @@ export default function ModelsPage() {
         </div>
       </section>
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <Link href="/guide" className="bg-gray-900 rounded-xl px-4 py-3 hover:bg-gray-800 transition-colors group">
+          <p className="text-sm font-medium text-violet-400 group-hover:text-violet-300">Setup Guide →</p>
+          <p className="text-xs text-gray-500 mt-0.5">How to install and configure LTX-2.3 with ComfyUI</p>
+        </Link>
+        <Link href="/workflows" className="bg-gray-900 rounded-xl px-4 py-3 hover:bg-gray-800 transition-colors group">
+          <p className="text-sm font-medium text-violet-400 group-hover:text-violet-300">Workflow Templates →</p>
+          <p className="text-xs text-gray-500 mt-0.5">Download official ComfyUI workflow JSON files</p>
+        </Link>
+      </div>
+
       <div className="text-center pt-2">
         <Link href="/guide">
           <button className="bg-violet-600 hover:bg-violet-500 text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors">
