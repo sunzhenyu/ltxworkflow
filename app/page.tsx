@@ -1,65 +1,86 @@
-import Image from "next/image";
+import Logo from "@/components/Logo";
+import { auth } from "@/auth";
+import Link from "next/link";
+import ModelCards from "@/components/ModelCards";
+import VramMatcher from "@/components/VramMatcher";
+import WorkflowBuilder from "@/components/WorkflowBuilder";
+import PromptEnhancer from "@/components/PromptEnhancer";
+import UserMenu from "@/components/UserMenu";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
+      <header className="flex items-center justify-between">
+        <span className="text-violet-400 font-bold text-lg flex items-center gap-2">
+          <Logo size={28} />
+          ltx workflow
+        </span>
+        {session?.user ? (
+          <UserMenu email={session.user.email!} name={session.user.name} />
+        ) : (
+          <Link href="/sign-in">
+            <button className="text-sm bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-lg transition-colors">
+              Sign In
+            </button>
+          </Link>
+        )}
+      </header>
+
+      <section className="text-center space-y-4">
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
+          LTX 2.3 Prompt Generator &amp;{" "}
+          <span className="text-violet-400">ComfyUI Workflow JSON</span>
+        </h1>
+        <p className="text-gray-400 max-w-2xl mx-auto text-lg">
+          Match your GPU, generate ComfyUI workflows, and enhance prompts for{" "}
+          <strong className="text-gray-200">LTX-2.3</strong> and{" "}
+          <strong className="text-gray-200">LTX-2.3 Distilled</strong>.
+          Supports FP8 quantized variants — runs on 16GB+ VRAM.
+        </p>
+        <div className="flex gap-3 justify-center flex-wrap text-sm text-gray-500">
+          <span className="bg-gray-800 px-3 py-1 rounded-full">taeltx2_3.safetensors</span>
+          <span className="bg-gray-800 px-3 py-1 rounded-full">spatial upscaler x2</span>
+          <span className="bg-gray-800 px-3 py-1 rounded-full">ComfyUI JSON export</span>
+          <span className="bg-gray-800 px-3 py-1 rounded-full">16GB–32GB VRAM</span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      <VramMatcher />
+      <PromptEnhancer />
+      <WorkflowBuilder />
+      <ModelCards />
+
+      <section className="border-t border-gray-800 pt-8">
+        <h2 className="text-lg font-bold mb-4">Official Resources</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {[
+            { label: "LTX-2.3 on HuggingFace", desc: "Official model weights by Lightricks", url: "https://huggingface.co/Lightricks/LTX-2.3" },
+            { label: "ComfyUI-LTXVideo", desc: "Official ComfyUI nodes & example workflows", url: "https://github.com/Lightricks/ComfyUI-LTXVideo" },
+            { label: "Kijai FP8 Models", desc: "FP8 quantized variants for 16GB VRAM", url: "https://huggingface.co/Kijai/LTX2.3_comfy" },
+            { label: "LTX-Video GitHub", desc: "Official LTX-Video model repository", url: "https://github.com/Lightricks/LTX-Video" },
+            { label: "ComfyUI", desc: "Node-based UI for running diffusion models", url: "https://github.com/comfyanonymous/ComfyUI" },
+            { label: "ComfyUI Manager", desc: "Install LTXVideo nodes via Manager", url: "https://github.com/ltdrdata/ComfyUI-Manager" },
+          ].map((r) => (
+            <a key={r.url} href={r.url} target="_blank" rel="noopener noreferrer"
+              className="bg-gray-900 rounded-xl px-4 py-3 hover:bg-gray-800 transition-colors group">
+              <p className="text-sm font-medium text-violet-400 group-hover:text-violet-300">{r.label} →</p>
+              <p className="text-xs text-gray-500 mt-0.5">{r.desc}</p>
+            </a>
+          ))}
         </div>
-      </main>
-    </div>
+      </section>
+
+      <footer className="border-t border-gray-800 pt-8 text-sm text-gray-500 space-y-2">
+        <p>
+          <strong className="text-gray-400">LTX-2.3</strong> is an open-source video generation model by Lightricks.
+          Configure <strong className="text-gray-400">taeltx2_3.safetensors</strong>, generate ComfyUI workflow JSON,
+          and optimize LTX 2.3 for 16GB+ VRAM with FP8 quantization. Supports{" "}
+          <strong className="text-gray-400">spatial upscaler x2</strong> and all official variants.
+        </p>
+        <p className="text-xs text-gray-600">ltx workflow — Not affiliated with Lightricks.</p>
+      </footer>
+    </main>
   );
 }

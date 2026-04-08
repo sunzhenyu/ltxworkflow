@@ -4,7 +4,18 @@
       "WebFetch(domain:ltx.io)",
       "WebSearch",
       "Read(//Users/sunhaoyu/haoyu/CodeX/**)",
-      "Bash(npx create-next-app@latest ltxworkflow --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes)"
+      "Bash(npx create-next-app@latest ltxworkflow --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)",
+      "Bash(curl -s -X POST https://yunwu.ai/v1/messages -H \"x-api-key: sk-xfVzvAqzSlKoUuYUxEAunjHgYdsj7hmw73uTllRhqaROHpoM\" -H \"anthropic-version: 2023-06-01\" -H \"content-type: application/json\" -d '{\"\"\"\"model\"\"\"\":\"\"\"\"claude-haiku-4-5-20251001\"\"\"\",\"\"\"\"max_tokens\"\"\"\":50,\"\"\"\"messages\"\"\"\":[{\"\"\"\"role\"\"\"\":\"\"\"\"user\"\"\"\",\"\"\"\"content\"\"\"\":\"\"\"\"say hi\"\"\"\"}]}')",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(curl:*)",
+      "Bash(node:*)",
+      "Bash(openssl rand:*)",
+      "Bash(git remote:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
