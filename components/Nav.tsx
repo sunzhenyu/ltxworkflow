@@ -7,6 +7,7 @@ const links = [
   { href: "/guide", label: "Guide" },
   { href: "/models", label: "Models" },
   { href: "/workflows", label: "Workflows" },
+  { href: "/feedback", label: "Feedback" },
 ];
 
 export default function Nav({ rightSlot }: { rightSlot?: React.ReactNode }) {
