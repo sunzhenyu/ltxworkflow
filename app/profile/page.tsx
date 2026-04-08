@@ -1,4 +1,5 @@
 import Logo from "@/components/Logo";
+import Nav from "@/components/Nav";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -10,10 +11,7 @@ export default async function ProfilePage() {
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8 space-y-8">
-      <header className="flex items-center justify-between">
-        <Link href="/" className="text-violet-400 font-bold text-lg flex items-center gap-2"><Logo size={24} />ltx workflow</Link>
-        <UserMenu email={session.user?.email!} name={session.user?.name} />
-      </header>
+      <Nav rightSlot={<UserMenu email={session.user?.email!} name={session.user?.name} />} />
 
       <section className="bg-gray-900 rounded-xl p-6 space-y-6">
         <h1 className="text-xl font-bold">Profile</h1>

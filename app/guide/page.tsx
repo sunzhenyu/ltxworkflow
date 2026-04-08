@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Logo from "@/components/Logo";
+import Nav from "@/components/Nav";
 
 export const metadata: Metadata = {
   title: "LTX 2.3 ComfyUI Setup Guide — Install & Run LTX-2.3",
@@ -51,11 +51,7 @@ const steps = [
 export default function GuidePage() {
   return (
     <main className="max-w-3xl mx-auto px-4 py-8 space-y-8">
-      <header className="flex items-center justify-between">
-        <Link href="/" className="text-violet-400 font-bold text-lg flex items-center gap-2">
-          <Logo size={24} />ltx workflow
-        </Link>
-      </header>
+      <Nav />
 
       <section className="space-y-2">
         <h1 className="text-3xl font-extrabold">LTX 2.3 ComfyUI Setup Guide</h1>

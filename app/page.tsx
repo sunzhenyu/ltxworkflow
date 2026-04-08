@@ -1,4 +1,5 @@
 import Logo from "@/components/Logo";
+import Nav from "@/components/Nav";
 import { auth } from "@/auth";
 import Link from "next/link";
 import ModelCards from "@/components/ModelCards";
@@ -12,17 +13,8 @@ export default async function Home() {
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
-      <header className="flex items-center justify-between">
-        <span className="text-violet-400 font-bold text-lg flex items-center gap-2">
-          <Logo size={28} />
-          ltx workflow
-        </span>
-        <nav className="hidden md:flex items-center gap-4 text-sm text-gray-400">
-          <Link href="/guide" className="hover:text-gray-200 transition-colors">Guide</Link>
-          <Link href="/models" className="hover:text-gray-200 transition-colors">Models</Link>
-          <Link href="/workflows" className="hover:text-gray-200 transition-colors">Workflows</Link>
-        </nav>
-        {session?.user ? (
+      <Nav rightSlot={
+        session?.user ? (
           <UserMenu email={session.user.email!} name={session.user.name} />
         ) : (
           <Link href="/sign-in">
@@ -30,8 +22,8 @@ export default async function Home() {
               Sign In
             </button>
           </Link>
-        )}
-      </header>
+        )
+      } />
 
       <section className="text-center space-y-4">
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">

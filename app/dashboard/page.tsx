@@ -4,7 +4,7 @@ import Link from "next/link";
 import SavedWorkflows from "@/components/dashboard/SavedWorkflows";
 import AdvancedWorkflowBuilder from "@/components/dashboard/AdvancedWorkflowBuilder";
 import UserMenu from "@/components/UserMenu";
-import Logo from "@/components/Logo";
+import Nav from "@/components/Nav";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -12,14 +12,7 @@ export default async function DashboardPage() {
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
-      <header className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/" className="text-violet-400 font-bold text-lg flex items-center gap-2"><Logo size={24} />ltx workflow</Link>
-          <span className="text-gray-600">/</span>
-          <span className="text-gray-300 text-sm">Dashboard</span>
-        </div>
-        <UserMenu email={session.user?.email!} name={session.user?.name} />
-      </header>
+      <Nav rightSlot={<UserMenu email={session.user?.email!} name={session.user?.name} />} />
 
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-gray-900 rounded-xl p-5">
