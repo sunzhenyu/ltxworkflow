@@ -17,6 +17,11 @@ export default async function Home() {
           <Logo size={28} />
           ltx workflow
         </span>
+        <nav className="hidden md:flex items-center gap-4 text-sm text-gray-400">
+          <Link href="/guide" className="hover:text-gray-200 transition-colors">Guide</Link>
+          <Link href="/models" className="hover:text-gray-200 transition-colors">Models</Link>
+          <Link href="/workflows" className="hover:text-gray-200 transition-colors">Workflows</Link>
+        </nav>
         {session?.user ? (
           <UserMenu email={session.user.email!} name={session.user.name} />
         ) : (
