@@ -19,7 +19,7 @@ export default function AdvancedWorkflowBuilder({ userId }: { userId: string }) 
     scheduler: "euler",
     prompt: "",
     negativePrompt: "blurry, low quality, distorted, watermark",
-    modelFile: "taeltx2_3.safetensors",
+    modelFile: "ltx-2.3-22b-dev.safetensors",
   });
   const [enhancing, setEnhancing] = useState(false);
   const [saving, setSaving] = useState(false);
