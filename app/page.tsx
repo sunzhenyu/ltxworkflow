@@ -13,17 +13,7 @@ export default async function Home() {
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
-      <Nav rightSlot={
-        session?.user ? (
-          <UserMenu email={session.user.email!} name={session.user.name} />
-        ) : (
-          <Link href="/sign-in">
-            <button className="text-sm bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-lg transition-colors">
-              Sign In
-            </button>
-          </Link>
-        )
-      } />
+      <Nav />
 
       <section className="text-center space-y-4">
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
