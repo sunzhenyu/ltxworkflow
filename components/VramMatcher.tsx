@@ -12,7 +12,7 @@ export default function VramMatcher() {
     <section className="bg-gray-900 rounded-xl p-6">
       <h2 className="text-xl font-bold mb-1">VRAM Adapter</h2>
       <p className="text-gray-400 text-sm mb-4">
-        Select your GPU VRAM to see compatible LTX-2.3 models:
+        Select your GPU VRAM to see compatible LTX 2.3 models:
       </p>
       <div className="flex gap-2 flex-wrap mb-6">
         {VRAM_OPTIONS.map((v) => (

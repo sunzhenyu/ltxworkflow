@@ -5,7 +5,7 @@ import { MODELS } from "@/lib/models";
 
 export const metadata: Metadata = {
   title: "LTX 2.3 Model Download — Dev, Distilled, FP8 Variants",
-  description: "Download LTX-2.3 models: official dev & distilled (32GB VRAM), FP8 quantized by Kijai (16GB VRAM). Includes VAE and spatial upscaler for ComfyUI.",
+  description: "Download LTX 2.3 models: official dev & distilled (32GB VRAM), FP8 quantized by Kijai (16GB VRAM). Includes VAE and spatial upscaler for ComfyUI.",
   alternates: { canonical: "https://ltxworkflow.com/models" },
 };
 
@@ -19,7 +19,7 @@ export default function ModelsPage() {
 
       <section className="space-y-2">
         <h1 className="text-3xl font-extrabold">LTX 2.3 Model Downloads</h1>
-        <p className="text-gray-400">All official LTX-2.3 checkpoints and quantized variants. Choose based on your GPU VRAM.</p>
+        <p className="text-gray-400">All official LTX 2.3 checkpoints and quantized variants. Choose based on your GPU VRAM.</p>
       </section>
 
       <section className="space-y-3">
@@ -74,7 +74,7 @@ export default function ModelsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Link href="/guide" className="bg-gray-900 rounded-xl px-4 py-3 hover:bg-gray-800 transition-colors group">
           <p className="text-sm font-medium text-violet-400 group-hover:text-violet-300">Setup Guide →</p>
-          <p className="text-xs text-gray-500 mt-0.5">How to install and configure LTX-2.3 with ComfyUI</p>
+          <p className="text-xs text-gray-500 mt-0.5">How to install and configure LTX 2.3 with ComfyUI</p>
         </Link>
         <Link href="/workflows" className="bg-gray-900 rounded-xl px-4 py-3 hover:bg-gray-800 transition-colors group">
           <p className="text-sm font-medium text-violet-400 group-hover:text-violet-300">Workflow Templates →</p>

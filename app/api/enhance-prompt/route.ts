@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       max_tokens: 300,
       messages: [{
         role: "user",
-        content: `You are a professional video director. Enhance this prompt for LTX-2.3 video generation with cinematic camera language (Dolly Zoom, Tracking Shot, Rack Focus, etc.), lighting, and motion details. Return only the enhanced prompt, no explanation.\n\nPrompt: ${prompt}`,
+        content: `You are a professional video director. Enhance this prompt for LTX 2.3 video generation with cinematic camera language (Dolly Zoom, Tracking Shot, Rack Focus, etc.), lighting, and motion details. Return only the enhanced prompt, no explanation.\n\nPrompt: ${prompt}`,
       }],
     });
     const enhanced = msg.choices[0].message.content ?? "";

@@ -3,7 +3,7 @@ import { MODELS } from "@/lib/models";
 export default function ModelCards() {
   return (
     <section>
-      <h2 className="text-xl font-bold mb-4">LTX-2.3 Model Downloads</h2>
+      <h2 className="text-xl font-bold mb-4">LTX 2.3 Model Downloads</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {MODELS.map((m) => (
           <div key={m.id} className="bg-gray-900 rounded-xl p-5 flex flex-col gap-2">

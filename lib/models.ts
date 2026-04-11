@@ -15,7 +15,7 @@ export type ModelVariant = {
 export const MODELS: ModelVariant[] = [
   {
     id: "ltx23-dev",
-    name: "LTX-2.3 Dev",
+    name: "LTX 2.3 Dev",
     filename: "ltx-2.3-22b-dev.safetensors",
     size: "~42 GB",
     vram: 32,
@@ -26,7 +26,7 @@ export const MODELS: ModelVariant[] = [
   },
   {
     id: "ltx23-distilled",
-    name: "LTX-2.3 Distilled",
+    name: "LTX 2.3 Distilled",
     filename: "ltx-2.3-22b-distilled.safetensors",
     size: "~42 GB",
     vram: 32,
@@ -37,7 +37,7 @@ export const MODELS: ModelVariant[] = [
   },
   {
     id: "ltx23-dev-fp8",
-    name: "LTX-2.3 Dev (FP8, Kijai)",
+    name: "LTX 2.3 Dev (FP8, Kijai)",
     filename: "ltx-2.3-22b-dev_transformer_only_fp8_input_scaled.safetensors",
     size: "25 GB",
     vram: 16,
@@ -48,7 +48,7 @@ export const MODELS: ModelVariant[] = [
   },
   {
     id: "ltx23-distilled-fp8",
-    name: "LTX-2.3 Distilled (FP8 v3, Kijai)",
+    name: "LTX 2.3 Distilled (FP8 v3, Kijai)",
     filename: "ltx-2.3-22b-distilled_transformer_only_fp8_input_scaled_v3.safetensors",
     size: "25 GB",
     vram: 16,
@@ -69,7 +69,7 @@ export const MODELS: ModelVariant[] = [
   },
   {
     id: "ltx23-vae",
-    name: "LTX-2.3 VAE",
+    name: "LTX 2.3 VAE",
     filename: "taeltx2_3.safetensors",
     size: "~0.5 GB",
     vram: 2,

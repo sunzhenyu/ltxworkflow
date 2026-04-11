@@ -35,7 +35,7 @@ export default function FeedbackPage() {
         <p className="text-sm text-gray-400">All model data is sourced from official repositories:</p>
         <ul className="space-y-1 text-sm">
           {[
-            { label: "Lightricks LTX-2.3 (official)", url: "https://huggingface.co/Lightricks/LTX-2.3" },
+            { label: "Lightricks LTX 2.3 (official)", url: "https://huggingface.co/Lightricks/LTX-2.3" },
             { label: "ComfyUI-LTXVideo (official nodes)", url: "https://github.com/Lightricks/ComfyUI-LTXVideo" },
             { label: "Kijai FP8 models", url: "https://huggingface.co/Kijai/LTX2.3_comfy" },
           ].map((l) => (

@@ -3,8 +3,8 @@ import Link from "next/link";
 import Nav from "@/components/Nav";
 
 export const metadata: Metadata = {
-  title: "LTX 2.3 ComfyUI Setup Guide — Install & Run LTX-2.3",
-  description: "Step-by-step guide to install LTX-2.3 with ComfyUI. Download models, configure nodes, and generate AI videos on 16GB–32GB VRAM GPUs.",
+  title: "LTX 2.3 ComfyUI Setup Guide — Install & Run LTX 2.3",
+  description: "Step-by-step guide to install LTX 2.3 with ComfyUI. Download models, configure nodes, and generate AI videos on 16GB–32GB VRAM GPUs.",
   alternates: { canonical: "https://ltxworkflow.com/guide" },
 };
 
@@ -20,7 +20,7 @@ const steps = [
     code: "cd ComfyUI/custom_nodes\ngit clone https://github.com/Lightricks/ComfyUI-LTXVideo",
   },
   {
-    title: "3. Download LTX-2.3 Model",
+    title: "3. Download LTX 2.3 Model",
     content: "Choose the right model for your VRAM. Place checkpoint files in ComfyUI/models/checkpoints/.",
     items: [
       { label: "32GB+ VRAM", value: "ltx-2.3-22b-dev.safetensors or ltx-2.3-22b-distilled.safetensors (official, ~42GB)" },
@@ -29,7 +29,7 @@ const steps = [
   },
   {
     title: "4. Download Required VAE",
-    content: "The TAE (Tiny AutoEncoder) is required for all LTX-2.3 workflows. Place in ComfyUI/models/vae/.",
+    content: "The TAE (Tiny AutoEncoder) is required for all LTX 2.3 workflows. Place in ComfyUI/models/vae/.",
     code: "# Download from: https://huggingface.co/Kijai/LTX2.3_comfy\n# File: taeltx2_3.safetensors → ComfyUI/models/vae/",
   },
   {
@@ -54,13 +54,13 @@ export default function GuidePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "HowTo",
-        "name": "How to Install LTX-2.3 with ComfyUI",
-        "description": "Step-by-step guide to install LTX-2.3 with ComfyUI and generate AI videos.",
+        "name": "How to Install LTX 2.3 with ComfyUI",
+        "description": "Step-by-step guide to install LTX 2.3 with ComfyUI and generate AI videos.",
         "url": "https://ltxworkflow.com/guide",
         "step": [
           { "@type": "HowToStep", "name": "Install ComfyUI", "text": "Clone ComfyUI and install dependencies." },
           { "@type": "HowToStep", "name": "Install ComfyUI-LTXVideo nodes", "text": "Install official Lightricks nodes via ComfyUI Manager." },
-          { "@type": "HowToStep", "name": "Download LTX-2.3 model", "text": "Download the appropriate checkpoint for your VRAM." },
+          { "@type": "HowToStep", "name": "Download LTX 2.3 model", "text": "Download the appropriate checkpoint for your VRAM." },
           { "@type": "HowToStep", "name": "Download VAE", "text": "Download taeltx2_3.safetensors and place in models/vae/." },
           { "@type": "HowToStep", "name": "Load workflow", "text": "Generate or download a workflow JSON and drag into ComfyUI." },
         ],
@@ -69,7 +69,7 @@ export default function GuidePage() {
 
       <section className="space-y-2">
         <h1 className="text-3xl font-extrabold">LTX 2.3 ComfyUI Setup Guide</h1>
-        <p className="text-gray-400">How to install LTX-2.3, download models, and generate AI videos with ComfyUI.</p>
+        <p className="text-gray-400">How to install LTX 2.3, download models, and generate AI videos with ComfyUI.</p>
       </section>
 
       <div className="space-y-6">
@@ -101,7 +101,7 @@ export default function GuidePage() {
         <ul className="space-y-2 text-sm">
           {[
             { label: "ComfyUI-LTXVideo (official nodes)", url: "https://github.com/Lightricks/ComfyUI-LTXVideo" },
-            { label: "LTX-2.3 models on HuggingFace", url: "https://huggingface.co/Lightricks/LTX-2.3" },
+            { label: "LTX 2.3 models on HuggingFace", url: "https://huggingface.co/Lightricks/LTX-2.3" },
             { label: "Kijai FP8 models (16GB VRAM)", url: "https://huggingface.co/Kijai/LTX2.3_comfy" },
             { label: "ComfyUI Manager", url: "https://github.com/ltdrdata/ComfyUI-Manager" },
           ].map((l) => (
@@ -116,7 +116,7 @@ export default function GuidePage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Link href="/models" className="bg-gray-900 rounded-xl px-4 py-3 hover:bg-gray-800 transition-colors group">
-          <p className="text-sm font-medium text-violet-400 group-hover:text-violet-300">LTX-2.3 Model Downloads →</p>
+          <p className="text-sm font-medium text-violet-400 group-hover:text-violet-300">LTX 2.3 Model Downloads →</p>
           <p className="text-xs text-gray-500 mt-0.5">All official checkpoints and FP8 variants</p>
         </Link>
         <Link href="/workflows" className="bg-gray-900 rounded-xl px-4 py-3 hover:bg-gray-800 transition-colors group">

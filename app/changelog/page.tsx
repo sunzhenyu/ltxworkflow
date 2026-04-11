@@ -3,7 +3,7 @@ import Nav from "@/components/Nav";
 
 export const metadata: Metadata = {
   title: "Changelog — LTX 2.3 Model & Tool Updates",
-  description: "Latest updates to ltx workflow: new LTX-2.3 model variants, ComfyUI node changes, and tool improvements.",
+  description: "Latest updates to ltx workflow: new LTX 2.3 model variants, ComfyUI node changes, and tool improvements.",
   alternates: { canonical: "https://ltxworkflow.com/changelog" },
 };
 
@@ -12,7 +12,7 @@ const entries = [
     date: "2026-04-08",
     title: "Site Launch",
     items: [
-      "Launched ltxworkflow.com with LTX-2.3 support",
+      "Launched ltxworkflow.com with LTX 2.3 support",
       "ComfyUI workflow JSON generator with official node names",
       "VRAM Adapter for 16GB / 24GB / 32GB GPUs",
       "AI prompt enhancer (gpt-5.2 via yunwu.ai)",
@@ -24,9 +24,9 @@ const entries = [
   },
   {
     date: "2026-04-01",
-    title: "LTX-2.3 Released by Lightricks",
+    title: "LTX 2.3 Released by Lightricks",
     items: [
-      "Official LTX-2.3 (22B parameters) released on HuggingFace",
+      "Official LTX 2.3 (22B parameters) released on HuggingFace",
       "Distilled variant: 8 steps, CFG=1, same quality as dev",
       "FP8 quantized variants by Kijai for 16GB VRAM (requires RTX 40xx+)",
       "New ComfyUI nodes: LTXVConditioning, LTXVScheduler, EmptyLTXVLatentVideo",
@@ -43,7 +43,7 @@ export default function ChangelogPage() {
 
       <section className="space-y-2">
         <h1 className="text-3xl font-extrabold">Changelog</h1>
-        <p className="text-gray-400">Updates to ltx workflow and LTX-2.3 model releases.</p>
+        <p className="text-gray-400">Updates to ltx workflow and LTX 2.3 model releases.</p>
       </section>
 
       <div className="space-y-6">

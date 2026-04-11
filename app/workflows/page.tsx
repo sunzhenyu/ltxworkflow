@@ -4,7 +4,7 @@ import Nav from "@/components/Nav";
 
 export const metadata: Metadata = {
   title: "LTX 2.3 ComfyUI Workflow Templates — T2V, I2V, Distilled",
-  description: "Download official LTX-2.3 ComfyUI workflow JSON templates. Text-to-video, image-to-video, single-stage and two-stage distilled pipelines.",
+  description: "Download official LTX 2.3 ComfyUI workflow JSON templates. Text-to-video, image-to-video, single-stage and two-stage distilled pipelines.",
   alternates: { canonical: "https://ltxworkflow.com/workflows" },
 };
 
