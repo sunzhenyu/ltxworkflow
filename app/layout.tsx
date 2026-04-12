@@ -4,22 +4,22 @@ import Providers from "@/components/Providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ComfyUI LTX 2.3 Workflow Generator — LoRA, FP8, GGUF",
-  description: "Generate ComfyUI workflow JSON for LTX 2.3 video model. Supports LTX 2.3 LoRA training, FP8 quantization, GGUF variants. Free tool for 16GB–32GB VRAM.",
-  keywords: "comfyui ltx 2.3, ltx 2.3 lora, ltx 2.3 gguf, comfyui, ltx ai",
+  title: "LTX 2.3 Model Download & ComfyUI Workflow Generator",
+  description: "Download LTX 2.3 models: taeltx2_3.safetensors VAE, FP8 variants for 16GB VRAM, official dev & distilled. Generate ComfyUI workflow JSON. Supports LTX 2.3 LoRA.",
+  keywords: "ltx 2.3 download, taeltx2_3.safetensors, comfyui ltx 2.3, ltx 2.3 lora, ltx 2.3 gguf, ltx 2.3 fp8",
   metadataBase: new URL("https://ltxworkflow.com"),
   alternates: { canonical: "https://ltxworkflow.com" },
   openGraph: {
-    title: "ComfyUI LTX 2.3 Workflow Generator — LoRA, FP8, GGUF",
-    description: "Generate ComfyUI workflow JSON for LTX 2.3. Supports LTX 2.3 LoRA, FP8, GGUF. Match GPU VRAM, enhance prompts with AI.",
+    title: "LTX 2.3 Model Download & ComfyUI Workflow Generator",
+    description: "Download taeltx2_3.safetensors, FP8 & distilled LTX 2.3 models. Generate ComfyUI workflow JSON for 16GB–32GB VRAM.",
     url: "https://ltxworkflow.com",
     siteName: "ltx workflow",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ComfyUI LTX 2.3 Workflow Generator",
-    description: "Generate ComfyUI workflow JSON for LTX 2.3. Supports LTX 2.3 LoRA, FP8, GGUF variants.",
+    title: "LTX 2.3 Model Download & ComfyUI Workflow Generator",
+    description: "Download taeltx2_3.safetensors, FP8 & distilled LTX 2.3 models. Generate ComfyUI workflow JSON.",
   },
 };
 

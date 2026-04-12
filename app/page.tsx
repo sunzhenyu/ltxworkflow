@@ -27,18 +27,19 @@ export default async function Home() {
 
       <section className="text-center space-y-4">
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-          <span className="text-violet-400">ComfyUI LTX 2.3</span> Workflow Generator
+          <span className="text-violet-400">LTX 2.3</span> Download & ComfyUI Workflow Generator
         </h1>
         <p className="text-gray-400 max-w-2xl mx-auto text-lg">
-          Generate ComfyUI workflow JSON for <strong className="text-gray-200">LTX 2.3</strong> video model.
-          Supports <strong className="text-gray-200">LTX 2.3 LoRA</strong> training, FP8 quantization, and GGUF variants.
-          Match your GPU VRAM, enhance prompts with AI.
+          Download <strong className="text-gray-200">LTX 2.3</strong> models —{" "}
+          <strong className="text-gray-200">taeltx2_3.safetensors</strong> VAE, FP8 distilled, and official checkpoints.
+          Generate <strong className="text-gray-200">ComfyUI LTX 2.3</strong> workflow JSON.
+          Supports LTX 2.3 LoRA, 16GB–32GB VRAM.
         </p>
         <div className="flex gap-3 justify-center flex-wrap text-sm text-gray-500">
+          <span className="bg-gray-800 px-3 py-1 rounded-full">taeltx2_3.safetensors</span>
           <span className="bg-gray-800 px-3 py-1 rounded-full">ComfyUI LTX 2.3</span>
           <span className="bg-gray-800 px-3 py-1 rounded-full">LTX 2.3 LoRA</span>
-          <span className="bg-gray-800 px-3 py-1 rounded-full">FP8 / GGUF</span>
-          <span className="bg-gray-800 px-3 py-1 rounded-full">16GB–32GB VRAM</span>
+          <span className="bg-gray-800 px-3 py-1 rounded-full">FP8 / 16GB VRAM</span>
         </div>
       </section>
 

@@ -4,8 +4,8 @@ import Nav from "@/components/Nav";
 import { MODELS } from "@/lib/models";
 
 export const metadata: Metadata = {
-  title: "LTX 2.3 Model Download — Dev, Distilled, FP8 Variants",
-  description: "Download LTX 2.3 models: official dev & distilled (32GB VRAM), FP8 quantized by Kijai (16GB VRAM). Includes VAE and spatial upscaler for ComfyUI.",
+  title: "LTX 2.3 Model Download — taeltx2_3.safetensors, FP8, Distilled",
+  description: "Download LTX 2.3 models for ComfyUI: taeltx2_3.safetensors (VAE), ltx-2.3-22b-distilled fp8 v3 (16GB), official dev & distilled (32GB). All HuggingFace links.",
   alternates: { canonical: "https://ltxworkflow.com/models" },
 };
 
@@ -19,7 +19,12 @@ export default function ModelsPage() {
 
       <section className="space-y-2">
         <h1 className="text-3xl font-extrabold">LTX 2.3 Model Downloads</h1>
-        <p className="text-gray-400">All official LTX 2.3 checkpoints and quantized variants. Choose based on your GPU VRAM.</p>
+        <p className="text-gray-400">
+          Download all LTX 2.3 model files for ComfyUI — including{" "}
+          <strong className="text-gray-200">taeltx2_3.safetensors</strong> (VAE, required),
+          FP8 distilled variants for 16GB VRAM, and official dev/distilled checkpoints.
+          All links go directly to HuggingFace.
+        </p>
       </section>
 
       <section className="space-y-3">
