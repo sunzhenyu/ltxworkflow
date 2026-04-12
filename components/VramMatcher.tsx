@@ -12,7 +12,7 @@ export default function VramMatcher() {
     <section className="bg-gray-900 rounded-xl p-6">
       <h2 className="text-xl font-bold mb-1">VRAM Adapter</h2>
       <p className="text-gray-400 text-sm mb-4">
-        Select your GPU VRAM to see compatible LTX 2.3 models:
+        Select your GPU VRAM to see recommended LTX 2.3 models and download links:
       </p>
       <div className="flex gap-2 flex-wrap mb-6">
         {VRAM_OPTIONS.map((v) => (
@@ -31,24 +31,29 @@ export default function VramMatcher() {
       </div>
       <div className="grid gap-3">
         {compatible.map((m) => (
-          <div key={m.id} className="flex items-center justify-between bg-gray-800 rounded-lg px-4 py-3">
-            <div>
-              <span className="font-medium text-sm">{m.name}</span>
-              <span className="ml-2 text-xs text-gray-400 font-mono">{m.filename}</span>
-              {m.badge && (
-                <span className="ml-2 text-xs bg-violet-700 text-violet-100 px-2 py-0.5 rounded-full">
-                  {m.badge}
-                </span>
-              )}
+          <div key={m.id} className="bg-gray-800 rounded-lg px-4 py-3 space-y-1.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-medium text-sm">{m.name}</span>
+                {m.badge && (
+                  <span className="text-xs bg-violet-700 text-violet-100 px-2 py-0.5 rounded-full">
+                    {m.badge}
+                  </span>
+                )}
+              </div>
+              <a
+                href={m.hfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-violet-400 hover:text-violet-300 shrink-0 ml-4"
+              >
+                Download →
+              </a>
             </div>
-            <a
-              href={m.hfUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-violet-400 hover:text-violet-300 shrink-0 ml-4"
-            >
-              HuggingFace →
-            </a>
+            <code className="text-xs text-green-400 font-mono break-all">{m.filename}</code>
+            {m.recommendation && (
+              <p className="text-xs text-gray-400">{m.recommendation}</p>
+            )}
           </div>
         ))}
         {compatible.length === 0 && (
