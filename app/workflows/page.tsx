@@ -60,46 +60,17 @@ export default function WorkflowsPage() {
           All workflows require <strong className="text-gray-200">taeltx2_3.safetensors</strong> (VAE) —{" "}
           <Link href="/models" className="text-violet-400 hover:text-violet-300 underline">download it here</Link> first.
         </p>
-      </section>
-
-      <section className="bg-gray-900 rounded-xl p-5 space-y-4 border border-violet-800">
-        <div className="flex items-center gap-2">
-          <span className="text-xs bg-violet-700 text-violet-100 px-2 py-0.5 rounded-full font-medium">Quick Pick</span>
-          <h2 className="text-sm font-bold text-gray-100">Which workflow should I use?</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {[
-            {
-              q: "First time with LTX 2.3?",
-              a: "Single Stage Distilled",
-              detail: "Fastest setup. Works on 16GB VRAM with FP8. T2V + I2V in one workflow.",
-            },
-            {
-              q: "Want higher resolution output?",
-              a: "Two Stage Distilled",
-              detail: "Generate at low res, then upscale 2× with the spatial upscaler model.",
-            },
-            {
-              q: "Have a LTX 2.3 LoRA?",
-              a: "ICLoRA Union Control",
-              detail: "Apply LoRA + control signal together. Use with a reference image.",
-            },
-            {
-              q: "Want to control motion paths?",
-              a: "ICLoRA Motion Track",
-              detail: "Draw motion trajectories to control how subjects move in the video.",
-            },
-          ].map((item) => (
-            <div key={item.q} className="bg-gray-800 rounded-lg px-4 py-3 space-y-1">
-              <p className="text-xs text-gray-400">{item.q}</p>
-              <p className="text-sm font-semibold text-violet-300">→ {item.a}</p>
-              <p className="text-xs text-gray-500">{item.detail}</p>
-            </div>
-          ))}
+        <div className="flex gap-3 pt-1">
+          <a href="#downloads" className="text-sm bg-violet-700 hover:bg-violet-600 text-white px-4 py-2 rounded-lg transition-colors font-medium">
+            Download Workflows ↓
+          </a>
+          <a href="#guide" className="text-sm bg-gray-800 hover:bg-gray-700 text-gray-200 px-4 py-2 rounded-lg transition-colors font-medium">
+            How to Choose ↓
+          </a>
         </div>
       </section>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div id="downloads" className="scroll-mt-8 grid grid-cols-1 sm:grid-cols-2 gap-5">
         {workflows.map((w) => (
           <div key={w.file} className="bg-gray-900 rounded-xl p-5 flex flex-col gap-3">
             <div className="space-y-1">
@@ -139,6 +110,27 @@ export default function WorkflowsPage() {
           </div>
         ))}
       </div>
+
+      <section id="guide" className="scroll-mt-8 bg-gray-900 rounded-xl p-5 space-y-4 border border-violet-800">
+        <div className="flex items-center gap-2">
+          <span className="text-xs bg-violet-700 text-violet-100 px-2 py-0.5 rounded-full font-medium">How to Choose</span>
+          <h2 className="text-base font-bold text-gray-100">Which workflow should I use?</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {[
+            { q: "First time with LTX 2.3?", a: "Single Stage Distilled", detail: "Fastest setup. Works on 16GB VRAM with FP8. T2V + I2V in one workflow." },
+            { q: "Want higher resolution output?", a: "Two Stage Distilled", detail: "Generate at low res, then upscale 2× with the spatial upscaler model." },
+            { q: "Have a LTX 2.3 LoRA?", a: "ICLoRA Union Control", detail: "Apply LoRA + control signal together. Use with a reference image." },
+            { q: "Want to control motion paths?", a: "ICLoRA Motion Track", detail: "Draw motion trajectories to control how subjects move in the video." },
+          ].map((item) => (
+            <div key={item.q} className="bg-gray-800 rounded-lg px-4 py-3 space-y-1">
+              <p className="text-xs text-gray-400">{item.q}</p>
+              <p className="text-sm font-semibold text-violet-300">→ {item.a}</p>
+              <p className="text-xs text-gray-500">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <div className="bg-gray-900 rounded-xl p-5 space-y-2">
         <h2 className="font-bold text-sm">Custom Workflow Generator</h2>
