@@ -44,9 +44,9 @@ export default async function Home() {
       </section>
 
       <VramMatcher />
+      <ModelCards />
       <PromptEnhancer />
       <WorkflowBuilder />
-      <ModelCards />
 
       <section className="border-t border-gray-800 pt-8">
         <h2 className="text-lg font-bold mb-4">Official Resources</h2>
