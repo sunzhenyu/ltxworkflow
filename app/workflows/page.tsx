@@ -62,6 +62,43 @@ export default function WorkflowsPage() {
         </p>
       </section>
 
+      <section className="bg-gray-900 rounded-xl p-5 space-y-4 border border-violet-800">
+        <div className="flex items-center gap-2">
+          <span className="text-xs bg-violet-700 text-violet-100 px-2 py-0.5 rounded-full font-medium">Quick Pick</span>
+          <h2 className="text-sm font-bold text-gray-100">Which workflow should I use?</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {[
+            {
+              q: "First time with LTX 2.3?",
+              a: "Single Stage Distilled",
+              detail: "Fastest setup. Works on 16GB VRAM with FP8. T2V + I2V in one workflow.",
+            },
+            {
+              q: "Want higher resolution output?",
+              a: "Two Stage Distilled",
+              detail: "Generate at low res, then upscale 2× with the spatial upscaler model.",
+            },
+            {
+              q: "Have a LTX 2.3 LoRA?",
+              a: "ICLoRA Union Control",
+              detail: "Apply LoRA + control signal together. Use with a reference image.",
+            },
+            {
+              q: "Want to control motion paths?",
+              a: "ICLoRA Motion Track",
+              detail: "Draw motion trajectories to control how subjects move in the video.",
+            },
+          ].map((item) => (
+            <div key={item.q} className="bg-gray-800 rounded-lg px-4 py-3 space-y-1">
+              <p className="text-xs text-gray-400">{item.q}</p>
+              <p className="text-sm font-semibold text-violet-300">→ {item.a}</p>
+              <p className="text-xs text-gray-500">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {workflows.map((w) => (
           <div key={w.file} className="bg-gray-900 rounded-xl p-5 flex flex-col gap-3">
@@ -102,16 +139,6 @@ export default function WorkflowsPage() {
           </div>
         ))}
       </div>
-
-      <section className="bg-gray-900 rounded-xl p-5 space-y-2">
-        <h2 className="font-bold text-sm">Which workflow should I use?</h2>
-        <ul className="text-xs text-gray-400 space-y-1.5">
-          <li><strong className="text-gray-200">First time with LTX 2.3?</strong> → Start with <span className="text-violet-400">Single Stage Distilled</span>. Fastest setup, works on 16GB VRAM.</li>
-          <li><strong className="text-gray-200">Want higher resolution output?</strong> → Use <span className="text-violet-400">Two Stage Distilled</span> with the spatial upscaler.</li>
-          <li><strong className="text-gray-200">Have a LTX 2.3 LoRA?</strong> → Use <span className="text-violet-400">ICLoRA Union Control</span> to apply it with image conditioning.</li>
-          <li><strong className="text-gray-200">Want motion control?</strong> → Use <span className="text-violet-400">ICLoRA Motion Track</span> to define movement trajectories.</li>
-        </ul>
-      </section>
 
       <div className="bg-gray-900 rounded-xl p-5 space-y-2">
         <h2 className="font-bold text-sm">Custom Workflow Generator</h2>

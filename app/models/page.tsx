@@ -11,21 +11,25 @@ export const metadata: Metadata = {
 
 const VRAM_GROUPS = [
   {
+    id: "16gb",
     label: "16GB VRAM — FP8 Quantized (RTX 40xx+)",
     ids: ["ltx23-distilled-fp8", "ltx23-dev-fp8"],
     note: "Requires RTX 40-series or newer for fp8 matrix multiplication. Use Distilled for fastest generation; use Dev if applying LoRA weights.",
   },
   {
+    id: "24gb",
     label: "24GB VRAM — Official + Sequential Offloading",
     ids: ["ltx23-distilled-fp8-24gb"],
     note: "Enable sequential offloading in ComfyUI settings (Model Offload or Sequential). Slower than 32GB but uses full-quality official weights.",
   },
   {
+    id: "32gb",
     label: "32GB VRAM — Official Full Precision",
     ids: ["ltx23-dev", "ltx23-distilled"],
     note: "Official Lightricks checkpoints at full bf16 precision. Distilled is recommended for most use cases (8 steps, CFG=1).",
   },
   {
+    id: "required",
     label: "Required for All Setups",
     ids: ["ltx23-vae", "ltx23-spatial-upscaler"],
     note: "Download taeltx2_3.safetensors (VAE) regardless of your VRAM — all ComfyUI workflows require it. Spatial upscaler is optional.",
@@ -48,10 +52,46 @@ export default function ModelsPage() {
         </p>
       </section>
 
+      {/* Official model selection guide */}
+      <section className="bg-gray-900 rounded-xl p-5 space-y-4 border border-gray-800">
+        <div className="flex items-center gap-2">
+          <span className="text-xs bg-violet-700 text-violet-100 px-2 py-0.5 rounded-full font-medium">Official Guide</span>
+          <h2 className="text-sm font-bold text-gray-100">How to choose the right model</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-400">
+          <div className="space-y-1">
+            <p className="font-medium text-gray-200">Distilled vs Dev</p>
+            <p><strong className="text-gray-300">Distilled</strong> — 8 steps, CFG=1. Recommended for most users. Fastest generation, high quality. Cannot be fine-tuned.</p>
+            <p><strong className="text-gray-300">Dev</strong> — Full model. Use only if you need LoRA training or fine-tuning. Slower, more flexible.</p>
+          </div>
+          <div className="space-y-1">
+            <p className="font-medium text-gray-200">FP8 vs Full Precision</p>
+            <p><strong className="text-gray-300">FP8 (Kijai)</strong> — Quantized to 8-bit float. Runs on 16GB VRAM. Requires RTX 40xx+ for hardware fp8 support. Slight quality trade-off.</p>
+            <p><strong className="text-gray-300">Full bf16</strong> — Official Lightricks weights. Best quality. Needs 32GB VRAM, or 24GB with sequential offloading.</p>
+          </div>
+          <div className="space-y-1">
+            <p className="font-medium text-gray-200">Quick decision</p>
+            <ul className="space-y-0.5">
+              <li>→ <strong className="text-gray-300">16GB, RTX 40xx+:</strong> Distilled FP8 v3</li>
+              <li>→ <strong className="text-gray-300">16GB + LoRA:</strong> Dev FP8</li>
+              <li>→ <strong className="text-gray-300">24GB:</strong> Official Distilled + offloading</li>
+              <li>→ <strong className="text-gray-300">32GB+:</strong> Official Distilled (recommended)</li>
+            </ul>
+          </div>
+          <div className="space-y-1">
+            <p className="font-medium text-gray-200">Always required</p>
+            <p><strong className="text-gray-300">taeltx2_3.safetensors</strong> (VAE) — place in <code className="text-green-400">models/vae/</code>. Every workflow needs this regardless of which checkpoint you use.</p>
+            <a href="https://github.com/Lightricks/ComfyUI-LTXVideo" target="_blank" rel="noopener noreferrer" className="text-violet-400 hover:text-violet-300 underline">
+              Official ComfyUI-LTXVideo README →
+            </a>
+          </div>
+        </div>
+      </section>
+
       {VRAM_GROUPS.map((group) => {
         const models = group.ids.map((id) => modelMap[id]).filter(Boolean);
         return (
-          <section key={group.label} className="space-y-3">
+          <section key={group.label} id={group.id} className="space-y-3 scroll-mt-8">
             <div>
               <h2 className="text-base font-bold text-gray-100">{group.label}</h2>
               <p className="text-xs text-gray-500 mt-0.5">{group.note}</p>
