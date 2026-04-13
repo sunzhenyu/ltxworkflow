@@ -3,7 +3,6 @@ import Link from "next/link";
 export default function ModelCards() {
   return (
     <section className="space-y-3">
-      <h2 className="text-xl font-bold">LTX 2.3 Models & Workflows</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="bg-gray-900 rounded-xl p-6 flex flex-col gap-3">
           <div>
