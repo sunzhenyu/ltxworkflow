@@ -70,10 +70,10 @@ export default async function Home() {
 
       <footer className="border-t border-gray-800 pt-8 text-sm text-gray-500 space-y-2">
         <p>
-          <strong className="text-gray-400">LTX 2.3</strong> is an open-source video generation model by Lightricks.
-          Configure <strong className="text-gray-400">taeltx2_3.safetensors</strong>, generate ComfyUI workflow JSON,
-          and optimize LTX 2.3 for 16GB+ VRAM with FP8 quantization. Supports{" "}
-          <strong className="text-gray-400">spatial upscaler x2</strong> and all official variants.
+          Download <strong className="text-gray-400">LTX 2.3</strong> models for ComfyUI —{" "}
+          <strong className="text-gray-400">taeltx2_3.safetensors</strong> (VAE, required),{" "}
+          <strong className="text-gray-400">ltx-2.3-22b-distilled_transformer_only_fp8_input_scaled_v3.safetensors</strong> (16GB FP8),
+          and official full-precision checkpoints (32GB). Generate ComfyUI workflow JSON for LTX 2.3 text-to-video and image-to-video.
         </p>
         <p className="text-xs text-gray-600">ltx workflow — Not affiliated with Lightricks.</p>
       </footer>
