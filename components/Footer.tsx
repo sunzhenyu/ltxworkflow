@@ -11,6 +11,7 @@ export default function Footer() {
       </p>
 
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
+        <Link href="/feedback" className="hover:text-gray-400 transition-colors">Feedback</Link>
         <Link href="/changelog" className="hover:text-gray-400 transition-colors">Changelog</Link>
         <Link href="/privacy" className="hover:text-gray-400 transition-colors">Privacy Policy</Link>
         <Link href="/terms" className="hover:text-gray-400 transition-colors">Terms of Service</Link>

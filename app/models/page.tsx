@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import { MODELS } from "@/lib/models";
 
 export const metadata: Metadata = {
@@ -154,6 +155,8 @@ export default function ModelsPage() {
           <p className="text-xs text-gray-500 mt-0.5">Download ComfyUI workflow JSON for LTX 2.3</p>
         </Link>
       </div>
+
+      <Footer />
     </main>
   );
 }

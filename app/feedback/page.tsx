@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import FeedbackForm from "@/components/FeedbackForm";
 
 export const metadata: Metadata = {
@@ -45,6 +46,8 @@ export default function FeedbackPage() {
           ))}
         </ul>
       </div>
+
+      <Footer />
     </main>
   );
 }

@@ -5,6 +5,7 @@ import SavedWorkflows from "@/components/dashboard/SavedWorkflows";
 import AdvancedWorkflowBuilder from "@/components/dashboard/AdvancedWorkflowBuilder";
 import UserMenu from "@/components/UserMenu";
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -31,6 +32,8 @@ export default async function DashboardPage() {
 
       <AdvancedWorkflowBuilder userId={session.user?.id ?? ""} />
       <SavedWorkflows userId={session.user?.id ?? ""} />
+
+      <Footer />
     </main>
   );
 }

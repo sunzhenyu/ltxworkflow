@@ -19,7 +19,14 @@
       "Bash(git push:*)",
       "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); [print\\(s['rfilename']\\) for s in data.get\\('siblings',[]\\) if s['rfilename'].endswith\\('.safetensors'\\)]\")",
       "Bash(find app:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Read(//tmp/**)",
+      "Bash(chmod +x:*)",
+      "Bash(export NEXT_PUBLIC_SUPABASE_URL=https://zivfvqaodrdfdifdashi.supabase.co)",
+      "Bash(export SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InppdmZ2cWFvZHJkZmRpZmRhc2hpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTU0MjY5OSwiZXhwIjoyMDkxMTE4Njk5fQ.HhjiE78YelQZoigSKJTsb67dFZtfOuFC1mK9IaUkDcU)",
+      "Bash(npx supabase:*)",
+      "Bash(psql:*)",
+      "Bash(grep -l \"import Footer\" app/**/*.tsx)"
     ]
   }
 }

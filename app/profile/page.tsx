@@ -1,5 +1,6 @@
 import Logo from "@/components/Logo";
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -49,6 +50,8 @@ export default async function ProfilePage() {
           </Link>
         </div>
       </section>
+
+      <Footer />
     </main>
   );
 }

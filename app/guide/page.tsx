@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "LTX 2.3 ComfyUI Setup Guide — Install & Run LTX 2.3",
@@ -132,6 +133,8 @@ export default function GuidePage() {
           </button>
         </Link>
       </div>
+
+      <Footer />
     </main>
   );
 }

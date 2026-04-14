@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "LTX 2.3 ComfyUI Workflow JSON Download — T2V, I2V, LoRA, Two-Stage",
@@ -143,6 +144,8 @@ export default function WorkflowsPage() {
           </button>
         </Link>
       </div>
+
+      <Footer />
     </main>
   );
 }

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Nav from "@/components/Nav";
 
 export const metadata: Metadata = {
-  title: "Changelog — LTX 2.3 Model & Tool Updates",
+  title: "Release Notes — LTX 2.3 Model & Tool Updates",
   description: "Latest updates to ltx workflow: new LTX 2.3 model variants, ComfyUI node changes, and tool improvements.",
   alternates: { canonical: "https://ltxworkflow.com/changelog" },
 };
@@ -10,9 +10,8 @@ export const metadata: Metadata = {
 const entries = [
   {
     date: "2026-04-13",
-    title: "SEO Optimization & UX Improvements",
+    title: "UX Improvements",
     items: [
-      "SEO: Added download intent to all TDK — taeltx2_3.safetensors, FP8 filenames in meta descriptions",
       "Homepage: Replaced model grid with two-button entry cards (Models / Workflows)",
       "Models page: Added 'How to Choose' official guide (Distilled vs Dev, FP8 vs bf16)",
       "Models page: Separated 16GB/24GB/32GB models with VRAM-specific recommendations",
@@ -28,7 +27,7 @@ const entries = [
       "Launched ltxworkflow.com with LTX 2.3 support",
       "ComfyUI workflow JSON generator with official node names",
       "VRAM Adapter for 16GB / 24GB / 32GB GPUs",
-      "AI prompt enhancer (gpt-5.2 via yunwu.ai)",
+      "AI prompt enhancer",
       "Model downloads: dev, distilled, FP8 (Kijai), VAE, spatial upscaler",
       "Google OAuth + email/password authentication",
       "Cloud workflow save via Supabase",
@@ -55,7 +54,7 @@ export default function ChangelogPage() {
       <Nav />
 
       <section className="space-y-2">
-        <h1 className="text-3xl font-extrabold">Changelog</h1>
+        <h1 className="text-3xl font-extrabold">Release Notes</h1>
         <p className="text-gray-400">Updates to ltx workflow and LTX 2.3 model releases.</p>
       </section>
 
