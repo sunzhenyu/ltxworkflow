@@ -7,7 +7,7 @@ const links = [
   { href: "/guide", label: "Guide" },
   { href: "/models", label: "Models" },
   { href: "/workflows", label: "Workflows" },
-  { href: "/changelog", label: "Changelog" },
+  { href: "/blog", label: "Blog" },
   { href: "/feedback", label: "Feedback" },
 ];
 

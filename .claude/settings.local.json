@@ -18,7 +18,8 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); [print\\(s['rfilename']\\) for s in data.get\\('siblings',[]\\) if s['rfilename'].endswith\\('.safetensors'\\)]\")",
-      "Bash(find app:*)"
+      "Bash(find app:*)",
+      "mcp__ide__getDiagnostics"
     ]
   }
 }
