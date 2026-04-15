@@ -63,8 +63,6 @@ export default async function BlogPage() {
                     {post.category}
                   </span>
                   <span className="text-gray-500">{date}</span>
-                  <span className="text-gray-500">·</span>
-                  <span className="text-gray-500">{post.read_time_minutes} min</span>
                 </div>
                 <h2 className="font-bold text-base text-gray-100 group-hover:text-violet-300 transition-colors">
                   {post.title}

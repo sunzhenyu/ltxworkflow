@@ -26,7 +26,13 @@
       "Bash(export SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InppdmZ2cWFvZHJkZmRpZmRhc2hpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTU0MjY5OSwiZXhwIjoyMDkxMTE4Njk5fQ.HhjiE78YelQZoigSKJTsb67dFZtfOuFC1mK9IaUkDcU)",
       "Bash(npx supabase:*)",
       "Bash(psql:*)",
-      "Bash(grep -l \"import Footer\" app/**/*.tsx)"
+      "Bash(grep -l \"import Footer\" app/**/*.tsx)",
+      "WebFetch(domain:crepal.ai)",
+      "WebFetch(domain:docs.comfy.org)",
+      "WebFetch(domain:wavespeed.ai)",
+      "WebFetch(domain:www.genaintel.com)",
+      "WebFetch(domain:aistudynow.com)",
+      "Bash(python3 -c ':*)"
     ]
   }
 }

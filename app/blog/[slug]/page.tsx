@@ -97,10 +97,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               {post.category}
             </span>
             <span className="text-gray-500">{publishedDate}</span>
-            <span className="text-gray-500">·</span>
-            <span className="text-gray-500">{post.read_time_minutes} min read</span>
-            <span className="text-gray-500">·</span>
-            <span className="text-gray-500">{post.view_count} views</span>
           </div>
           <h1 className="text-4xl font-extrabold text-gray-100">{post.title}</h1>
           <p className="text-lg text-gray-400">{post.excerpt}</p>

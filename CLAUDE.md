@@ -24,15 +24,18 @@
 执行以下步骤：
 
 1. 询问用户选择分类：Tutorial, Comparison, Guide, Tips, News
-2. 根据分类自动生成合适的标题（关于 LTX 2.3 的内容）
-   - 可以参考 https://ltx.studio/blog 的文章风格和主题
-   - 标题应该实用、具体、吸引人
-3. 执行命令生成文章：
+2. 根据分类和主题，用 WebSearch 搜索相关权威内容（英文搜索词），找到 3-5 个高质量来源
+3. 用 `curl -s "URL" | python3 -c "import sys,re; html=sys.stdin.read(); text=re.sub(r'<[^>]+>',' ',re.sub(r'<script.*?</script>','',re.sub(r'<style.*?</style>','',html,flags=re.DOTALL),flags=re.DOTALL)); print(re.sub(r'\s+',' ',text).strip()[:5000])"` 抓取每个来源的正文内容
+4. 基于真实抓取的内容，生成高质量文章，要求：
+   - 内容准确、有深度，基于真实数据
+   - 文章末尾必须有 "## Sources" 章节，列出所有参考来源的标题和链接（Markdown 格式）
+   - 标题实用、具体、包含目标关键词
+5. 写一个临时 Node.js 脚本直接插入 Supabase，执行后删除脚本：
    ```bash
    export NEXT_PUBLIC_SUPABASE_URL=https://zivfvqaodrdfdifdashi.supabase.co
    export SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InppdmZ2cWFvZHJkZmRpZmRhc2hpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTU0MjY5OSwiZXhwIjoyMDkxMTE4Njk5fQ.HhjiE78YelQZoigSKJTsb67dFZtfOuFC1mK9IaUkDcU
-   node skills/create-blog-post.js "生成的标题" Category
+   node /tmp/insert-blog-post.js
    ```
-4. 报告生成结果和访问链接
+6. 报告生成结果和访问链接
 
 
