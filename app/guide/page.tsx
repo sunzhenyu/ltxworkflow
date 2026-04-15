@@ -4,9 +4,15 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "LTX 2.3 ComfyUI Setup Guide — Install & Run LTX 2.3",
-  description: "Step-by-step guide to install LTX 2.3 with ComfyUI. Download models, configure nodes, and generate AI videos on 16GB–32GB VRAM GPUs.",
+  title: "How to Install LTX 2.3 with ComfyUI — Complete Setup Guide (16GB-32GB VRAM)",
+  description: "Complete step-by-step guide to install and run LTX 2.3 with ComfyUI. Download taeltx2_3.safetensors, install nodes, configure settings for 16GB or 32GB VRAM. Generate AI videos in minutes.",
   alternates: { canonical: "https://ltxworkflow.com/guide" },
+  openGraph: {
+    title: "LTX 2.3 ComfyUI Installation Guide — Easy Setup",
+    description: "Learn how to install LTX 2.3 with ComfyUI. Step-by-step instructions for downloading models and generating videos.",
+    url: "https://ltxworkflow.com/guide",
+    type: "article",
+  },
 };
 
 const steps = [

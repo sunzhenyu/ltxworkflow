@@ -5,9 +5,15 @@ import Footer from "@/components/Footer";
 import { MODELS } from "@/lib/models";
 
 export const metadata: Metadata = {
-  title: "LTX 2.3 Model Download — taeltx2_3.safetensors, FP8, Distilled",
-  description: "Download LTX 2.3 models for ComfyUI: taeltx2_3.safetensors (VAE), ltx-2.3-22b-distilled fp8 v3 (16GB), official dev & distilled (32GB). All HuggingFace links.",
+  title: "Download LTX 2.3 Models Free — taeltx2_3.safetensors, FP8, Direct Links",
+  description: "Free direct download links for all LTX 2.3 ComfyUI models. Get taeltx2_3.safetensors (VAE), FP8 quantized (16GB VRAM), and official checkpoints (32GB). Organized by GPU requirements with installation guide.",
   alternates: { canonical: "https://ltxworkflow.com/models" },
+  openGraph: {
+    title: "Download LTX 2.3 Models Free — All Variants",
+    description: "Direct HuggingFace links to taeltx2_3.safetensors, FP8, and official LTX 2.3 models for ComfyUI",
+    url: "https://ltxworkflow.com/models",
+    type: "website",
+  },
 };
 
 const VRAM_GROUPS = [
@@ -42,14 +48,29 @@ export default function ModelsPage() {
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "LTX 2.3 Models",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Windows, Linux",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "description": "Free LTX 2.3 AI video generation models for ComfyUI. Includes taeltx2_3.safetensors VAE, FP8 quantized models for 16GB VRAM, and official checkpoints.",
+        "downloadUrl": "https://ltxworkflow.com/models",
+        "softwareRequirements": "ComfyUI, CUDA GPU with 16GB+ VRAM"
+      })}} />
       <Nav activeHref="/models" />
 
       <section className="space-y-2">
-        <h1 className="text-3xl font-extrabold">LTX 2.3 Model Downloads</h1>
+        <h1 className="text-3xl font-extrabold">Free LTX 2.3 Model Downloads — Direct Links</h1>
         <p className="text-gray-400">
-          All LTX 2.3 model files for ComfyUI — grouped by GPU VRAM. Start with{" "}
-          <strong className="text-gray-200">taeltx2_3.safetensors</strong> (VAE, required for every setup),
-          then choose a checkpoint based on your VRAM. All links go directly to HuggingFace.
+          Download all LTX 2.3 model files for ComfyUI with direct HuggingFace links — organized by GPU VRAM.
+          Start with <strong className="text-gray-200">taeltx2_3.safetensors</strong> (VAE, required for all setups),
+          then choose a checkpoint: FP8 quantized for 16GB VRAM or official full precision for 32GB+.
         </p>
         <div className="flex gap-3 pt-1">
           <a href="#downloads" className="text-sm bg-violet-700 hover:bg-violet-600 text-white px-4 py-2 rounded-lg transition-colors font-medium">
@@ -60,6 +81,25 @@ export default function ModelsPage() {
           </a>
         </div>
       </section>
+
+      {/* Quick Start Guide */}
+      <div className="bg-gradient-to-r from-violet-900/30 to-purple-900/30 border border-violet-700/50 rounded-xl p-5 space-y-3">
+        <h2 className="text-lg font-bold text-violet-300">Quick Start: 3 Steps to Get Running</h2>
+        <ol className="space-y-2 text-sm text-gray-300">
+          <li className="flex gap-2">
+            <span className="text-violet-400 font-bold shrink-0">1.</span>
+            <span>Download <strong>taeltx2_3.safetensors</strong> (VAE) — required for all workflows</span>
+          </li>
+          <li className="flex gap-2">
+            <span className="text-violet-400 font-bold shrink-0">2.</span>
+            <span>Choose your checkpoint: <strong>FP8 v3</strong> (16GB VRAM) or <strong>Official Distilled</strong> (32GB VRAM)</span>
+          </li>
+          <li className="flex gap-2">
+            <span className="text-violet-400 font-bold shrink-0">3.</span>
+            <span>Place files in ComfyUI folders: VAE → <code className="text-green-400 bg-gray-900 px-1.5 py-0.5 rounded">models/vae/</code>, Checkpoint → <code className="text-green-400 bg-gray-900 px-1.5 py-0.5 rounded">models/checkpoints/</code></span>
+          </li>
+        </ol>
+      </div>
 
       {/* Downloads section */}
       <div id="downloads" className="scroll-mt-8 space-y-8">
