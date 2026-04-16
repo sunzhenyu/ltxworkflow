@@ -12,33 +12,102 @@
 4. 如果有新模型：列出新内容，询问是否更新 `models.ts` 和 `app/changelog/page.tsx`
 5. 如果没有新内容：报告"No updates found"
 
+## 通用内容生成流程（博客 & Resources）
+
+所有内容生成（博客、Tutorials、Community、Showcase、Research、Tools）共用以下流程：
+
+### 抓取内容
+1. 用 WebSearch 搜索主题，**只选 1-2 篇**最权威的来源（不要多）
+2. 用 curl 抓取正文：
+   ```bash
+   curl -s "URL" | python3 -c "import sys,re; html=sys.stdin.read(); text=re.sub(r'<[^>]+>',' ',re.sub(r'<script.*?</script>','',re.sub(r'<style.*?</style>','',html,flags=re.DOTALL),flags=re.DOTALL)); print(re.sub(r'\s+',' ',text).strip()[:5000])"
+   ```
+3. 基于抓取内容生成高质量文章：
+   - 内容准确、有深度，基于真实数据
+   - 文章末尾必须有 `## Sources` 章节，只列 1-2 篇来源（标题 + 链接）
+   - 标题实用、具体、包含目标关键词
+
+### 插入数据库
+写临时 Node.js 脚本到 `scripts/` 目录，执行后删除：
+```bash
+export NEXT_PUBLIC_SUPABASE_URL=https://zivfvqaodrdfdifdashi.supabase.co
+export SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InppdmZ2cWFvZHJkZmRpZmRhc2hpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTU0MjY5OSwiZXhwIjoyMDkxMTE4Njk5fQ.HhjiE78YelQZoigSKJTsb67dFZtfOuFC1mK9IaUkDcU
+node scripts/insert-content.js && rm scripts/insert-content.js
+```
+
+---
+
 ## 添加博客文章
 
-当用户说以下任何一个触发词时：
-- "create blog"
-- "add blog"
-- "添加博客"
-- "写博客"
-- "生成博客"
+触发词：`create blog` / `add blog` / `添加博客` / `写博客` / `生成博客`
 
-执行以下步骤：
-
-1. **自主选择分类**，从以下分类中随机选一个，不需要询问用户：
-   Tutorial, Guide, Tips, Comparison, News, Deep Dive, Case Study, FAQ
-2. 根据分类自主决定一个关于 LTX 2.3 的具体主题和标题
-3. 用 WebSearch 搜索该主题，**只选 2 篇**最权威的来源
-4. 用 curl 抓取这 2 篇文章正文：
-   `curl -s "URL" | python3 -c "import sys,re; html=sys.stdin.read(); text=re.sub(r'<[^>]+>',' ',re.sub(r'<script.*?</script>','',re.sub(r'<style.*?</style>','',html,flags=re.DOTALL),flags=re.DOTALL)); print(re.sub(r'\s+',' ',text).strip()[:5000])"`
-5. 基于抓取内容生成高质量文章，要求：
-   - 内容准确、有深度，基于真实数据
-   - 文章末尾必须有 "## Sources" 章节，只列这 2 篇来源（标题 + 链接）
-   - 标题实用、具体、包含目标关键词
-6. 写临时 Node.js 脚本插入 Supabase，执行后删除：
-   ```bash
-   export NEXT_PUBLIC_SUPABASE_URL=https://zivfvqaodrdfdifdashi.supabase.co
-   export SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InppdmZ2cWFvZHJkZmRpZmRhc2hpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTU0MjY5OSwiZXhwIjoyMDkxMTE4Njk5fQ.HhjiE78YelQZoigSKJTsb67dFZtfOuFC1mK9IaUkDcU
-   node scripts/insert-blog-post.js && rm scripts/insert-blog-post.js
+1. **自主选择分类**（随机，不询问用户）：Tutorial, Guide, Tips, Comparison, News, Deep Dive, Case Study, FAQ
+2. 自主决定关于 LTX 2.3 的具体主题和标题
+3. 按通用流程抓取内容并生成文章
+4. 插入 `blog_posts` 表，字段：
+   ```js
+   { slug, title, excerpt, content, category, tags, author_name: 'ltx workflow',
+     read_time_minutes: 5, published_at: new Date().toISOString(), is_published: true,
+     seo_title, seo_description }
    ```
-7. 报告生成结果和访问链接
+5. 报告访问链接：`https://ltxworkflow.com/blog/{slug}`
 
+---
 
+## 添加 Tutorials
+
+触发词：`add tutorial` / `添加教程`
+
+1. 自主决定一个 LTX 2.3 实操教程主题
+2. 按通用流程抓取内容并生成文章
+3. 插入 `tutorials` 表，字段：
+   ```js
+   { slug, title, excerpt, content, tags, author_name: 'ltx workflow',
+     source_url, source_title, source_published_at,
+     is_published: true, seo_title, seo_description }
+   ```
+4. 报告访问链接：`https://ltxworkflow.com/resources/tutorials/{slug}`
+
+---
+
+## 添加 Community
+
+触发词：`add community` / `添加社区`
+
+1. 用 WebSearch 搜索 Reddit/Discord 上关于 LTX 2.3 的热门讨论
+2. 按通用流程抓取内容并整理成摘要文章
+3. 插入 `community` 表，字段同 tutorials
+4. 报告访问链接：`https://ltxworkflow.com/resources/community/{slug}`
+
+---
+
+## 添加 Showcase
+
+触发词：`add showcase` / `添加案例`
+
+1. 用 WebSearch 搜索 LTX 2.3 优秀视频生成案例
+2. 按通用流程整理成展示文章（描述生成效果、使用的参数/工作流）
+3. 插入 `showcase` 表，字段同 tutorials
+4. 报告访问链接：`https://ltxworkflow.com/resources/showcase/{slug}`
+
+---
+
+## 添加 Research
+
+触发词：`add research` / `添加论文`
+
+1. 用 WebSearch 搜索 arxiv 上关于 LTX / 视频生成的最新论文
+2. 按通用流程生成论文解读文章（摘要、核心贡献、与 LTX 2.3 的关联）
+3. 插入 `research` 表，字段同 tutorials，`source_published_at` 用论文发布日期
+4. 报告访问链接：`https://ltxworkflow.com/resources/research/{slug}`
+
+---
+
+## 添加 Tools
+
+触发词：`add tool` / `添加工具`
+
+1. 用 WebSearch 搜索 ComfyUI 节点、插件或 LTX 2.3 相关工具
+2. 按通用流程生成工具介绍文章（功能、安装方式、使用场景）
+3. 插入 `tools` 表，字段同 tutorials
+4. 报告访问链接：`https://ltxworkflow.com/resources/tools/{slug}`

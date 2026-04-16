@@ -11,7 +11,11 @@ const links = [
     label: "Resources",
     submenu: [
       { href: "/blog", label: "Blog" },
-      { href: "/changelog", label: "Release Notes" },
+      { href: "/resources/tutorials", label: "Tutorials" },
+      { href: "/resources/community", label: "Community" },
+      { href: "/resources/showcase", label: "Showcase" },
+      { href: "/resources/research", label: "Research" },
+      { href: "/resources/tools", label: "Tools" },
     ]
   },
 ];
