@@ -26,8 +26,8 @@ export default function FeedbackPage() {
       <div className="bg-gray-900 rounded-xl p-5 space-y-2">
         <h2 className="font-bold">Email Us</h2>
         <p className="text-sm text-gray-400">Prefer email? Reach us at:</p>
-        <a href="mailto:kuyadan136@gmail.com" className="text-violet-400 hover:text-violet-300 text-sm">
-          kuyadan136@gmail.com
+        <a href="mailto:support@ltxworkflow.com" className="text-violet-400 hover:text-violet-300 text-sm">
+          support@ltxworkflow.com
         </a>
       </div>
 
