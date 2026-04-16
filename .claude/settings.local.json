@@ -32,7 +32,8 @@
       "WebFetch(domain:wavespeed.ai)",
       "WebFetch(domain:www.genaintel.com)",
       "WebFetch(domain:aistudynow.com)",
-      "Bash(python3 -c ':*)"
+      "Bash(python3 -c ':*)",
+      "Bash(wait)"
     ]
   }
 }
