@@ -53,7 +53,16 @@ export default function NavClient({ links, activeHref, session }: { links: NavLi
               </Link>
             );
           })}
-          {session && <UserMenu email={session.user?.email || ""} name={session.user?.name} />}
+          {session ? (
+            <UserMenu email={session.user?.email || ""} name={session.user?.name} />
+          ) : (
+            <Link
+              href="/sign-in"
+              className="bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium px-4 py-1.5 rounded-lg transition-colors"
+            >
+              Sign In
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -106,11 +115,21 @@ export default function NavClient({ links, activeHref, session }: { links: NavLi
               </Link>
             );
           })}
-          {session && (
-            <div className="border-t border-gray-800 mt-2 pt-2">
-              <UserMenu email={session.user?.email || ""} name={session.user?.name} />
-            </div>
-          )}
+          {session ? (
+              <div className="border-t border-gray-800 mt-2 pt-2">
+                <UserMenu email={session.user?.email || ""} name={session.user?.name} />
+              </div>
+            ) : (
+              <div className="border-t border-gray-800 mt-2 pt-2 px-4">
+                <Link
+                  href="/sign-in"
+                  className="block text-sm text-violet-400 hover:text-violet-300 py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Sign In
+                </Link>
+              </div>
+            )}
         </div>
       )}
     </>
