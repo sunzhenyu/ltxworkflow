@@ -9,6 +9,25 @@ export const metadata: Metadata = {
 
 const entries = [
   {
+    date: "2026-04-16",
+    title: "Blog System & SEO Improvements",
+    items: [
+      "Blog: Added dynamic sitemap.xml — all published posts now indexed by Google automatically",
+      "Blog: Removed fake read time and view count from list and detail pages",
+      "Blog: Aligned detail page width with other pages (max-w-6xl)",
+      "Blog: Added Sources section to all posts for content credibility",
+      "Blog: Published 4 new articles (taeltx2_3 guide, LTX 2.3 release, model comparison, LoRA training deep dive)",
+      "Nav: Added Resources dropdown with Blog and Release Notes sub-items",
+      "Nav: Mobile responsive hamburger menu",
+      "Nav: Logo now links to homepage with gradient text",
+      "Footer: Added to all pages, Feedback link moved to footer",
+      "SEO: Updated titles and descriptions with action-oriented keywords (Free, Direct Links)",
+      "SEO: Added Schema.org structured data to Models page",
+      "SEO: Added Quick Start 3-step guide to Models page",
+      "Favicon: Replaced black icon with purple gradient to match site branding",
+    ],
+  },
+  {
     date: "2026-04-13",
     title: "UX Improvements",
     items: [
