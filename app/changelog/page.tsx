@@ -13,10 +13,6 @@ const entries = [
     date: "2026-04-16",
     title: "Blog System & Site Improvements",
     items: [
-      "Blog: Added dynamic sitemap.xml — all published posts now indexed by Google automatically",
-      "Blog: Removed fake read time and view count from list and detail pages",
-      "Blog: Aligned detail page width with other pages (max-w-6xl)",
-      "Blog: Added Sources section to all posts for content credibility",
       "Blog: Published 4 new articles (taeltx2_3 guide, LTX 2.3 release, model comparison, LoRA training deep dive)",
       "Nav: Added Resources dropdown with Blog and Release Notes sub-items",
       "Nav: Mobile responsive hamburger menu",
