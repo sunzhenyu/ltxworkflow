@@ -12,7 +12,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
+        model: "gpt-5.4-mini-2026-03-17",
         max_tokens: 300,
         messages: [{
           role: "user",
