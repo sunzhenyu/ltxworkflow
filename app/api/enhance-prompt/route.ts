@@ -5,14 +5,14 @@ export async function POST(req: Request) {
   if (!prompt) return NextResponse.json({ error: "No prompt" }, { status: 400 });
 
   try {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const response = await fetch(`${process.env.ANTHROPIC_BASE_URL}/chat/completions`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "Authorization": `Bearer ${process.env.ANTHROPIC_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "openai/gpt-5.2",
+        model: "claude-3-5-sonnet-20241022",
         max_tokens: 300,
         messages: [{
           role: "user",
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     });
 
     const result = await response.json();
-    console.log("[enhance-prompt] OpenRouter response:", JSON.stringify(result));
+    console.log("[enhance-prompt] API response:", JSON.stringify(result));
     const enhanced = result.choices?.[0]?.message?.content ?? "";
     return NextResponse.json({ enhanced, _debug: result });
   } catch (e) {
