@@ -22,8 +22,9 @@ export async function POST(req: Request) {
     });
 
     const result = await response.json();
+    console.log("[enhance-prompt] OpenRouter response:", JSON.stringify(result));
     const enhanced = result.choices?.[0]?.message?.content ?? "";
-    return NextResponse.json({ enhanced });
+    return NextResponse.json({ enhanced, _debug: result });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: "API error" }, { status: 500 });
