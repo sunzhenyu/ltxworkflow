@@ -71,8 +71,9 @@ export default function ChangelogPage() {
     <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
       <Nav />
 
-      <section>
+      <section className="space-y-2">
         <h1 className="text-3xl font-extrabold">Release Notes</h1>
+        <p className="text-gray-400">Updates to ltx workflow and LTX 2.3 model releases.</p>
       </section>
 
       <div className="space-y-6">
