@@ -86,7 +86,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   });
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+    <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
       <Nav activeHref="/blog" />
 
       <article className="space-y-6">
