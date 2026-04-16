@@ -10,6 +10,11 @@ type NavLink = { href: string; label: string } | { label: string; submenu: { hre
 export default function NavClient({ links, activeHref, session }: { links: NavLink[]; activeHref?: string; session: any }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Check if any submenu item is active
+  const isSubmenuActive = (submenu: { href: string; label: string }[]) => {
+    return submenu.some(sub => activeHref?.startsWith(sub.href));
+  };
+
   return (
     <>
       <nav className="flex items-center justify-between">
@@ -19,9 +24,10 @@ export default function NavClient({ links, activeHref, session }: { links: NavLi
         <div className="hidden md:flex items-center gap-6">
           {links.map((l) => {
             if ("submenu" in l) {
+              const isActive = isSubmenuActive(l.submenu);
               return (
                 <div key={l.label} className="relative group">
-                  <button className="text-gray-400 hover:text-gray-200 transition-colors flex items-center gap-1">
+                  <button className={`transition-colors flex items-center gap-1 ${isActive ? "text-violet-400" : "text-gray-400 hover:text-gray-200"}`}>
                     {l.label}
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -33,7 +39,9 @@ export default function NavClient({ links, activeHref, session }: { links: NavLi
                         <Link
                           key={sub.href}
                           href={sub.href}
-                          className="block px-4 py-2 text-sm text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors"
+                          className={`block px-4 py-2 text-sm transition-colors ${
+                            activeHref === sub.href ? "text-violet-400 bg-gray-800" : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
+                          }`}
                         >
                           {sub.label}
                         </Link>
@@ -86,14 +94,17 @@ export default function NavClient({ links, activeHref, session }: { links: NavLi
         <div className="md:hidden mt-4 bg-gray-900 rounded-lg border border-gray-800 py-2">
           {links.map((l) => {
             if ("submenu" in l) {
+              const isActive = isSubmenuActive(l.submenu);
               return (
                 <div key={l.label} className="border-b border-gray-800 last:border-0">
-                  <div className="px-4 py-2 text-sm text-gray-500 font-medium">{l.label}</div>
+                  <div className={`px-4 py-2 text-sm font-medium ${isActive ? "text-violet-400" : "text-gray-500"}`}>{l.label}</div>
                   {l.submenu.map((sub) => (
                     <Link
                       key={sub.href}
                       href={sub.href}
-                      className="block px-6 py-2 text-sm text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors"
+                      className={`block px-6 py-2 text-sm transition-colors ${
+                        activeHref === sub.href ? "text-violet-400 bg-gray-800" : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
+                      }`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       {sub.label}
