@@ -22,9 +22,6 @@ export default function Footer() {
           <a href="https://toolfame.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
             <img src="https://toolfame.com/badge-light.svg" alt="Featured on ToolFame" className="h-[54px] w-auto block" />
           </a>
-          <a href="https://dofollow.tools" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-            <img src="https://dofollow.tools/badge/badge_transparent.svg" alt="Featured on Dofollow.Tools" className="h-[54px] w-auto block" />
-          </a>
           <a href="https://showmebest.ai" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
             <img src="https://showmebest.ai/badge/feature-badge-white.webp" alt="Featured on ShowMeBestAI" className="h-[54px] w-auto block" />
           </a>
@@ -49,9 +46,6 @@ export default function Footer() {
           </a>
           <a href="https://toolfame.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
             <img src="https://toolfame.com/badge-light.svg" alt="Featured on ToolFame" className="h-[54px] w-auto block" />
-          </a>
-          <a href="https://dofollow.tools" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-            <img src="https://dofollow.tools/badge/badge_transparent.svg" alt="Featured on Dofollow.Tools" className="h-[54px] w-auto block" />
           </a>
           <a href="https://showmebest.ai" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
             <img src="https://showmebest.ai/badge/feature-badge-white.webp" alt="Featured on ShowMeBestAI" className="h-[54px] w-auto block" />
