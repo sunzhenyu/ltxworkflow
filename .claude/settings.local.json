@@ -43,7 +43,8 @@
       "Bash(export:*)",
       "Bash(python3 -c \"import sys,re; html=sys.stdin.read\\(\\); text=re.sub\\(r'<[^>]+>',' ',re.sub\\(r'<script.*?</script>','',re.sub\\(r'<style.*?</style>','',html,flags=re.DOTALL\\),flags=re.DOTALL\\)\\); print\\(re.sub\\(r'\\\\s+',' ',text\\).strip\\(\\)\\)\")",
       "Bash(python3:*)",
-      "Bash(ls -lh audio-tutorial-*.png)"
+      "Bash(ls -lh audio-tutorial-*.png)",
+      "Bash(ls -lh vram-*.png)"
     ]
   }
 }

@@ -18,14 +18,28 @@
 
 ### 抓取内容
 1. 用 WebSearch 搜索主题，**只选 1-2 篇**最权威的来源（不要多）
-2. 用 curl 抓取正文：
-   ```bash
-   curl -s "URL" | python3 -c "import sys,re; html=sys.stdin.read(); text=re.sub(r'<[^>]+>',' ',re.sub(r'<script.*?</script>','',re.sub(r'<style.*?</style>','',html,flags=re.DOTALL),flags=re.DOTALL)); print(re.sub(r'\s+',' ',text).strip()[:5000])"
+2. 用 curl 下载完整 HTML 到 `/tmp/article.html`
+3. 用 Python HTMLParser 解析，保留原文的段落结构：
+   ```python
+   # 解析 h2, h3, p, li, code 标签
+   # 保留段落、列表、代码块的原始结构
+   # 输出为格式化的 markdown
    ```
-3. 基于抓取内容生成高质量文章：
-   - 内容准确、有深度，基于真实数据
-   - 文章末尾必须有 `## Sources` 章节，只列 1-2 篇来源（标题 + 链接）
-   - 标题实用、具体、包含目标关键词
+4. 处理图片和视频：
+   - 提取原文中的图片 URL（排除 logo、广告）
+   - 提取原文中的视频 URL（mp4、webm 等格式）
+   - 下载到 `public/images/resources/` 或 `public/videos/resources/` 目录
+   - 在 markdown 中插入：
+     - 图片：`![描述](/images/resources/filename.ext)`
+     - 视频：使用 HTML5 video 标签或提供下载链接
+5. 移除营销内容：
+   - 课程推广（"Join X students", "Early-bird pricing"）
+   - 产品广告
+   - 社交媒体分享按钮文字
+6. 生成最终文章：
+   - 开头添加英文编者按：`> **Editor's Note:** [简短总结]`
+   - 保留原文完整内容和章节结构
+   - 文章末尾添加 `## Sources` 章节
 
 ### 插入数据库
 写临时 Node.js 脚本到 `scripts/` 目录，执行后删除：
