@@ -46,7 +46,9 @@
       "Bash(ls -lh audio-tutorial-*.png)",
       "Bash(ls -lh vram-*.png)",
       "Bash(ls -lh /tmp/*-markdown.txt)",
-      "Bash(ls -lh /tmp/*.html)"
+      "Bash(ls -lh /tmp/*.html)",
+      "Bash(mkdir -p /Users/sunhaoyu/haoyu/CodeX/ltxworkflow/public/videos/resources)",
+      "Bash(ls -lh *.mp4)"
     ]
   }
 }
