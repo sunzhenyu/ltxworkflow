@@ -39,7 +39,7 @@ export default async function Home() {
 
         {/* Startup Fame Highlight Badge */}
         <div className="flex justify-center py-2">
-          <a href="https://startupfa.me" target="_blank" rel="noopener noreferrer">
+          <a href="https://startupfa.me/s/ltx-workflow?utm_source=ltxworkflow.com" target="_blank" rel="noopener noreferrer">
             <img
               src="https://startupfa.me/badges/highlight-badge.webp"
               alt="Featured on Startup Fame - Highlight"

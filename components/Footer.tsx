@@ -28,8 +28,8 @@ export default function Footer() {
           <a href="https://turbo0.com/item/ltx-workflow" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
             <img src="https://img.turbo0.com/badge-listed-light.svg" alt="Listed on Turbo0" className="h-[54px] w-auto block" />
           </a>
-          <a href="https://startupfa.me" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-            <img src="https://startupfa.me/badges/featured/default.webp" alt="Featured on Startup Fame" className="h-[54px] w-auto block" />
+          <a href="https://startupfa.me/s/ltx-workflow?utm_source=ltxworkflow.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://startupfa.me/badges/featured-badge.webp" alt="ltx workflow - Featured on Startup Fame" width="171" height="54" className="h-[54px] w-auto block" />
           </a>
           <a href="https://fazier.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
             <img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=light" alt="Featured on Fazier" className="h-[54px] w-auto block" />
@@ -53,8 +53,8 @@ export default function Footer() {
           <a href="https://turbo0.com/item/ltx-workflow" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
             <img src="https://img.turbo0.com/badge-listed-light.svg" alt="Listed on Turbo0" className="h-[54px] w-auto block" />
           </a>
-          <a href="https://startupfa.me" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-            <img src="https://startupfa.me/badges/featured/default.webp" alt="Featured on Startup Fame" className="h-[54px] w-auto block" />
+          <a href="https://startupfa.me/s/ltx-workflow?utm_source=ltxworkflow.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://startupfa.me/badges/featured-badge.webp" alt="ltx workflow - Featured on Startup Fame" width="171" height="54" className="h-[54px] w-auto block" />
           </a>
           <a href="https://fazier.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
             <img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=light" alt="Featured on Fazier" className="h-[54px] w-auto block" />
