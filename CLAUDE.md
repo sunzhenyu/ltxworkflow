@@ -16,37 +16,121 @@
 
 所有内容生成（博客、Tutorials、Community、Showcase、Research、Tools）共用以下流程：
 
+### 工具脚本位置
+所有内容生成脚本位于 `scripts/content-generation/` 目录：
+- `extract-article.py` - 提取文章内容
+- `extract-media.py` - 提取图片和视频 URL
+- `download-media.sh` - 批量下载媒体文件
+- `insert-content.js` - 插入/更新数据库
+- `README.md` - 详细使用文档
+
 ### 抓取内容
 1. 用 WebSearch 搜索主题，**只选 1-2 篇**最权威的来源（不要多）
 2. 用 curl 下载完整 HTML 到 `/tmp/article.html`
-3. 用 Python HTMLParser 解析，保留原文的段落结构：
-   ```python
-   # 解析 h2, h3, p, li, code 标签
-   # 保留段落、列表、代码块的原始结构
-   # 输出为格式化的 markdown
+3. 使用 `extract-article.py` 提取内容：
+   ```bash
+   python3 scripts/content-generation/extract-article.py /tmp/article.html /tmp/content.md
    ```
-4. 处理图片和视频：
-   - 提取原文中的图片 URL（排除 logo、广告）
-   - 提取原文中的视频 URL（mp4、webm 等格式）
-   - 下载到 `public/images/resources/` 或 `public/videos/resources/` 目录
-   - 在 markdown 中插入：
-     - 图片：`![描述](/images/resources/filename.ext)`
-     - 视频：使用 HTML5 video 标签或提供下载链接
-5. 移除营销内容：
-   - 课程推广（"Join X students", "Early-bird pricing"）
-   - 产品广告
-   - 社交媒体分享按钮文字
-6. 生成最终文章：
+   - 自动保留原文段落结构（h1-h4, p, li, code, blockquote）
+   - 自动移除营销内容（课程推广、订阅、广告等）
+   - 自动过滤导航、页脚等 UI 元素
+
+4. 使用 `extract-media.py` 提取媒体 URL：
+   ```bash
+   python3 scripts/content-generation/extract-media.py /tmp/article.html > /tmp/media-urls.txt
+   ```
+   - 自动提取图片和视频 URL
+   - 自动过滤 logo、icon、og-image 等 UI 元素
+
+5. 使用 `download-media.sh` 下载媒体文件：
+   ```bash
+   # 下载图片
+   ./scripts/content-generation/download-media.sh /tmp/image-urls.txt public/images/resources/ article-prefix-
+   
+   # 下载视频
+   ./scripts/content-generation/download-media.sh /tmp/video-urls.txt public/videos/resources/ article-prefix-
+   ```
+
+6. 在 markdown 中插入媒体：
+   - 图片：`![描述](/images/resources/article-prefix-1.jpg)`
+   - 视频：
+     ```html
+     <video controls width="100%" style="max-width: 800px; margin: 20px 0;">
+       <source src="/videos/resources/article-prefix-1.mp4" type="video/mp4">
+       Your browser does not support the video tag.
+     </video>
+     ```
+
+7. 生成最终文章：
    - 开头添加英文编者按：`> **Editor's Note:** [简短总结]`
    - 保留原文完整内容和章节结构
    - 文章末尾添加 `## Sources` 章节
 
 ### 插入数据库
-写临时 Node.js 脚本到 `scripts/` 目录，执行后删除：
+使用 `insert-content.js` 脚本：
 ```bash
-export NEXT_PUBLIC_SUPABASE_URL=https://zivfvqaodrdfdifdashi.supabase.co
-export SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InppdmZ2cWFvZHJkZmRpZmRhc2hpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTU0MjY5OSwiZXhwIjoyMDkxMTE4Njk5fQ.HhjiE78YelQZoigSKJTsb67dFZtfOuFC1mK9IaUkDcU
-node scripts/insert-content.js && rm scripts/insert-content.js
+# 准备数据文件
+cat > /tmp/data.json << EOF
+{
+  "slug": "article-slug",
+  "title": "Article Title",
+  "excerpt": "Short description",
+  "content": "$(cat /tmp/content.md)",
+  "tags": ["ltx-2.3", "comfyui"],
+  "author_name": "ltx workflow",
+  "source_url": "https://...",
+  "source_title": "Source Title",
+  "is_published": true,
+  "seo_title": "SEO Title",
+  "seo_description": "SEO Description"
+}
+EOF
+
+# 插入数据库
+node scripts/content-generation/insert-content.js <table> /tmp/data.json
+
+# 或更新已有内容
+node scripts/content-generation/insert-content.js <table> <slug> /tmp/data.json
+```
+
+### 完整工作流示例
+```bash
+# 1. 下载 HTML
+curl -sL "https://example.com/article" -o /tmp/article.html
+
+# 2. 提取内容
+python3 scripts/content-generation/extract-article.py /tmp/article.html /tmp/content.md
+
+# 3. 提取媒体 URL
+python3 scripts/content-generation/extract-media.py /tmp/article.html > /tmp/media-urls.txt
+
+# 4. 下载媒体（手动分离图片和视频 URL）
+grep -E '\.(jpg|png|gif|webp)' /tmp/media-urls.txt > /tmp/images.txt
+grep -E '\.(mp4|webm|mov)' /tmp/media-urls.txt > /tmp/videos.txt
+./scripts/content-generation/download-media.sh /tmp/images.txt public/images/resources/ my-article-
+./scripts/content-generation/download-media.sh /tmp/videos.txt public/videos/resources/ my-article-
+
+# 5. 编辑 content.md，插入图片和视频引用
+
+# 6. 准备数据并插入数据库
+cat > /tmp/data.json << EOF
+{
+  "slug": "my-article",
+  "title": "My Article",
+  "excerpt": "Description",
+  "content": "$(cat /tmp/content.md | jq -Rs .)",
+  "tags": ["ltx-2.3"],
+  "author_name": "ltx workflow",
+  "source_url": "https://example.com/article",
+  "is_published": true
+}
+EOF
+node scripts/content-generation/insert-content.js tutorials /tmp/data.json
+
+# 7. 提交到 git
+git add public/images/resources/my-article-* public/videos/resources/my-article-*
+git commit -m "feat: add tutorial with media"
+git push
 ```
 
 ---
