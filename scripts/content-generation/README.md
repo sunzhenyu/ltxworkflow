@@ -136,26 +136,47 @@ python3 scripts/content-generation/extract-article.py /tmp/article.html /tmp/con
 # 3. Extract media URLs
 python3 scripts/content-generation/extract-media.py /tmp/article.html > /tmp/media-urls.txt
 
-# 4. Download media files
-./scripts/content-generation/download-media.sh /tmp/media-urls.txt public/images/resources/ my-article-
+# 4. Download media (manually separate images and videos)
+grep -E '\.(jpg|png|gif|webp)' /tmp/media-urls.txt > /tmp/images.txt
+grep -E '\.(mp4|webm|mov)' /tmp/media-urls.txt > /tmp/videos.txt
+./scripts/content-generation/download-media.sh /tmp/images.txt public/images/resources/ my-article-
+./scripts/content-generation/download-media.sh /tmp/videos.txt public/videos/resources/ my-article-
 
-# 5. Prepare data for database
+# 5. Edit content.md and insert media references
+# Images: ![Description](/images/resources/my-article-1.jpg)
+# Videos: ![Video Description](/videos/resources/my-article-1.mp4)
+# Note: Use image markdown syntax for videos - MarkdownContent component auto-detects .mp4/.webm/.mov
+
+# 6. Prepare data and insert into database
 cat > /tmp/data.json << EOF
 {
   "slug": "my-article",
   "title": "My Article",
-  "excerpt": "Article description",
-  "content": "$(cat /tmp/content.md)",
+  "excerpt": "Description",
+  "content": "$(cat /tmp/content.md | jq -Rs .)",
   "tags": ["ltx-2.3"],
   "author_name": "ltx workflow",
   "source_url": "https://example.com/article",
   "is_published": true
 }
 EOF
-
-# 6. Insert into database
 node scripts/content-generation/insert-content.js tutorials /tmp/data.json
+
+# 7. Commit to git
+git add public/images/resources/my-article-* public/videos/resources/my-article-*
+git commit -m "feat: add tutorial with media"
+git push
 ```
+
+## Video Embedding
+
+**Important:** Videos should use the same markdown syntax as images:
+
+```markdown
+![Video Description](/videos/resources/video-file.mp4)
+```
+
+The `MarkdownContent.tsx` component automatically detects video file extensions (.mp4, .webm, .mov) and renders them as HTML5 video players instead of images. **Do NOT use raw HTML `<video>` tags in markdown content.**
 
 ## Environment Variables
 

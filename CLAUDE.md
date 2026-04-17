@@ -53,13 +53,8 @@
 
 6. 在 markdown 中插入媒体：
    - 图片：`![描述](/images/resources/article-prefix-1.jpg)`
-   - 视频：
-     ```html
-     <video controls width="100%" style="max-width: 800px; margin: 20px 0;">
-       <source src="/videos/resources/article-prefix-1.mp4" type="video/mp4">
-       Your browser does not support the video tag.
-     </video>
-     ```
+   - 视频：`![视频描述](/videos/resources/article-prefix-1.mp4)`
+   - **注意**：视频使用图片语法 `![...](...mp4)`，MarkdownContent 组件会自动检测 .mp4/.webm/.mov 扩展名并渲染为 video 标签
 
 7. 生成最终文章：
    - 开头添加英文编者按：`> **Editor's Note:** [简短总结]`

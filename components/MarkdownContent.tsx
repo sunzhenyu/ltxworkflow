@@ -103,13 +103,31 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
             {children}
           </td>
         ),
-        img: ({ src, alt }) => (
-          <img
-            src={src}
-            alt={alt}
-            className="rounded-lg mb-4 max-w-full h-auto"
-          />
-        ),
+        img: ({ src, alt }) => {
+          // Check if it's a video file
+          if (src?.match(/\.(mp4|webm|mov)$/i)) {
+            return (
+              <div className="mb-4">
+                <video
+                  controls
+                  className="rounded-lg max-w-full h-auto"
+                  style={{ maxWidth: '800px' }}
+                >
+                  <source src={src} type={`video/${src.split('.').pop()}`} />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            );
+          }
+          // Regular image
+          return (
+            <img
+              src={src}
+              alt={alt}
+              className="rounded-lg mb-4 max-w-full h-auto"
+            />
+          );
+        },
         hr: () => (
           <hr className="border-gray-700 my-6" />
         ),
