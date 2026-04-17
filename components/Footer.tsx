@@ -13,42 +13,54 @@ export default function Footer() {
       {/* Featured Badges Marquee */}
       <div className="relative overflow-hidden py-4">
         <div className="flex gap-6 animate-marquee">
-          <a href="https://github.com/AlonzoLeeeooo/awesome-video-generation" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-            <img src="https://img.shields.io/badge/Awesome-Video_Generation-blue?style=for-the-badge&logo=github" alt="Featured on Awesome Video Generation" className="h-[54px] w-auto" />
+          <a href="https://www.producthunt.com/products/ltx-workflow" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=ltx-workflow&theme=dark" alt="Featured on Product Hunt" className="h-[54px] w-auto block" />
           </a>
-          <a href="https://github.com/showlab/Awesome-Video-Diffusion" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-            <img src="https://img.shields.io/badge/Awesome-Video_Diffusion-purple?style=for-the-badge&logo=github" alt="Featured on Awesome Video Diffusion" className="h-[54px] w-auto" />
+          <a href="https://dev.to" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://d2fltix0v2e0sb.cloudfront.net/dev-badge.svg" alt="Listed on DEV.to" className="h-[54px] w-auto block" />
           </a>
-          <a href="https://theresanaiforthat.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-            <img src="https://img.shields.io/badge/There's_An_AI-For_That-orange?style=for-the-badge" alt="Listed on There's An AI For That" className="h-[54px] w-auto" />
+          <a href="https://toolfame.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://toolfame.com/badge-light.svg" alt="Featured on ToolFame" className="h-[54px] w-auto block" />
           </a>
-          <a href="https://www.futuretools.io" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-            <img src="https://img.shields.io/badge/Future-Tools-green?style=for-the-badge" alt="Listed on Future Tools" className="h-[54px] w-auto" />
+          <a href="https://dofollow.tools" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://dofollow.tools/badge/badge_transparent.svg" alt="Featured on Dofollow.Tools" className="h-[54px] w-auto block" />
           </a>
-          <a href="https://topai.tools" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-            <img src="https://img.shields.io/badge/Top-AI_Tools-red?style=for-the-badge" alt="Listed on TopAI.tools" className="h-[54px] w-auto" />
+          <a href="https://showmebest.ai" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://showmebest.ai/badge/feature-badge-white.webp" alt="Featured on ShowMeBestAI" className="h-[54px] w-auto block" />
           </a>
-          <a href="https://www.uneed.best" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-            <img src="https://img.shields.io/badge/Uneed-Best-yellow?style=for-the-badge" alt="Featured on Uneed" className="h-[54px] w-auto" />
+          <a href="https://turbo0.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://img.turbo0.com/badge-listed-light.svg" alt="Listed on Turbo0" className="h-[54px] w-auto block" />
+          </a>
+          <a href="https://startupfa.me" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://startupfa.me/badges/featured/default.webp" alt="Featured on Startup Fame" className="h-[54px] w-auto block" />
+          </a>
+          <a href="https://fazier.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=light" alt="Featured on Fazier" className="h-[54px] w-auto block" />
           </a>
           {/* Duplicate for seamless loop */}
-          <a href="https://github.com/AlonzoLeeeooo/awesome-video-generation" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-            <img src="https://img.shields.io/badge/Awesome-Video_Generation-blue?style=for-the-badge&logo=github" alt="Featured on Awesome Video Generation" className="h-[54px] w-auto" />
+          <a href="https://www.producthunt.com/products/ltx-workflow" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=ltx-workflow&theme=dark" alt="Featured on Product Hunt" className="h-[54px] w-auto block" />
           </a>
-          <a href="https://github.com/showlab/Awesome-Video-Diffusion" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-            <img src="https://img.shields.io/badge/Awesome-Video_Diffusion-purple?style=for-the-badge&logo=github" alt="Featured on Awesome Video Diffusion" className="h-[54px] w-auto" />
+          <a href="https://dev.to" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://d2fltix0v2e0sb.cloudfront.net/dev-badge.svg" alt="Listed on DEV.to" className="h-[54px] w-auto block" />
           </a>
-          <a href="https://theresanaiforthat.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-            <img src="https://img.shields.io/badge/There's_An_AI-For_That-orange?style=for-the-badge" alt="Listed on There's An AI For That" className="h-[54px] w-auto" />
+          <a href="https://toolfame.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://toolfame.com/badge-light.svg" alt="Featured on ToolFame" className="h-[54px] w-auto block" />
           </a>
-          <a href="https://www.futuretools.io" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-            <img src="https://img.shields.io/badge/Future-Tools-green?style=for-the-badge" alt="Listed on Future Tools" className="h-[54px] w-auto" />
+          <a href="https://dofollow.tools" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://dofollow.tools/badge/badge_transparent.svg" alt="Featured on Dofollow.Tools" className="h-[54px] w-auto block" />
           </a>
-          <a href="https://topai.tools" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-            <img src="https://img.shields.io/badge/Top-AI_Tools-red?style=for-the-badge" alt="Listed on TopAI.tools" className="h-[54px] w-auto" />
+          <a href="https://showmebest.ai" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://showmebest.ai/badge/feature-badge-white.webp" alt="Featured on ShowMeBestAI" className="h-[54px] w-auto block" />
           </a>
-          <a href="https://www.uneed.best" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-            <img src="https://img.shields.io/badge/Uneed-Best-yellow?style=for-the-badge" alt="Featured on Uneed" className="h-[54px] w-auto" />
+          <a href="https://turbo0.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://img.turbo0.com/badge-listed-light.svg" alt="Listed on Turbo0" className="h-[54px] w-auto block" />
+          </a>
+          <a href="https://startupfa.me" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://startupfa.me/badges/featured/default.webp" alt="Featured on Startup Fame" className="h-[54px] w-auto block" />
+          </a>
+          <a href="https://fazier.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=light" alt="Featured on Fazier" className="h-[54px] w-auto block" />
           </a>
         </div>
       </div>
