@@ -37,6 +37,9 @@ export default function Footer() {
           <a href="https://fazier.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
             <img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=light" alt="Featured on Fazier" className="h-[54px] w-auto block" />
           </a>
+          <a href="https://futuretools.io/" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://futuretools.io/_next/image?url=%2Flogo%402x.png&w=64&q=75&dpl=dpl_4cALsf7ySXmctGdvC7T5DdTzupW6" alt="Listed on Future Tools" className="h-[54px] w-auto block" />
+          </a>
           {/* Duplicate for seamless loop */}
           <a href="https://www.producthunt.com/products/ltx-workflow" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
             <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=ltx-workflow&theme=dark" alt="Featured on Product Hunt" className="h-[54px] w-auto block" />
@@ -61,6 +64,9 @@ export default function Footer() {
           </a>
           <a href="https://fazier.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
             <img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=light" alt="Featured on Fazier" className="h-[54px] w-auto block" />
+          </a>
+          <a href="https://futuretools.io/" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+            <img src="https://futuretools.io/_next/image?url=%2Flogo%402x.png&w=64&q=75&dpl=dpl_4cALsf7ySXmctGdvC7T5DdTzupW6" alt="Listed on Future Tools" className="h-[54px] w-auto block" />
           </a>
         </div>
       </div>
