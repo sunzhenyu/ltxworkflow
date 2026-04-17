@@ -40,7 +40,10 @@
       "Bash(python3 -c \"import sys,json; data=json.load\\(sys.stdin\\); models=[m['id'] for m in data.get\\('data',[]\\)]; gemini=[m for m in models if 'gemini' in m.lower\\(\\)]; gpt=[m for m in models if 'gpt' in m.lower\\(\\)]; print\\('=== Gemini ==='\\); print\\('\\\\n'.join\\(gemini\\) if gemini else 'None'\\); print\\('\\\\n=== GPT ==='\\); print\\('\\\\n'.join\\(gpt[:15]\\) if gpt else 'None'\\)\")",
       "Bash(python3 -c \"import sys,re; html=sys.stdin.read\\(\\); text=re.sub\\(r'<[^>]+>',' ',re.sub\\(r'<script.*?</script>','',re.sub\\(r'<style.*?</style>','',html,flags=re.DOTALL\\),flags=re.DOTALL\\)\\); print\\(re.sub\\(r'\\\\s+',' ',text\\).strip\\(\\)[:4000]\\)\")",
       "Bash(ls -lh *.webp)",
-      "Bash(export:*)"
+      "Bash(export:*)",
+      "Bash(python3 -c \"import sys,re; html=sys.stdin.read\\(\\); text=re.sub\\(r'<[^>]+>',' ',re.sub\\(r'<script.*?</script>','',re.sub\\(r'<style.*?</style>','',html,flags=re.DOTALL\\),flags=re.DOTALL\\)\\); print\\(re.sub\\(r'\\\\s+',' ',text\\).strip\\(\\)\\)\")",
+      "Bash(python3:*)",
+      "Bash(ls -lh audio-tutorial-*.png)"
     ]
   }
 }
