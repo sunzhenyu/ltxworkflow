@@ -25,7 +25,7 @@ export default function Footer() {
           <a href="https://showmebest.ai" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
             <img src="https://showmebest.ai/badge/feature-badge-white.webp" alt="Featured on ShowMeBestAI" className="h-[54px] w-auto block" />
           </a>
-          <a href="https://turbo0.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+          <a href="https://turbo0.com/item/ltx-workflow" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
             <img src="https://img.turbo0.com/badge-listed-light.svg" alt="Listed on Turbo0" className="h-[54px] w-auto block" />
           </a>
           <a href="https://startupfa.me" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
@@ -50,7 +50,7 @@ export default function Footer() {
           <a href="https://showmebest.ai" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
             <img src="https://showmebest.ai/badge/feature-badge-white.webp" alt="Featured on ShowMeBestAI" className="h-[54px] w-auto block" />
           </a>
-          <a href="https://turbo0.com" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+          <a href="https://turbo0.com/item/ltx-workflow" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
             <img src="https://img.turbo0.com/badge-listed-light.svg" alt="Listed on Turbo0" className="h-[54px] w-auto block" />
           </a>
           <a href="https://startupfa.me" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
