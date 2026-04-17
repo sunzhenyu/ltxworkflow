@@ -105,7 +105,7 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
         ),
         img: ({ src, alt }) => {
           // Check if it's a video file
-          if (src?.match(/\.(mp4|webm|mov)$/i)) {
+          if (typeof src === 'string' && src.match(/\.(mp4|webm|mov)$/i)) {
             return (
               <div className="mb-4">
                 <video
