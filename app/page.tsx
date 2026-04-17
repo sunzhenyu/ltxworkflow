@@ -36,6 +36,20 @@ export default async function Home() {
           Generate <strong className="text-gray-200">ComfyUI workflow JSON</strong> instantly.
           Supports T2V, I2V, LoRA, and spatial upscaler.
         </p>
+
+        {/* Startup Fame Highlight Badge */}
+        <div className="flex justify-center py-2">
+          <a href="https://startupfa.me" target="_blank" rel="noopener noreferrer">
+            <img
+              src="https://startupfa.me/badges/highlight-badge.webp"
+              alt="Featured on Startup Fame - Highlight"
+              width="228"
+              height="54"
+              className="hover:opacity-80 transition-opacity"
+            />
+          </a>
+        </div>
+
         <div className="flex gap-3 justify-center flex-wrap text-sm text-gray-500">
           <span className="bg-gray-800 px-3 py-1 rounded-full">✓ taeltx2_3.safetensors</span>
           <span className="bg-gray-800 px-3 py-1 rounded-full">✓ FP8 16GB VRAM</span>
