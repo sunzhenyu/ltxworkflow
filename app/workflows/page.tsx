@@ -23,7 +23,7 @@ const workflows = [
     vram: "16GB+",
     steps: "8 steps, CFG=1",
     useCase: "Start here. Text-to-video and image-to-video in one workflow using the distilled model. Fastest generation, works on 16GB VRAM with FP8.",
-    requires: ["taeltx2_3.safetensors (VAE)", "ltx-2.3-22b-distilled_...fp8_input_scaled_v3.safetensors (16GB) or ltx-2.3-22b-distilled.safetensors (32GB)"],
+    requires: ["taeltx2_3.safetensors (VAE)", "ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors (16GB) or ltx-2.3-22b-distilled-1.1.safetensors (32GB)"],
   },
   {
     name: "T2V / I2V Two Stage Distilled",
@@ -32,7 +32,7 @@ const workflows = [
     vram: "16GB+",
     steps: "8 steps + upscale",
     useCase: "Two-stage pipeline: generate at low resolution then upscale 2× with the spatial upscaler. Better quality at higher resolution.",
-    requires: ["taeltx2_3.safetensors (VAE)", "Distilled checkpoint (FP8 or full)", "ltx-2.3-spatial-upscaler-x2-1.0.safetensors"],
+    requires: ["taeltx2_3.safetensors (VAE)", "ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors (16GB) or ltx-2.3-22b-distilled-1.1.safetensors (32GB)", "ltx-2.3-spatial-upscaler-x2-1.0.safetensors"],
   },
   {
     name: "ICLoRA Union Control Distilled",
@@ -41,7 +41,7 @@ const workflows = [
     vram: "16GB+",
     steps: "8 steps, CFG=1",
     useCase: "Image-conditioned LoRA with union control net. Apply a LoRA and control signal simultaneously for precise video generation from a reference image.",
-    requires: ["taeltx2_3.safetensors (VAE)", "Distilled checkpoint", "A compatible LTX 2.3 LoRA file"],
+    requires: ["taeltx2_3.safetensors (VAE)", "ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors (16GB) or ltx-2.3-22b-distilled-1.1.safetensors (32GB)", "A compatible LTX 2.3 LoRA file"],
   },
   {
     name: "ICLoRA Motion Track Distilled",
@@ -50,7 +50,7 @@ const workflows = [
     vram: "16GB+",
     steps: "8 steps, CFG=1",
     useCase: "Motion tracking with ICLoRA. Define motion trajectories to control how objects or subjects move through the generated video.",
-    requires: ["taeltx2_3.safetensors (VAE)", "Distilled checkpoint", "A compatible LTX 2.3 LoRA file"],
+    requires: ["taeltx2_3.safetensors (VAE)", "ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors (16GB) or ltx-2.3-22b-distilled-1.1.safetensors (32GB)", "A compatible LTX 2.3 LoRA file"],
   },
 ];
 

@@ -15,6 +15,45 @@ export type ModelVariant = {
 // Source: https://github.com/Lightricks/ComfyUI-LTXVideo
 // Official checkpoints go to: COMFYUI_ROOT/models/checkpoints/
 export const MODELS: ModelVariant[] = [
+  // ── v1.1 models (latest) ──────────────────────────────────────────────────
+  {
+    id: "ltx23-distilled-11",
+    name: "LTX 2.3 Distilled 1.1",
+    filename: "ltx-2.3-22b-distilled-1.1.safetensors",
+    size: "46.1 GB",
+    vram: 32,
+    type: "distilled",
+    hfUrl: "https://huggingface.co/Lightricks/LTX-2.3",
+    description: "Official v1.1 distilled model. 8 steps, CFG=1. Latest release from Lightricks.",
+    badge: "v1.1 Latest",
+    recommendation: "Recommended for 32GB VRAM. Newest official distilled checkpoint.",
+  },
+  {
+    id: "ltx23-distilled-11-fp8",
+    name: "LTX 2.3 Distilled 1.1 FP8 (Kijai)",
+    filename: "ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors",
+    size: "25.2 GB",
+    vram: 16,
+    vramMax: 24,
+    type: "fp8",
+    hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy",
+    description: "FP8 quantized v1.1 distilled by Kijai. Best for 16GB VRAM. 8 steps, CFG=1.",
+    badge: "16GB Best",
+    recommendation: "Best choice for 16GB VRAM. Latest v1.1 FP8 distilled. Requires RTX 40xx+ for fp8 matmuls.",
+  },
+  {
+    id: "ltx23-distilled-11-lora",
+    name: "LTX 2.3 Distilled 1.1 LoRA (Kijai)",
+    filename: "ltx-2.3-22b-distilled-1.1_lora-dynamic_fro09_avg_rank_111_bf16.safetensors",
+    size: "2.74 GB",
+    vram: 16,
+    type: "lora",
+    hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy",
+    description: "Distilled LoRA v1.1 by Kijai. Use with the dev model for distilled-quality output on 16GB VRAM.",
+    badge: "16GB LoRA",
+    recommendation: "Pair with the dev FP8 model. Load as LoRA in ComfyUI models/loras/.",
+  },
+  // ── v1.0 models (previous) ────────────────────────────────────────────────
   {
     id: "ltx23-dev",
     name: "LTX 2.3 Dev",
@@ -35,9 +74,8 @@ export const MODELS: ModelVariant[] = [
     vram: 32,
     type: "distilled",
     hfUrl: "https://huggingface.co/Lightricks/LTX-2.3",
-    description: "Distilled version. 8 steps, CFG=1. Faster inference, same quality.",
-    badge: "Recommended",
-    recommendation: "Official recommendation for 32GB VRAM. 8 steps, fastest full-precision inference.",
+    description: "v1.0 distilled version. 8 steps, CFG=1. Superseded by v1.1.",
+    recommendation: "Previous version. Use v1.1 Distilled for latest quality.",
   },
   {
     id: "ltx23-distilled-fp8",
@@ -48,9 +86,8 @@ export const MODELS: ModelVariant[] = [
     vramMax: 24,
     type: "fp8",
     hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy",
-    description: "FP8 distilled v3 by Kijai. Best for 16GB VRAM. 8 steps, CFG=1.",
-    badge: "16GB Best",
-    recommendation: "Best choice for 16GB VRAM. Distilled = 8 steps, fastest generation. Requires RTX 40xx+ for fp8 matmuls.",
+    description: "FP8 distilled v3 by Kijai. Previous version, superseded by v1.1 FP8.",
+    recommendation: "Previous version. Use v1.1 FP8 for latest quality.",
   },
   {
     id: "ltx23-dev-fp8",
@@ -67,17 +104,18 @@ export const MODELS: ModelVariant[] = [
   },
   {
     id: "ltx23-distilled-fp8-24gb",
-    name: "LTX 2.3 Distilled (bf16, 24GB)",
-    filename: "ltx-2.3-22b-distilled.safetensors",
-    size: "~42 GB",
+    name: "LTX 2.3 Distilled 1.1 (bf16, 24GB)",
+    filename: "ltx-2.3-22b-distilled-1.1.safetensors",
+    size: "46.1 GB",
     vram: 24,
     vramMax: 31,
     type: "distilled",
     hfUrl: "https://huggingface.co/Lightricks/LTX-2.3",
-    description: "Official distilled model runnable on 24GB with sequential offloading enabled in ComfyUI.",
+    description: "Official v1.1 distilled model runnable on 24GB with sequential offloading enabled in ComfyUI.",
     badge: "24GB",
-    recommendation: "Enable sequential offloading in ComfyUI settings. Slower than 32GB but uses official weights at full quality.",
+    recommendation: "Enable sequential offloading in ComfyUI settings. Uses latest v1.1 official weights.",
   },
+  // ── required for all setups ───────────────────────────────────────────────
   {
     id: "ltx23-spatial-upscaler",
     name: "Spatial Upscaler x2",

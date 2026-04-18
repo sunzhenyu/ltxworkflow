@@ -20,20 +20,20 @@ const VRAM_GROUPS = [
   {
     id: "16gb",
     label: "16GB VRAM — FP8 Quantized (RTX 40xx+)",
-    ids: ["ltx23-distilled-fp8", "ltx23-dev-fp8"],
-    note: "Requires RTX 40-series or newer for fp8 matrix multiplication. Use Distilled for fastest generation; use Dev if applying LoRA weights.",
+    ids: ["ltx23-distilled-11-fp8", "ltx23-dev-fp8", "ltx23-distilled-11-lora"],
+    note: "Requires RTX 40-series or newer for fp8 matrix multiplication. Use v1.1 FP8 Distilled for fastest generation; use Dev FP8 + LoRA v1.1 if applying LoRA weights.",
   },
   {
     id: "24gb",
     label: "24GB VRAM — Official + Sequential Offloading",
     ids: ["ltx23-distilled-fp8-24gb"],
-    note: "Enable sequential offloading in ComfyUI settings (Model Offload or Sequential). Slower than 32GB but uses full-quality official weights.",
+    note: "Enable sequential offloading in ComfyUI settings (Model Offload or Sequential). Uses latest v1.1 official weights.",
   },
   {
     id: "32gb",
     label: "32GB VRAM — Official Full Precision",
-    ids: ["ltx23-dev", "ltx23-distilled"],
-    note: "Official Lightricks checkpoints at full bf16 precision. Distilled is recommended for most use cases (8 steps, CFG=1).",
+    ids: ["ltx23-distilled-11", "ltx23-dev"],
+    note: "Official Lightricks checkpoints at full bf16 precision. v1.1 Distilled is recommended for most use cases (8 steps, CFG=1).",
   },
   {
     id: "required",
@@ -169,10 +169,10 @@ export default function ModelsPage() {
           <div className="space-y-1">
             <p className="font-medium text-gray-200">Quick decision</p>
             <ul className="space-y-0.5">
-              <li>→ <strong className="text-gray-300">16GB, RTX 40xx+:</strong> Distilled FP8 v3</li>
-              <li>→ <strong className="text-gray-300">16GB + LoRA:</strong> Dev FP8</li>
-              <li>→ <strong className="text-gray-300">24GB:</strong> Official Distilled + offloading</li>
-              <li>→ <strong className="text-gray-300">32GB+:</strong> Official Distilled (recommended)</li>
+              <li>→ <strong className="text-gray-300">16GB, RTX 40xx+:</strong> Distilled 1.1 FP8</li>
+              <li>→ <strong className="text-gray-300">16GB + LoRA:</strong> Dev FP8 + LoRA 1.1</li>
+              <li>→ <strong className="text-gray-300">24GB:</strong> Official Distilled 1.1 + offloading</li>
+              <li>→ <strong className="text-gray-300">32GB+:</strong> Official Distilled 1.1 (recommended)</li>
             </ul>
           </div>
           <div className="space-y-1">
