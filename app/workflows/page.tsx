@@ -4,11 +4,11 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Free LTX 2.3 ComfyUI Workflow JSON Download — T2V, I2V, LoRA Ready",
-  description: "Download free LTX 2.3 ComfyUI workflow JSON files with direct links. Includes T2V/I2V single-stage, two-stage upscaler, ICLoRA control, and motion tracking. Drag and drop into ComfyUI to start generating videos instantly.",
+  title: "LTX 2.3 ComfyUI Workflow JSON Download — T2V, I2V, LoRA Ready",
+  description: "Download LTX 2.3 ComfyUI workflow JSON files with direct links. Includes T2V/I2V single-stage, two-stage upscaler, ICLoRA control, and motion tracking. Drag and drop into ComfyUI to start generating videos instantly.",
   alternates: { canonical: "https://ltxworkflow.com/workflows" },
   openGraph: {
-    title: "Free LTX 2.3 ComfyUI Workflow JSON — Ready to Use",
+    title: "LTX 2.3 ComfyUI Workflow JSON — Ready to Use",
     description: "Download official LTX 2.3 workflow templates for ComfyUI. T2V, I2V, LoRA, and upscaler workflows included.",
     url: "https://ltxworkflow.com/workflows",
     type: "website",

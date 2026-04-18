@@ -62,7 +62,7 @@ export default async function Home() {
         <div className="flex gap-3 justify-center flex-wrap text-sm text-gray-500">
           <span className="bg-gray-800 px-3 py-1 rounded-full">✓ taeltx2_3.safetensors</span>
           <span className="bg-gray-800 px-3 py-1 rounded-full">✓ FP8 16GB VRAM</span>
-          <span className="bg-gray-800 px-3 py-1 rounded-full">✓ Free Direct Links</span>
+          <span className="bg-gray-800 px-3 py-1 rounded-full">✓ Direct Links</span>
           <span className="bg-gray-800 px-3 py-1 rounded-full">✓ ComfyUI Ready</span>
         </div>
       </section>

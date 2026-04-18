@@ -5,11 +5,11 @@ import Footer from "@/components/Footer";
 import { MODELS } from "@/lib/models";
 
 export const metadata: Metadata = {
-  title: "Download LTX 2.3 Models Free — taeltx2_3.safetensors, FP8, Direct Links",
-  description: "Free direct download links for all LTX 2.3 ComfyUI models. Get taeltx2_3.safetensors (VAE), FP8 quantized (16GB VRAM), and official checkpoints (32GB). Organized by GPU requirements with installation guide.",
+  title: "LTX 2.3 Model Downloads — taeltx2_3.safetensors, FP8, Direct Links",
+  description: "Direct download links for all LTX 2.3 ComfyUI models. Get taeltx2_3.safetensors (VAE), FP8 quantized (16GB VRAM), and official checkpoints (32GB). Organized by GPU requirements with installation guide.",
   alternates: { canonical: "https://ltxworkflow.com/models" },
   openGraph: {
-    title: "Download LTX 2.3 Models Free — All Variants",
+    title: "LTX 2.3 Model Downloads — All Variants",
     description: "Direct HuggingFace links to taeltx2_3.safetensors, FP8, and official LTX 2.3 models for ComfyUI",
     url: "https://ltxworkflow.com/models",
     type: "website",
@@ -59,7 +59,7 @@ export default function ModelsPage() {
           "price": "0",
           "priceCurrency": "USD"
         },
-        "description": "Free LTX 2.3 AI video generation models for ComfyUI. Includes taeltx2_3.safetensors VAE, FP8 quantized models for 16GB VRAM, and official checkpoints.",
+        "description": "LTX 2.3 AI video generation models for ComfyUI. Includes taeltx2_3.safetensors VAE, FP8 quantized models for 16GB VRAM, and official checkpoints.",
         "downloadUrl": "https://ltxworkflow.com/models",
         "softwareRequirements": "ComfyUI, CUDA GPU with 16GB+ VRAM"
       })}} />
