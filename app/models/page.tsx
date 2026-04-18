@@ -66,7 +66,7 @@ export default function ModelsPage() {
       <Nav activeHref="/models" />
 
       <section className="space-y-2">
-        <h1 className="text-3xl font-extrabold">Free LTX 2.3 Model Downloads — Direct Links</h1>
+        <h1 className="text-3xl font-extrabold">LTX 2.3 Model Downloads</h1>
         <p className="text-gray-400">
           Download all LTX 2.3 model files for ComfyUI with direct HuggingFace links — organized by GPU VRAM.
           Start with <strong className="text-gray-200">taeltx2_3.safetensors</strong> (VAE, required for all setups),
