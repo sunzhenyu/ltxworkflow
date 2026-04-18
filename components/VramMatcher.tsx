@@ -37,7 +37,7 @@ export default function VramMatcher() {
       <div>
         <h2 className="text-xl font-bold mb-1">VRAM Adapter</h2>
         <p className="text-gray-400 text-sm">
-          Select your GPU VRAM to see recommended LTX 2.3 models and download links:
+          Select your GPU VRAM to see recommended LTX 2.3 models:
         </p>
       </div>
       <div className="flex gap-2 flex-wrap">
