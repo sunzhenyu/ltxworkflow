@@ -25,6 +25,9 @@
 - `README.md` - 详细使用文档
 
 ### 抓取内容
+
+> **⚠️ 强制要求：必须完整执行步骤 1-7，不得跳过媒体抓取步骤（步骤 4-6）。即使文章没有图片/视频，也必须运行 extract-media.py 确认后再继续。**
+
 1. 用 WebSearch 搜索主题，**只选 1-2 篇**最权威的来源（不要多）
 2. 用 curl 下载完整 HTML 到 `/tmp/article.html`
 3. 使用 `extract-article.py` 提取内容：

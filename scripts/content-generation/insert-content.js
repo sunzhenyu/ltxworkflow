@@ -26,8 +26,10 @@ const supabase = createClient(
 );
 
 async function insertContent(table, data) {
-  // Add timestamps
-  data.published_at = data.published_at || new Date().toISOString();
+  // Only add published_at for tables that have this column (blog_posts only)
+  if (table === 'blog_posts') {
+    data.published_at = data.published_at || new Date().toISOString();
+  }
 
   // For blog posts, add read_time_minutes if not provided
   if (table === 'blog_posts' && !data.read_time_minutes) {
