@@ -17,14 +17,6 @@ function ModelRow({ m }: { m: ReturnType<typeof getModelsForVram>[0] }) {
             </span>
           )}
         </div>
-        <a
-          href={m.hfUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-violet-400 hover:text-violet-300 shrink-0 ml-4"
-        >
-          Download →
-        </a>
       </div>
       <code className="text-xs text-green-400 font-mono break-all">{m.filename}</code>
       {m.recommendation && (
