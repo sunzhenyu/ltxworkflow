@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import PromptEnhancer from "@/components/PromptEnhancer";
+import WorkflowBuilder from "@/components/WorkflowBuilder";
 
 export const metadata: Metadata = {
-  title: "LTX 2.3 ComfyUI Workflow JSON Download — T2V, I2V, LoRA Ready",
-  description: "Download LTX 2.3 ComfyUI workflow JSON files with direct links. Includes T2V/I2V single-stage, two-stage upscaler, ICLoRA control, and motion tracking. Drag and drop into ComfyUI to start generating videos instantly.",
+  title: "LTX 2.3 Workflow Generator & ComfyUI JSON Downloads",
+  description: "Generate custom ComfyUI workflow JSON for LTX 2.3 with AI prompt enhancement. Download official T2V, I2V, LoRA, and upscaler workflow templates. Pro tools for serious video creators.",
   alternates: { canonical: "https://ltxworkflow.com/workflows" },
   openGraph: {
-    title: "LTX 2.3 ComfyUI Workflow JSON — Ready to Use",
-    description: "Download official LTX 2.3 workflow templates for ComfyUI. T2V, I2V, LoRA, and upscaler workflows included.",
+    title: "LTX 2.3 Workflow Generator & ComfyUI JSON Downloads",
+    description: "AI-powered prompt enhancer and ComfyUI workflow JSON generator for LTX 2.3. Plus official workflow templates for T2V, I2V, LoRA, and upscaler.",
     url: "https://ltxworkflow.com/workflows",
     type: "website",
   },
@@ -60,20 +62,32 @@ export default function WorkflowsPage() {
       <Nav activeHref="/workflows" />
 
       <section className="space-y-2">
-        <h1 className="text-3xl font-extrabold">LTX 2.3 ComfyUI Workflow JSON</h1>
+        <h1 className="text-3xl font-extrabold">LTX 2.3 Workflow Generator</h1>
         <p className="text-gray-400">
-          Download official LTX 2.3 ComfyUI workflow JSON files from Lightricks.
-          Drag any <strong className="text-gray-200">.json</strong> file into ComfyUI to load it instantly.
+          Generate custom ComfyUI workflow JSON with AI-enhanced prompts, or download official workflow templates below.
           All workflows require <strong className="text-gray-200">taeltx2_3.safetensors</strong> (VAE) —{" "}
           <Link href="/models" className="text-violet-400 hover:text-violet-300 underline">download it here</Link> first.
         </p>
-        <div className="flex gap-3 pt-1">
-          <a href="#downloads" className="text-sm bg-violet-700 hover:bg-violet-600 text-white px-4 py-2 rounded-lg transition-colors font-medium">
-            Download Workflows ↓
-          </a>
-          <a href="#guide" className="text-sm bg-gray-800 hover:bg-gray-700 text-gray-200 px-4 py-2 rounded-lg transition-colors font-medium">
-            How to Choose ↓
-          </a>
+      </section>
+
+      <PromptEnhancer />
+      <WorkflowBuilder />
+
+      <section className="space-y-4">
+        <div className="border-t border-gray-800 pt-6">
+          <h2 className="text-xl font-bold mb-1">Official Workflow Templates</h2>
+          <p className="text-gray-400 text-sm">
+            Download official LTX 2.3 ComfyUI workflow JSON files from Lightricks.
+            Drag any <strong className="text-gray-200">.json</strong> file into ComfyUI to load it instantly.
+          </p>
+          <div className="flex gap-3 pt-3">
+            <a href="#downloads" className="text-sm bg-violet-700 hover:bg-violet-600 text-white px-4 py-2 rounded-lg transition-colors font-medium">
+              Download Workflows ↓
+            </a>
+            <a href="#guide" className="text-sm bg-gray-800 hover:bg-gray-700 text-gray-200 px-4 py-2 rounded-lg transition-colors font-medium">
+              How to Choose ↓
+            </a>
+          </div>
         </div>
       </section>
 
