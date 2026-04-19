@@ -9,6 +9,13 @@ export const metadata: Metadata = {
   keywords: "ltx 2.3 download, taeltx2_3.safetensors download, comfyui ltx 2.3, ltx 2.3 fp8, ltx 2.3 lora, ltx-2.3-22b-distilled, direct download",
   metadataBase: new URL("https://ltxworkflow.com"),
   alternates: { canonical: "https://ltxworkflow.com" },
+  icons: {
+    icon: [
+      { url: "/icon", type: "image/png", sizes: "32x32" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [{ url: "/icon", type: "image/png", sizes: "32x32" }],
+  },
   openGraph: {
     title: "LTX 2.3 Download — Direct Links to All Models",
     description: "Download taeltx2_3.safetensors, FP8 & official LTX 2.3 models. Generate ComfyUI workflows for 16GB–32GB VRAM.",
