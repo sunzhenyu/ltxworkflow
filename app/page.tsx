@@ -37,7 +37,27 @@ export default async function Home() {
           Supports T2V, I2V, LoRA, and spatial upscaler.
         </p>
 
-        {/* Featured Badges - hidden */}
+        {/* Featured Badges */}
+        <div className="hidden flex justify-center gap-4 py-2 flex-wrap">
+          <a href="https://startupfa.me/s/ltx-workflow?utm_source=ltxworkflow.com" target="_blank" rel="noopener noreferrer">
+            <img
+              src="https://startupfa.me/badges/highlight-badge.webp"
+              alt="Featured on Startup Fame - Highlight"
+              width="228"
+              height="54"
+              className="hover:opacity-80 transition-opacity"
+            />
+          </a>
+          <a href="https://fazier.com/launches/ltxworkflow.com" target="_blank" rel="noopener noreferrer">
+            <img
+              src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&theme=light"
+              alt="Fazier badge"
+              width="120"
+              height="54"
+              className="hover:opacity-80 transition-opacity"
+            />
+          </a>
+        </div>
 
         <div className="flex gap-3 justify-center flex-wrap text-sm text-gray-500">
           <span className="bg-gray-800 px-3 py-1 rounded-full">✓ taeltx2_3.safetensors</span>
