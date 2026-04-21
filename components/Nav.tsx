@@ -6,6 +6,7 @@ import NavClient from "@/components/NavClient";
 const links = [
   { href: "/models", label: "Models" },
   { href: "/workflows", label: "Workflows" },
+  { href: "/pricing", label: "Pricing" },
   { href: "/guide", label: "Guide" },
   {
     label: "Resources",
@@ -18,7 +19,6 @@ const links = [
       { href: "/resources/tools", label: "Tools" },
     ]
   },
-  { href: "/pricing", label: "Pricing" },
 ];
 
 export default async function Nav({ activeHref }: { activeHref?: string }) {
