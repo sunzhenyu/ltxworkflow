@@ -122,10 +122,10 @@ export default function PricingPage() {
             <SubscribeButton productId={process.env.NEXT_PUBLIC_CREEM_PRODUCT_ID || 'PRODUCT_ID_PLACEHOLDER'} />
 
             <p className="text-xs text-gray-400 text-center">
-              随时取消，无隐藏费用
+              Cancel anytime, no hidden fees
             </p>
             <p className="text-xs text-red-400 text-center font-medium">
-              ⚠️ 所有支付均为最终支付，不支持退款
+              ⚠️ All payments are final and non-refundable
             </p>
           </div>
         </div>
