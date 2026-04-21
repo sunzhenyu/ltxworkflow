@@ -25,6 +25,15 @@ function SuccessContent({
           Thank you for subscribing to LTX Workflow Pro. You now have access to premium features and workflows.
         </p>
 
+        <div className="bg-yellow-900/20 border border-yellow-700/50 rounded-lg p-4 max-w-md">
+          <p className="text-sm text-yellow-400 font-medium">
+            ⚠️ Refund Policy
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            All payments are final. We do not offer refunds for any subscriptions. You can cancel your subscription at any time to prevent future charges.
+          </p>
+        </div>
+
         {searchParams.checkout_id && (
           <div className="bg-gray-900 rounded-lg p-4 text-sm text-gray-400 space-y-1">
             <p>Order ID: <span className="text-violet-400 font-mono">{searchParams.order_id}</span></p>

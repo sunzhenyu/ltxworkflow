@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import NavClient from "@/components/NavClient";
 
 const links = [
-  { href: "/models", label: "Models" },
+  { href: "/models", label: "Downloads" },
   { href: "/workflows", label: "Workflows" },
   { href: "/pricing", label: "Pricing" },
   { href: "/guide", label: "Guide" },

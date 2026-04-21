@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { MODELS, getModelsForVram } from "@/lib/models";
 
 const VRAM_OPTIONS = [16, 24, 32];
@@ -34,11 +35,22 @@ export default function VramMatcher() {
 
   return (
     <section className="bg-gray-900 rounded-xl p-6 space-y-5">
-      <div>
-        <h2 className="text-xl font-bold mb-1">VRAM Adapter</h2>
-        <p className="text-gray-400 text-sm">
-          Select your GPU VRAM to see recommended LTX 2.3 models:
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-xl font-bold mb-1">VRAM Adapter</h2>
+          <p className="text-gray-400 text-sm">
+            Select your GPU VRAM to see recommended LTX 2.3 models:
+          </p>
+        </div>
+        <Link
+          href="/models"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Download
+        </Link>
       </div>
       <div className="flex gap-2 flex-wrap">
         {VRAM_OPTIONS.map((v) => (

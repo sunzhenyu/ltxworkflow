@@ -124,6 +124,9 @@ export default function PricingPage() {
             <p className="text-xs text-gray-400 text-center">
               随时取消，无隐藏费用
             </p>
+            <p className="text-xs text-red-400 text-center font-medium">
+              ⚠️ 所有支付均为最终支付，不支持退款
+            </p>
           </div>
         </div>
       </div>
@@ -171,7 +174,7 @@ export default function PricingPage() {
               <span className="text-gray-400 group-open:rotate-180 transition-transform">▼</span>
             </summary>
             <p className="text-gray-400 text-sm mt-3">
-              We offer a 7-day money-back guarantee. If you're not satisfied with your Pro subscription, contact us within 7 days for a full refund.
+              No, all payments are final and non-refundable. Please make sure you understand the features and pricing before subscribing. You can cancel your subscription at any time to prevent future charges, but we do not provide refunds for past payments.
             </p>
           </details>
 
