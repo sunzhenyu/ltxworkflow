@@ -18,6 +18,7 @@ const links = [
       { href: "/resources/tools", label: "Tools" },
     ]
   },
+  { href: "/pricing", label: "Pricing" },
 ];
 
 export default async function Nav({ activeHref }: { activeHref?: string }) {
