@@ -10,6 +10,18 @@ export const metadata: Metadata = {
 
 const entries = [
   {
+    date: "2026-04-21",
+    title: "Pro Subscription & Content Library Launch",
+    items: [
+      "Pro Plan: Subscribe for ¥2.99/month to unlock unlimited prompt enhancements and workflow generations (free users get 3 uses per day)",
+      "Content Library: Added 13+ new resources including tutorials, community discussions, showcase examples, research papers, and tool guides",
+      "Navigation: Renamed 'Models' to 'Downloads' for clarity",
+      "VRAM Adapter: Added quick download button to jump directly to model downloads",
+      "Payment Policy: Clear no-refund policy displayed on pricing and success pages",
+      "Workflows Page: Removed subscription card for cleaner layout - visit Pricing page to subscribe",
+    ],
+  },
+  {
     date: "2026-04-16",
     title: "Blog System & Site Improvements",
     items: [
