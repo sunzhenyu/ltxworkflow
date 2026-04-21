@@ -110,14 +110,14 @@ export default function WorkflowsPage() {
 
             <div className="pt-2 border-t border-violet-700/50">
               <div className="flex items-baseline gap-2 mb-3">
-                <span className="text-3xl font-bold text-white">$9.99</span>
-                <span className="text-gray-400 text-sm">/month</span>
+                <span className="text-3xl font-bold text-white">¥2.99</span>
+                <span className="text-gray-400 text-sm">/月</span>
               </div>
 
               <SubscribeButton productId={process.env.NEXT_PUBLIC_CREEM_PRODUCT_ID || 'PRODUCT_ID_PLACEHOLDER'} />
 
               <p className="text-xs text-gray-400 text-center mt-2">
-                Cancel anytime. No hidden fees.
+                随时取消，无隐藏费用
               </p>
             </div>
           </div>
