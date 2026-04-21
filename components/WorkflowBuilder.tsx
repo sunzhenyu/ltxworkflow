@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { generateWorkflowJSON, WorkflowParams } from "@/lib/workflow";
@@ -24,16 +24,60 @@ export default function WorkflowBuilder() {
     negativePrompt: "blurry, low quality, distorted",
     modelFile: "ltx-2.3-22b-dev.safetensors",
   });
+  const [usageInfo, setUsageInfo] = useState<{
+    canUse: boolean;
+    isPro: boolean;
+    usageCount: number;
+    limit: number;
+    remaining?: number;
+  } | null>(null);
 
   const json = generateWorkflowJSON(params);
   const jsonStr = JSON.stringify(json, null, 2);
+
+  useEffect(() => {
+    if (isSignedIn) {
+      checkUsage();
+    }
+  }, [isSignedIn]);
+
+  async function checkUsage() {
+    try {
+      const res = await fetch('/api/usage/check?feature=workflow_generator');
+      const data = await res.json();
+      setUsageInfo(data);
+    } catch (error) {
+      console.error('Failed to check usage:', error);
+    }
+  }
 
   function set<K extends keyof WorkflowParams>(k: K, v: WorkflowParams[K]) {
     setParams((p) => ({ ...p, [k]: v }));
   }
 
-  function handleDownload() {
+  async function handleDownload() {
     if (!isSignedIn) return;
+
+    // Check usage limit
+    try {
+      const checkRes = await fetch('/api/usage/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ feature: 'workflow_generator' }),
+      });
+      const checkData = await checkRes.json();
+
+      if (!checkData.canUse) {
+        alert(checkData.message || 'Daily limit reached. Please subscribe for unlimited access.');
+        setUsageInfo(checkData);
+        return;
+      }
+
+      setUsageInfo(checkData);
+    } catch (error) {
+      console.error('Usage check failed:', error);
+    }
+
     const blob = new Blob([jsonStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -45,7 +89,20 @@ export default function WorkflowBuilder() {
 
   return (
     <section className="bg-gray-900 rounded-xl p-6">
-      <h2 className="text-xl font-bold mb-4">ComfyUI Workflow JSON Generator</h2>
+      <div className="flex items-start justify-between mb-4">
+        <h2 className="text-xl font-bold">ComfyUI Workflow JSON Generator</h2>
+        {isSignedIn && usageInfo && (
+          <div className="text-xs">
+            {usageInfo.isPro ? (
+              <span className="bg-violet-600 text-white px-2 py-1 rounded-full">Pro ⚡</span>
+            ) : (
+              <span className="bg-gray-700 text-gray-300 px-2 py-1 rounded-full">
+                {usageInfo.remaining || 0}/{usageInfo.limit} free uses today
+              </span>
+            )}
+          </div>
+        )}
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left: Controls */}
         <div className="space-y-4">
@@ -106,10 +163,19 @@ export default function WorkflowBuilder() {
             />
           </div>
           {isSignedIn ? (
-            <button onClick={handleDownload}
-              className="w-full bg-violet-600 hover:bg-violet-500 text-white font-semibold py-2.5 rounded-lg text-sm transition-colors">
-              Download JSON
-            </button>
+            <div className="space-y-2">
+              <button onClick={handleDownload}
+                className="w-full bg-violet-600 hover:bg-violet-500 text-white font-semibold py-2.5 rounded-lg text-sm transition-colors">
+                Download JSON
+              </button>
+              {usageInfo && !usageInfo.isPro && usageInfo.remaining === 0 && (
+                <Link href="/workflows#subscribe">
+                  <button className="w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2.5 rounded-lg text-sm transition-colors">
+                    Upgrade to Pro for Unlimited
+                  </button>
+                </Link>
+              )}
+            </div>
           ) : (
             <Link href="/sign-in">
               <button className="w-full bg-violet-600 hover:bg-violet-500 text-white font-semibold py-2.5 rounded-lg text-sm transition-colors">

@@ -73,28 +73,38 @@ export default function WorkflowsPage() {
         </section>
 
         <aside className="lg:w-80 shrink-0">
-          <div className="bg-gradient-to-br from-violet-900/50 to-purple-900/50 rounded-xl p-6 border border-violet-700/50 space-y-4">
+          <div id="subscribe" className="bg-gradient-to-br from-violet-900/50 to-purple-900/50 rounded-xl p-6 border border-violet-700/50 space-y-4">
             <div className="flex items-center gap-2">
               <span className="text-2xl">⚡</span>
               <h3 className="text-lg font-bold text-white">LTX Workflow Pro</h3>
             </div>
 
+            <div className="bg-gray-900/50 rounded-lg p-3 border border-violet-700/30">
+              <p className="text-xs text-gray-400 mb-1">Free Plan</p>
+              <p className="text-sm text-white font-semibold">3 uses/day for each tool</p>
+              <p className="text-xs text-gray-500 mt-1">Perfect for trying out LTX 2.3</p>
+            </div>
+
             <ul className="space-y-2 text-sm text-gray-300">
               <li className="flex items-start gap-2">
                 <span className="text-green-400 shrink-0 mt-0.5">✓</span>
-                <span>Premium ComfyUI workflow templates</span>
+                <span>Unlimited prompt enhancements</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-green-400 shrink-0 mt-0.5">✓</span>
-                <span>Advanced video generation tutorials</span>
+                <span>Unlimited workflow JSON downloads</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-green-400 shrink-0 mt-0.5">✓</span>
-                <span>Priority access to new features</span>
+                <span>Premium ComfyUI templates</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-green-400 shrink-0 mt-0.5">✓</span>
-                <span>Community support & updates</span>
+                <span>Advanced tutorials & resources</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 shrink-0 mt-0.5">✓</span>
+                <span>Priority support & updates</span>
               </li>
             </ul>
 

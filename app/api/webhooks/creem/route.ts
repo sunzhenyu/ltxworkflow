@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,27 +33,49 @@ export async function POST(request: NextRequest) {
     // Handle different event types
     switch (event.type) {
       case 'checkout.completed':
-        console.log('Payment successful!', {
-          checkoutId: event.data.id,
-          customerId: event.data.customer_id,
-          productId: event.data.product_id,
+        console.log('Payment successful!', event.data);
+        // Create or update subscription record
+        await supabase.from('user_subscriptions').upsert({
+          user_id: event.data.customer_email || event.data.customer_id,
+          email: event.data.customer_email,
+          customer_id: event.data.customer_id,
+          product_id: event.data.product_id,
+          status: 'active',
         });
-        // TODO: Grant access, send email, update database
         break;
 
       case 'subscription.created':
         console.log('New subscription:', event.data);
-        // TODO: Activate subscription in database
+        await supabase.from('user_subscriptions').upsert({
+          user_id: event.data.customer_email || event.data.customer_id,
+          email: event.data.customer_email,
+          customer_id: event.data.customer_id,
+          subscription_id: event.data.id,
+          product_id: event.data.product_id,
+          status: 'active',
+          current_period_start: event.data.current_period_start,
+          current_period_end: event.data.current_period_end,
+        });
         break;
 
       case 'subscription.canceled':
         console.log('Subscription canceled:', event.data);
-        // TODO: Revoke access
+        await supabase
+          .from('user_subscriptions')
+          .update({ status: 'canceled' })
+          .eq('subscription_id', event.data.id);
         break;
 
       case 'subscription.renewed':
         console.log('Subscription renewed:', event.data);
-        // TODO: Extend access period
+        await supabase
+          .from('user_subscriptions')
+          .update({
+            status: 'active',
+            current_period_start: event.data.current_period_start,
+            current_period_end: event.data.current_period_end,
+          })
+          .eq('subscription_id', event.data.id);
         break;
 
       default:

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 
@@ -9,15 +9,61 @@ export default function PromptEnhancer() {
   const [input, setInput] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [usageInfo, setUsageInfo] = useState<{
+    canUse: boolean;
+    isPro: boolean;
+    usageCount: number;
+    limit: number;
+    remaining?: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (isSignedIn) {
+      checkUsage();
+    }
+  }, [isSignedIn]);
+
+  async function checkUsage() {
+    try {
+      const res = await fetch('/api/usage/check?feature=prompt_enhancer');
+      const data = await res.json();
+      setUsageInfo(data);
+    } catch (error) {
+      console.error('Failed to check usage:', error);
+    }
+  }
 
   async function enhance() {
     if (!input.trim()) return;
     setLoading(true);
+
     if (!isSignedIn) {
       setResult(`${input}, cinematic lighting, shallow depth of field, 4K, photorealistic, smooth motion, professional cinematography`);
       setLoading(false);
       return;
     }
+
+    // Check usage limit
+    try {
+      const checkRes = await fetch('/api/usage/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ feature: 'prompt_enhancer' }),
+      });
+      const checkData = await checkRes.json();
+
+      if (!checkData.canUse) {
+        setResult(checkData.message || 'Daily limit reached. Please subscribe for unlimited access.');
+        setUsageInfo(checkData);
+        setLoading(false);
+        return;
+      }
+
+      setUsageInfo(checkData);
+    } catch (error) {
+      console.error('Usage check failed:', error);
+    }
+
     try {
       const res = await fetch("/api/enhance-prompt", {
         method: "POST",
@@ -34,7 +80,20 @@ export default function PromptEnhancer() {
 
   return (
     <section className="bg-gray-900 rounded-xl p-6">
-      <h2 className="text-xl font-bold mb-1">LTX 2.3 Prompt Generator</h2>
+      <div className="flex items-start justify-between mb-1">
+        <h2 className="text-xl font-bold">LTX 2.3 Prompt Generator</h2>
+        {isSignedIn && usageInfo && (
+          <div className="text-xs">
+            {usageInfo.isPro ? (
+              <span className="bg-violet-600 text-white px-2 py-1 rounded-full">Pro ⚡</span>
+            ) : (
+              <span className="bg-gray-700 text-gray-300 px-2 py-1 rounded-full">
+                {usageInfo.remaining || 0}/{usageInfo.limit} free uses today
+              </span>
+            )}
+          </div>
+        )}
+      </div>
       <p className="text-gray-400 text-sm mb-4">
         {isSignedIn
           ? "Director-level enhancement with cinematic camera language (Dolly Zoom, Tracking Shot, etc.)"
@@ -56,6 +115,13 @@ export default function PromptEnhancer() {
           <Link href="/sign-in">
             <button className="bg-gray-700 hover:bg-gray-600 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors">
               Sign in for Director Mode
+            </button>
+          </Link>
+        )}
+        {isSignedIn && usageInfo && !usageInfo.isPro && usageInfo.remaining === 0 && (
+          <Link href="/workflows#subscribe">
+            <button className="bg-violet-600 hover:bg-violet-500 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors">
+              Upgrade to Pro
             </button>
           </Link>
         )}
