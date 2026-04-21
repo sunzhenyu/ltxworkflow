@@ -80,7 +80,13 @@
    - 文章末尾添加 `## Sources` 章节
 
 ### 插入数据库
-使用 `insert-content.js` 脚本：
+使用 `insert-content.js` 脚本（已内置去重检查）：
+
+**去重机制**：
+- 自动检查 slug 是否已存在
+- 自动检查 source_url 是否已被使用
+- 如果重复会报错并退出，不会覆盖现有内容
+
 ```bash
 # 准备数据文件
 cat > /tmp/data.json << EOF
@@ -99,7 +105,7 @@ cat > /tmp/data.json << EOF
 }
 EOF
 
-# 插入数据库
+# 插入数据库（会自动检查重复）
 node scripts/content-generation/insert-content.js <table> /tmp/data.json
 
 # 或更新已有内容

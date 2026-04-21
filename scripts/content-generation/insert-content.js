@@ -26,6 +26,35 @@ const supabase = createClient(
 );
 
 async function insertContent(table, data) {
+  // Check for duplicate slug
+  const { data: existing } = await supabase
+    .from(table)
+    .select('slug')
+    .eq('slug', data.slug)
+    .single();
+
+  if (existing) {
+    console.error(`✗ Error: Slug "${data.slug}" already exists in ${table}`);
+    console.log('  Use update mode instead: node insert-content.js', table, data.slug, '<data.json>');
+    process.exit(1);
+  }
+
+  // Check for duplicate source_url if provided
+  if (data.source_url) {
+    const { data: existingUrl } = await supabase
+      .from(table)
+      .select('slug, source_url')
+      .eq('source_url', data.source_url)
+      .single();
+
+    if (existingUrl) {
+      console.error(`✗ Error: Source URL already exists in ${table}`);
+      console.log(`  Existing slug: ${existingUrl.slug}`);
+      console.log(`  URL: ${data.source_url}`);
+      process.exit(1);
+    }
+  }
+
   // Only add published_at for tables that have this column (blog_posts only)
   if (table === 'blog_posts') {
     data.published_at = data.published_at || new Date().toISOString();
