@@ -30,7 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const [blogResult, ...resourceResults] = await Promise.all([
       supabase.from("blog_posts").select("slug, published_at, updated_at").eq("is_published", true).order("published_at", { ascending: false }),
       ...RESOURCE_SECTIONS.map((s) =>
-        supabase.from(s).select("slug, source_published_at, updated_at").eq("is_published", true).order("source_published_at", { ascending: false })
+        supabase.from(s).select("slug, created_at, updated_at").eq("is_published", true).order("created_at", { ascending: false })
       ),
     ]);
 
@@ -44,7 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const resourceRoutes: MetadataRoute.Sitemap = resourceResults.flatMap((result, i) =>
       (result.data || []).map((item: any) => ({
         url: `https://ltxworkflow.com/resources/${RESOURCE_SECTIONS[i]}/${item.slug}`,
-        lastModified: new Date(item.updated_at || item.source_published_at || new Date()),
+        lastModified: new Date(item.updated_at || item.created_at),
         changeFrequency: "monthly" as const,
         priority: 0.6,
       }))

@@ -11,6 +11,7 @@ export type ResourceItem = {
   source_url: string | null;
   source_title: string | null;
   source_published_at: string | null;
+  created_at: string;
   is_published: boolean;
   seo_title: string | null;
   seo_description: string | null;
@@ -32,7 +33,7 @@ export async function getResourceItems(
     .from(section)
     .select("*", { count: "exact" })
     .eq("is_published", true)
-    .order("source_published_at", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false })
     .range(from, to);
 
   return { items: (data as ResourceItem[]) || [], total: count || 0 };

@@ -27,13 +27,11 @@ export async function ResourceListPage({ section, page }: Props) {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {items.map((item) => {
-              const date = item.source_published_at
-                ? new Date(item.source_published_at).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })
-                : null;
+              const date = new Date(item.created_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              });
               return (
                 <Link
                   key={item.slug}
@@ -44,7 +42,7 @@ export async function ResourceListPage({ section, page }: Props) {
                     <span className={`${meta.color} px-2 py-0.5 rounded-full font-medium`}>
                       {meta.label}
                     </span>
-                    {date && <span className="text-gray-500">{date}</span>}
+                    <span className="text-gray-500">{date}</span>
                   </div>
                   <h2 className="font-bold text-base text-gray-100 group-hover:text-violet-300 transition-colors">
                     {item.title}
