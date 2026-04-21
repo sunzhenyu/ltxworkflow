@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { getServerSession } from 'next-auth';
+import { auth } from '@/auth';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -11,7 +11,7 @@ const FREE_DAILY_LIMIT = 3;
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await auth();
     const { feature } = await request.json(); // 'prompt_enhancer' or 'workflow_generator'
 
     if (!session?.user?.email) {
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
 // GET endpoint to check current usage without incrementing
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await auth();
     const { searchParams } = new URL(request.url);
     const feature = searchParams.get('feature');
 
