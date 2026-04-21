@@ -4,13 +4,28 @@
 
 当用户说"检查更新"或"check updates"时，执行以下步骤：
 
-1. 用 WebFetch 抓取 HuggingFace API：
-   - `https://huggingface.co/api/models/Lightricks/LTX-2.3` (官方模型)
-   - `https://huggingface.co/api/models/Kijai/LTX2.3_comfy` (FP8 变体)
-2. 读取 `lib/models.ts` 中已有的模型文件名
-3. 对比两者，找出新增的 `.safetensors` 文件
-4. 如果有新模型：列出新内容，询问是否更新 `models.ts` 和 `app/changelog/page.tsx`
-5. 如果没有新内容：报告"No updates found"
+1. 用 curl 直接抓取 HuggingFace API（不用 WebFetch，WebFetch 对 HuggingFace 不可用）：
+   ```bash
+   curl -sL --max-time 30 "https://huggingface.co/api/models/Lightricks/LTX-2.3" -o /tmp/ltx23-api.json
+   curl -sL --max-time 30 "https://huggingface.co/api/models/Kijai/LTX2.3_comfy" -o /tmp/kijai-api.json
+   ```
+   如果 curl 也超时（exit 28），说明本地网络无法访问 HuggingFace，改用 WebSearch 搜索最新文件信息。
+
+2. 解析 API 结果：
+   ```bash
+   python3 -c "
+   import json
+   data = json.load(open('/tmp/kijai-api.json'))
+   files = [s['rfilename'] for s in data.get('siblings',[])]
+   for f in files:
+       if f.endswith('.safetensors'): print(f)
+   "
+   ```
+
+3. 读取 `lib/models.ts` 中已有的模型文件名
+4. 对比两者，找出新增的 `.safetensors` 文件
+5. 如果有新模型：列出新内容，询问是否更新 `models.ts` 和 `app/changelog/page.tsx`
+6. 如果没有新内容：报告"No updates found"
 
 ## 通用内容生成流程（博客 & Resources）
 

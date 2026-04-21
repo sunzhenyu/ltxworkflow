@@ -4,6 +4,7 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import PromptEnhancer from "@/components/PromptEnhancer";
 import WorkflowBuilder from "@/components/WorkflowBuilder";
+import SubscribeButton from "@/components/SubscribeButton";
 
 export const metadata: Metadata = {
   title: "LTX 2.3 Workflow Generator & ComfyUI JSON Downloads",
@@ -61,14 +62,57 @@ export default function WorkflowsPage() {
     <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
       <Nav activeHref="/workflows" />
 
-      <section className="space-y-2">
-        <h1 className="text-3xl font-extrabold">LTX 2.3 Workflow Generator</h1>
-        <p className="text-gray-400">
-          Generate custom ComfyUI workflow JSON with AI-enhanced prompts, or download official workflow templates below.
-          All workflows require <strong className="text-gray-200">taeltx2_3.safetensors</strong> (VAE) —{" "}
-          <Link href="/models" className="text-violet-400 hover:text-violet-300 underline">download it here</Link> first.
-        </p>
-      </section>
+      <div className="flex flex-col lg:flex-row gap-6">
+        <section className="flex-1 space-y-2">
+          <h1 className="text-3xl font-extrabold">LTX 2.3 Workflow Generator</h1>
+          <p className="text-gray-400">
+            Generate custom ComfyUI workflow JSON with AI-enhanced prompts, or download official workflow templates below.
+            All workflows require <strong className="text-gray-200">taeltx2_3.safetensors</strong> (VAE) —{" "}
+            <Link href="/models" className="text-violet-400 hover:text-violet-300 underline">download it here</Link> first.
+          </p>
+        </section>
+
+        <aside className="lg:w-80 shrink-0">
+          <div className="bg-gradient-to-br from-violet-900/50 to-purple-900/50 rounded-xl p-6 border border-violet-700/50 space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">⚡</span>
+              <h3 className="text-lg font-bold text-white">LTX Workflow Pro</h3>
+            </div>
+
+            <ul className="space-y-2 text-sm text-gray-300">
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 shrink-0 mt-0.5">✓</span>
+                <span>Premium ComfyUI workflow templates</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 shrink-0 mt-0.5">✓</span>
+                <span>Advanced video generation tutorials</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 shrink-0 mt-0.5">✓</span>
+                <span>Priority access to new features</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 shrink-0 mt-0.5">✓</span>
+                <span>Community support & updates</span>
+              </li>
+            </ul>
+
+            <div className="pt-2 border-t border-violet-700/50">
+              <div className="flex items-baseline gap-2 mb-3">
+                <span className="text-3xl font-bold text-white">$9.99</span>
+                <span className="text-gray-400 text-sm">/month</span>
+              </div>
+
+              <SubscribeButton productId={process.env.NEXT_PUBLIC_CREEM_PRODUCT_ID || 'PRODUCT_ID_PLACEHOLDER'} />
+
+              <p className="text-xs text-gray-400 text-center mt-2">
+                Cancel anytime. No hidden fees.
+              </p>
+            </div>
+          </div>
+        </aside>
+      </div>
 
       <PromptEnhancer />
       <WorkflowBuilder />
