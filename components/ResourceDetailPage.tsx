@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import MarkdownContent from "@/components/MarkdownContent";
+import VideoEmbed from "@/components/VideoEmbed";
 import { getResourceItem, sectionMeta, ResourceSection } from "@/lib/resources";
 
 type Props = {
@@ -41,6 +42,13 @@ export async function ResourceDetailPage({ section, slug }: Props) {
             <p className="text-sm text-gray-500">By {item.author_name}</p>
           )}
         </header>
+
+        {item.video_url && (
+          <div className="space-y-3">
+            <h2 className="text-lg font-bold text-gray-200">📹 Video Tutorial</h2>
+            <VideoEmbed url={item.video_url} title={item.title} />
+          </div>
+        )}
 
         <div className="bg-gray-900 rounded-xl p-6 md:p-8">
           <MarkdownContent content={item.content} />

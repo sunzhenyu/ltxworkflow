@@ -75,7 +75,11 @@
       "Bash(bash scripts/content-generation/download-media.sh /tmp/t1-videos.txt public/videos/resources/ tut-lora-)",
       "Bash(bash scripts/content-generation/download-media.sh /tmp/t2-images.txt public/images/resources/ tut-install-)",
       "Bash(bash scripts/content-generation/download-media.sh /tmp/t3-images.txt public/images/resources/ tut-upscale-)",
-      "WebFetch(domain:docs.creem.io)"
+      "WebFetch(domain:docs.creem.io)",
+      "Bash(python3 scripts/content-generation/extract-media.py /tmp/tutorial-1.html)",
+      "Bash(python3 scripts/content-generation/extract-media.py /tmp/tutorial-2.html)",
+      "Bash(python3 scripts/content-generation/extract-media.py /tmp/tutorial-3.html)",
+      "Bash(wc:*)"
     ]
   }
 }

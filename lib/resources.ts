@@ -11,6 +11,7 @@ export type ResourceItem = {
   source_url: string | null;
   source_title: string | null;
   source_published_at: string | null;
+  video_url: string | null;
   created_at: string;
   is_published: boolean;
   seo_title: string | null;
