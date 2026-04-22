@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "How to Install LTX 2.3 with ComfyUI — Complete Setup Guide (16GB-32GB VRAM)",
@@ -55,7 +56,17 @@ const steps = [
   },
 ];
 
-export default function GuidePage() {
+export default async function GuidePage() {
+  // Fetch video tutorials
+  const supabase = await createClient();
+  const { data: videoTutorials } = await supabase
+    .from("tutorials")
+    .select("slug, title, excerpt, video_url")
+    .not("video_url", "is", null)
+    .eq("is_published", true)
+    .order("created_at", { ascending: false })
+    .limit(3);
+
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
@@ -131,6 +142,40 @@ export default function GuidePage() {
           <p className="text-xs text-gray-500 mt-0.5">Official T2V, I2V, ICLoRA workflow JSON files</p>
         </Link>
       </div>
+
+      {videoTutorials && videoTutorials.length > 0 && (
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">📹 Video Tutorials</h2>
+            <Link href="/resources/tutorials" className="text-sm text-violet-400 hover:text-violet-300">
+              View All →
+            </Link>
+          </div>
+          <p className="text-gray-400 text-sm">
+            Watch step-by-step video guides to master LTX 2.3 and ComfyUI workflows.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {videoTutorials.map((tutorial) => (
+              <Link
+                key={tutorial.slug}
+                href={`/resources/tutorials/${tutorial.slug}`}
+                className="bg-gray-900 rounded-xl p-5 hover:bg-gray-800 transition-colors group space-y-3"
+              >
+                <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center">
+                  <svg className="w-12 h-12 text-violet-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+                <h3 className="font-bold text-sm text-gray-100 group-hover:text-violet-300 transition-colors line-clamp-2">
+                  {tutorial.title}
+                </h3>
+                <p className="text-xs text-gray-400 line-clamp-2">{tutorial.excerpt}</p>
+                <p className="text-xs text-violet-400 group-hover:text-violet-300">Watch Tutorial →</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       <div className="text-center pt-4">
         <Link href="/">
