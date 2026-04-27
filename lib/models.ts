@@ -4,12 +4,13 @@ export type ModelVariant = {
   filename: string;
   size: string;
   vram: number;
-  vramMax?: number; // upper bound — model won't show above this VRAM tier
+  vramMax?: number;
   type: "full" | "distilled" | "fp8" | "lora";
   hfUrl: string;
   description: string;
   badge?: string;
-  recommendation?: string; // official usage guidance
+  recommendation?: string;
+  isNew?: boolean;
 };
 
 // Source: https://github.com/Lightricks/ComfyUI-LTXVideo
@@ -128,6 +129,7 @@ export const MODELS: ModelVariant[] = [
     description: "Official FP8 dev model from Lightricks. 29.1GB, runs on 16GB VRAM.",
     badge: "Official FP8",
     recommendation: "Official FP8 from Lightricks. Alternative to Kijai's FP8 dev model.",
+    isNew: true,
   },
   {
     id: "ltx23-distilled-fp8-official",
@@ -141,6 +143,7 @@ export const MODELS: ModelVariant[] = [
     description: "Official FP8 distilled model from Lightricks. 8 steps, CFG=1.",
     badge: "Official FP8",
     recommendation: "Official FP8 distilled from Lightricks. Alternative to Kijai's FP8.",
+    isNew: true,
   },
   // ── LoRA v1.0 ─────────────────────────────────────────────────────────────
   {
@@ -154,6 +157,7 @@ export const MODELS: ModelVariant[] = [
     description: "Official distilled LoRA rank-384 v1.1. Use with dev model. Place in models/loras/.",
     badge: "v1.1 LoRA",
     recommendation: "Latest official LoRA. Pair with dev model for distilled-quality output.",
+    isNew: true,
   },
   // ── Upscalers ─────────────────────────────────────────────────────────────
   {
@@ -166,6 +170,7 @@ export const MODELS: ModelVariant[] = [
     hfUrl: "https://huggingface.co/Lightricks/LTX-2.3",
     description: "Spatial upscaler x1.5 for two-stage pipelines. Place in models/latent_upscale_models/.",
     recommendation: "Use when x2 upscale is too aggressive. Gentler upscaling option.",
+    isNew: true,
   },
   {
     id: "ltx23-temporal-upscaler",
@@ -177,6 +182,7 @@ export const MODELS: ModelVariant[] = [
     hfUrl: "https://huggingface.co/Lightricks/LTX-2.3",
     description: "Temporal upscaler x2 for frame interpolation. Place in models/latent_upscale_models/.",
     recommendation: "Optional. Use to double frame count (e.g. 25→49 frames) for smoother motion.",
+    isNew: true,
   },
   // ── required for all setups ───────────────────────────────────────────────
   {

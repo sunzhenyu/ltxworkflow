@@ -20,7 +20,7 @@ const VRAM_GROUPS = [
   {
     id: "16gb",
     label: "16GB VRAM — FP8 Quantized (RTX 40xx+)",
-    ids: ["ltx23-distilled-11-fp8", "ltx23-dev-fp8", "ltx23-distilled-11-lora"],
+    ids: ["ltx23-dev-fp8-official", "ltx23-distilled-fp8-official", "ltx23-distilled-lora-384-11", "ltx23-distilled-11-fp8", "ltx23-dev-fp8", "ltx23-distilled-11-lora"],
     note: "Requires RTX 40-series or newer for fp8 matrix multiplication. Use v1.1 FP8 Distilled for fastest generation; use Dev FP8 + LoRA v1.1 if applying LoRA weights.",
   },
   {
@@ -38,8 +38,8 @@ const VRAM_GROUPS = [
   {
     id: "required",
     label: "Required for All Setups",
-    ids: ["ltx23-vae", "ltx23-spatial-upscaler"],
-    note: "Download taeltx2_3.safetensors (VAE) regardless of your VRAM — all ComfyUI workflows require it. Spatial upscaler is optional.",
+    ids: ["ltx23-vae", "ltx23-spatial-upscaler-x15", "ltx23-temporal-upscaler", "ltx23-spatial-upscaler"],
+    note: "Download taeltx2_3.safetensors (VAE) regardless of your VRAM — all ComfyUI workflows require it. Upscalers are optional.",
   },
 ];
 
@@ -116,11 +116,14 @@ export default function ModelsPage() {
                   <div key={m.id} className="bg-gray-900 rounded-xl p-5 flex flex-col gap-2">
                     <div className="flex items-start justify-between">
                       <h3 className="font-semibold text-sm">{m.name}</h3>
-                      {m.badge && (
-                        <span className="text-xs bg-violet-700 text-violet-100 px-2 py-0.5 rounded-full shrink-0 ml-2">
-                          {m.badge}
-                        </span>
-                      )}
+                      <div className="flex gap-1 shrink-0 ml-2">
+                        {m.isNew && (
+                          <span className="text-xs bg-orange-600 text-white px-2 py-0.5 rounded-full">🔥 New</span>
+                        )}
+                        {m.badge && (
+                          <span className="text-xs bg-violet-700 text-violet-100 px-2 py-0.5 rounded-full">{m.badge}</span>
+                        )}
+                      </div>
                     </div>
                     <code className="text-xs text-green-400 bg-gray-800 px-2 py-1 rounded font-mono break-all">
                       {m.filename}
