@@ -1,17 +1,20 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { MODELS, getModelsForVram } from "@/lib/models";
+import { MODELS } from "@/lib/models";
 
 const VRAM_OPTIONS = [16, 24, 32];
-const REQUIRED_IDS = ["ltx23-vae", "ltx23-spatial-upscaler"];
+const REQUIRED_IDS = ["ltx23-vae", "ltx23-spatial-upscaler", "ltx23-spatial-upscaler-x15", "ltx23-temporal-upscaler"];
 
-function ModelRow({ m }: { m: ReturnType<typeof getModelsForVram>[0] }) {
+function ModelRow({ m }: { m: typeof MODELS[0] }) {
   return (
     <div className="bg-gray-800 rounded-lg px-4 py-3 space-y-1.5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="font-medium text-sm">{m.name}</span>
+          {m.isNew && (
+            <span className="text-xs bg-orange-600 text-white px-2 py-0.5 rounded-full">🔥 New</span>
+          )}
           {m.badge && (
             <span className="text-xs bg-violet-700 text-violet-100 px-2 py-0.5 rounded-full">
               {m.badge}
@@ -29,8 +32,9 @@ function ModelRow({ m }: { m: ReturnType<typeof getModelsForVram>[0] }) {
 
 export default function VramMatcher() {
   const [selected, setSelected] = useState<number>(16);
-  const all = getModelsForVram(selected);
-  const checkpoints = all.filter((m) => !REQUIRED_IDS.includes(m.id));
+  const checkpoints = MODELS.filter(
+    (m) => !REQUIRED_IDS.includes(m.id) && m.vram === selected && (m.vramMax === undefined || selected <= m.vramMax)
+  );
   const required = MODELS.filter((m) => REQUIRED_IDS.includes(m.id));
 
   return (
