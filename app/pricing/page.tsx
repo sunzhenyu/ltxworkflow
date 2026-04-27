@@ -166,7 +166,7 @@ export default async function PricingPage() {
               </li>
             </ul>
 
-            <SubscribeButton productId={process.env.NEXT_PUBLIC_CREEM_ONE_TIME_PRODUCT_ID || ''} />
+            <SubscribeButton productId={process.env.NEXT_PUBLIC_CREEM_ONE_TIME_PRODUCT_ID || ''} label="Buy Now →" />
 
             <p className="text-xs text-gray-400 text-center">
               Pay once, use for 30 days. No recurring charges.
