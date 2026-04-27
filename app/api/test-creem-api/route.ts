@@ -19,12 +19,14 @@ export async function GET() {
 
   for (const method of authMethods) {
     try {
+      const headers: Record<string, string> = {
+        ...method.headers,
+        'Content-Type': 'application/json',
+      };
+
       const response = await fetch('https://api.creem.io/v1/products', {
         method: 'GET',
-        headers: {
-          ...method.headers,
-          'Content-Type': 'application/json',
-        },
+        headers,
       });
 
       const data = await response.json();
