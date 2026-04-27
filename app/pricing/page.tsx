@@ -33,7 +33,7 @@ export default async function PricingPage() {
             <div>
               <h2 className="text-2xl font-bold text-white mb-2">Free</h2>
               <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-bold text-white">¥0</span>
+                <span className="text-4xl font-bold text-white">$0</span>
                 <span className="text-gray-400">/month</span>
               </div>
             </div>
@@ -85,7 +85,7 @@ export default async function PricingPage() {
             <div>
               <h2 className="text-2xl font-bold text-white mb-2">Pro</h2>
               <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-bold text-white">¥2.99</span>
+                <span className="text-4xl font-bold text-white">$2.99</span>
                 <span className="text-gray-300">/month</span>
               </div>
             </div>

@@ -31,12 +31,13 @@ export async function POST(request: NextRequest) {
       .eq('user_id', userId)
       .single();
 
-    // If user has active subscription, allow unlimited usage
+    // If user has active subscription or valid one-time purchase, allow unlimited usage
     if (subscription?.status === 'active') {
       const now = new Date();
-      const periodEnd = new Date(subscription.current_period_end);
+      const periodEnd = subscription.current_period_end ? new Date(subscription.current_period_end) : null;
+      const proUntil = subscription.pro_until ? new Date(subscription.pro_until) : null;
 
-      if (periodEnd > now) {
+      if ((periodEnd && periodEnd > now) || (proUntil && proUntil > now)) {
         return NextResponse.json({
           canUse: true,
           isPro: true,
@@ -125,9 +126,10 @@ export async function GET(request: NextRequest) {
 
     if (subscription?.status === 'active') {
       const now = new Date();
-      const periodEnd = new Date(subscription.current_period_end);
+      const periodEnd = subscription.current_period_end ? new Date(subscription.current_period_end) : null;
+      const proUntil = subscription.pro_until ? new Date(subscription.pro_until) : null;
 
-      if (periodEnd > now) {
+      if ((periodEnd && periodEnd > now) || (proUntil && proUntil > now)) {
         return NextResponse.json({
           canUse: true,
           isPro: true,
