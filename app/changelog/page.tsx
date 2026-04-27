@@ -10,6 +10,18 @@ export const metadata: Metadata = {
 
 const entries = [
   {
+    date: "2026-04-27",
+    title: "New Models & One-time Payment Option",
+    items: [
+      "New Models: Added official Lightricks FP8 variants for dev and distilled models (29.1GB / 29.5GB)",
+      "New Models: Added Spatial Upscaler x1.5 and Temporal Upscaler x2 for two-stage pipelines",
+      "New Models: Added official LoRA rank-384 v1.1 from Lightricks",
+      "Pricing: Added one-time payment option ($4.99 for 30 days Pro access, no auto-renewal)",
+      "Pricing: Updated currency display to USD ($)",
+      "Video Tutorials: Added 3 Bilibili video tutorials to the Guide page",
+    ],
+  },
+  {
     date: "2026-04-21",
     title: "Pro Subscription & Content Library Launch",
     items: [
