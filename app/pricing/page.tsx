@@ -3,6 +3,7 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import SubscribeButton from "@/components/SubscribeButton";
 import Link from "next/link";
+import { auth } from "@/auth";
 
 export const metadata: Metadata = {
   title: "Pricing - LTX Workflow Pro Subscription",
@@ -10,7 +11,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://ltxworkflow.com/pricing" },
 };
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const session = await auth();
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
       <Nav activeHref="/pricing" />
@@ -63,9 +65,9 @@ export default function PricingPage() {
               </li>
             </ul>
 
-            <Link href="/sign-in">
+            <Link href={session ? "/workflows" : "/sign-in"}>
               <button className="w-full bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 rounded-lg transition-colors">
-                Get Started Free
+                {session ? "Go to Workflows" : "Get Started Free"}
               </button>
             </Link>
           </div>
