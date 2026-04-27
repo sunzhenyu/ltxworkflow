@@ -26,7 +26,7 @@ export default async function PricingPage() {
         </p>
       </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
         {/* Free Plan */}
         <div className="bg-gray-900 rounded-xl p-8 border border-gray-800">
           <div className="space-y-4">
@@ -121,10 +121,59 @@ export default async function PricingPage() {
               </li>
             </ul>
 
-            <SubscribeButton productId={process.env.NEXT_PUBLIC_CREEM_PRODUCT_ID || 'PRODUCT_ID_PLACEHOLDER'} />
+            <SubscribeButton productId={process.env.NEXT_PUBLIC_CREEM_PRODUCT_ID || ''} />
 
             <p className="text-xs text-gray-400 text-center">
               Cancel anytime, no hidden fees
+            </p>
+            <p className="text-xs text-red-400 text-center font-medium">
+              ⚠️ All payments are final and non-refundable
+            </p>
+          </div>
+        </div>
+
+        {/* One-time Plan */}
+        <div className="bg-gray-900 rounded-xl p-8 border border-gray-700">
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-2">One-time</h2>
+              <div className="flex items-baseline gap-2">
+                <span className="text-4xl font-bold text-white">$4.99</span>
+                <span className="text-gray-400">/month</span>
+              </div>
+            </div>
+
+            <p className="text-gray-400 text-sm">
+              One-time payment, 30 days Pro access. No subscription required.
+            </p>
+
+            <ul className="space-y-3 py-4">
+              <li className="flex items-start gap-3">
+                <span className="text-violet-400 shrink-0 mt-0.5">⚡</span>
+                <span className="text-white text-sm font-medium">Unlimited prompt enhancements</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-violet-400 shrink-0 mt-0.5">⚡</span>
+                <span className="text-white text-sm font-medium">Unlimited workflow JSON downloads</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-violet-400 shrink-0 mt-0.5">⚡</span>
+                <span className="text-white text-sm font-medium">Premium ComfyUI templates</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-violet-400 shrink-0 mt-0.5">⚡</span>
+                <span className="text-white text-sm font-medium">Advanced tutorials & resources</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-green-400 shrink-0 mt-0.5">✓</span>
+                <span className="text-gray-300 text-sm">Supports Alipay & WeChat Pay</span>
+              </li>
+            </ul>
+
+            <SubscribeButton productId={process.env.NEXT_PUBLIC_CREEM_ONE_TIME_PRODUCT_ID || ''} />
+
+            <p className="text-xs text-gray-400 text-center">
+              30 days access, no auto-renewal
             </p>
             <p className="text-xs text-red-400 text-center font-medium">
               ⚠️ All payments are final and non-refundable

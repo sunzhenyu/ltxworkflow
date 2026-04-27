@@ -32,17 +32,23 @@ export async function POST(request: NextRequest) {
 
     // Handle different event types
     switch (event.type) {
-      case 'checkout.completed':
+      case 'checkout.completed': {
         console.log('Payment successful!', event.data);
-        // Create or update subscription record
+        const oneTimeProductId = process.env.NEXT_PUBLIC_CREEM_ONE_TIME_PRODUCT_ID;
+        const isOneTime = event.data.product_id === oneTimeProductId;
+        const proUntil = isOneTime
+          ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+          : null;
         await supabase.from('user_subscriptions').upsert({
           user_id: event.data.customer_email || event.data.customer_id,
           email: event.data.customer_email,
           customer_id: event.data.customer_id,
           product_id: event.data.product_id,
           status: 'active',
+          ...(proUntil && { pro_until: proUntil }),
         });
         break;
+      }
 
       case 'subscription.created':
         console.log('New subscription:', event.data);
