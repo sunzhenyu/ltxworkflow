@@ -1,35 +1,47 @@
-import { Checkout } from '@creem_io/nextjs';
 import { NextRequest, NextResponse } from 'next/server';
 
-// Validate environment variables
-const apiKey = process.env.CREEM_API_KEY;
-
-if (!apiKey || apiKey === 'your_creem_api_key_here') {
-  console.error('CREEM_API_KEY is not configured properly');
-}
-
 export async function GET(request: NextRequest) {
-  try {
-    // Log for debugging
-    console.log('Checkout request received');
-    console.log('API Key configured:', !!apiKey && apiKey !== 'your_creem_api_key_here');
+  const apiKey = process.env.CREEM_API_KEY;
+  const productId = request.nextUrl.searchParams.get('productId');
 
-    const handler = Checkout({
-      apiKey: apiKey!,
-      testMode: true,
-      defaultSuccessUrl: '/success',
+  if (!apiKey) {
+    return NextResponse.json({ error: 'CREEM_API_KEY not configured' }, { status: 500 });
+  }
+
+  if (!productId) {
+    return NextResponse.json({ error: 'productId is required' }, { status: 400 });
+  }
+
+  try {
+    const response = await fetch('https://api.creem.io/v1/checkouts', {
+      method: 'POST',
+      headers: {
+        'X-API-Key': apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        product_id: productId,
+        success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://ltxworkflow.com'}/success`,
+      }),
     });
 
-    return handler(request);
+    const data = await response.json();
+
+    if (!response.ok) {
+      return NextResponse.json({ error: 'Failed to create checkout', details: data }, { status: response.status });
+    }
+
+    // Redirect to Creem checkout URL
+    const checkoutUrl = data.checkout_url || data.url || data.redirect_url;
+    if (checkoutUrl) {
+      return NextResponse.redirect(checkoutUrl);
+    }
+
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Checkout error:', error);
-    return NextResponse.json(
-      {
-        error: 'Failed to create checkout',
-        details: error instanceof Error ? error.message : 'Unknown error',
-        configured: !!apiKey && apiKey !== 'your_creem_api_key_here'
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      error: 'Failed to create checkout',
+      details: error instanceof Error ? error.message : 'Unknown error',
+    }, { status: 500 });
   }
 }
