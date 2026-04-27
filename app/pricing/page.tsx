@@ -34,7 +34,7 @@ export default async function PricingPage() {
               <h2 className="text-2xl font-bold text-white mb-2">Free</h2>
               <div className="flex items-baseline gap-2">
                 <span className="text-4xl font-bold text-white">¥0</span>
-                <span className="text-gray-400">/月</span>
+                <span className="text-gray-400">/month</span>
               </div>
             </div>
 
@@ -86,7 +86,7 @@ export default async function PricingPage() {
               <h2 className="text-2xl font-bold text-white mb-2">Pro</h2>
               <div className="flex items-baseline gap-2">
                 <span className="text-4xl font-bold text-white">¥2.99</span>
-                <span className="text-gray-300">/月</span>
+                <span className="text-gray-300">/month</span>
               </div>
             </div>
 
@@ -144,7 +144,7 @@ export default async function PricingPage() {
             </div>
 
             <p className="text-gray-400 text-sm">
-              One-time payment, 30 days Pro access. No subscription required.
+              One-time payment for 30 days of Pro access. No auto-renewal.
             </p>
 
             <ul className="space-y-3 py-4">
@@ -164,16 +164,12 @@ export default async function PricingPage() {
                 <span className="text-violet-400 shrink-0 mt-0.5">⚡</span>
                 <span className="text-white text-sm font-medium">Advanced tutorials & resources</span>
               </li>
-              <li className="flex items-start gap-3">
-                <span className="text-green-400 shrink-0 mt-0.5">✓</span>
-                <span className="text-gray-300 text-sm">Supports Alipay & WeChat Pay</span>
-              </li>
             </ul>
 
             <SubscribeButton productId={process.env.NEXT_PUBLIC_CREEM_ONE_TIME_PRODUCT_ID || ''} />
 
             <p className="text-xs text-gray-400 text-center">
-              30 days access, no auto-renewal
+              Pay once, use for 30 days. No recurring charges.
             </p>
             <p className="text-xs text-red-400 text-center font-medium">
               ⚠️ All payments are final and non-refundable
