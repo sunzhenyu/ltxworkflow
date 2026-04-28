@@ -6,12 +6,12 @@ import PromptEnhancer from "@/components/PromptEnhancer";
 import WorkflowBuilder from "@/components/WorkflowBuilder";
 
 export const metadata: Metadata = {
-  title: "LTX 2.3 Workflow Generator & ComfyUI JSON Downloads",
-  description: "Generate custom ComfyUI workflow JSON for LTX 2.3 with AI prompt enhancement. Download official T2V, I2V, LoRA, and upscaler workflow templates. Pro tools for serious video creators.",
+  title: "LTX 2.3 ComfyUI Workflow JSON Download — LTX-2.3_T2V_I2V_Single_Stage_Distilled_Full.json",
+  description: "Download official LTX 2.3 ComfyUI workflow JSON files: LTX-2.3_T2V_I2V_Single_Stage_Distilled_Full.json, LTX-2.3_T2V_I2V_Two_Stage_Distilled.json, ICLoRA Union Control, Motion Track. Plus AI workflow generator.",
   alternates: { canonical: "https://ltxworkflow.com/workflows" },
   openGraph: {
-    title: "LTX 2.3 Workflow Generator & ComfyUI JSON Downloads",
-    description: "AI-powered prompt enhancer and ComfyUI workflow JSON generator for LTX 2.3. Plus official workflow templates for T2V, I2V, LoRA, and upscaler.",
+    title: "LTX 2.3 ComfyUI Workflow JSON Download",
+    description: "Download LTX-2.3_T2V_I2V_Single_Stage_Distilled_Full.json and all official LTX 2.3 ComfyUI workflow templates. Plus AI-powered workflow generator.",
     url: "https://ltxworkflow.com/workflows",
     type: "website",
   },
@@ -67,6 +67,9 @@ export default function WorkflowsPage() {
           Generate custom ComfyUI workflow JSON with AI-enhanced prompts, or download official workflow templates below.
           All workflows require <strong className="text-gray-200">taeltx2_3.safetensors</strong> (VAE) —{" "}
           <Link href="/models" className="text-violet-400 hover:text-violet-300 underline">download it here</Link> first.
+        </p>
+        <p className="text-xs text-gray-600">
+          Available: ltx-2.3_t2v_i2v_single_stage_distilled_full.json · ltx-2.3_t2v_i2v_two_stage_distilled.json · ltx-2.3_iclora_union_control_distilled.json · ltx-2.3_iclora_motion_track_distilled.json
         </p>
       </div>
 
