@@ -5,12 +5,12 @@ import Footer from "@/components/Footer";
 import { MODELS } from "@/lib/models";
 
 export const metadata: Metadata = {
-  title: "LTX 2.3 Model Downloads — taeltx2_3.safetensors, FP8, Direct Links",
-  description: "Direct download links for all LTX 2.3 ComfyUI models. Get taeltx2_3.safetensors (VAE), FP8 quantized (16GB VRAM), and official checkpoints (32GB). Organized by GPU requirements with installation guide.",
+  title: "LTX 2.3 Model Downloads — taeltx2_3.safetensors, ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors, Direct Links",
+  description: "Direct HuggingFace download links for all LTX 2.3 ComfyUI models: taeltx2_3.safetensors (VAE), ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors (16GB), ltx-2.3-22b-dev-fp8.safetensors, ltx-2.3-22b-distilled-1.1.safetensors (32GB). Organized by VRAM with ComfyUI workflow generator.",
   alternates: { canonical: "https://ltxworkflow.com/models" },
   openGraph: {
-    title: "LTX 2.3 Model Downloads — All Variants",
-    description: "Direct HuggingFace links to taeltx2_3.safetensors, FP8, and official LTX 2.3 models for ComfyUI",
+    title: "LTX 2.3 Model Downloads — taeltx2_3.safetensors & FP8 Direct Links",
+    description: "Direct HuggingFace links for taeltx2_3.safetensors, ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors, ltx-2.3-22b-dev-fp8.safetensors and all LTX 2.3 ComfyUI models.",
     url: "https://ltxworkflow.com/models",
     type: "website",
   },
@@ -136,14 +136,24 @@ export default function ModelsPage() {
                       <span>{m.size}</span>
                       <span className="text-violet-400">{m.vram}GB+ VRAM</span>
                     </div>
-                    <a
-                      href={m.hfUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-1 text-center text-xs bg-violet-700 hover:bg-violet-600 text-white py-2 rounded-lg transition-colors font-medium"
-                    >
-                      Download on HuggingFace →
-                    </a>
+                    <div className="flex gap-2 mt-1">
+                      <a
+                        href={m.hfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 text-center text-xs bg-violet-700 hover:bg-violet-600 text-white py-2 rounded-lg transition-colors font-medium"
+                      >
+                        Download →
+                      </a>
+                      {(m.type === "full" || m.type === "distilled" || m.type === "fp8") && (
+                        <Link
+                          href="/workflows"
+                          className="flex-1 text-center text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-2 rounded-lg transition-colors font-medium"
+                        >
+                          Generate Workflow →
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
