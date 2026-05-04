@@ -10,6 +10,19 @@ export const metadata: Metadata = {
 
 const entries = [
   {
+    date: "2026-05-27",
+    title: "17 New Model Variants — Audio VAE, MXFP8 & More",
+    items: [
+      "New: LTX23 Audio VAE (Kijai) — enables audio-conditioned video generation workflows",
+      "New: LTX23 Video VAE BF16 and Text Projection BF16 components (Kijai)",
+      "New: Spatial Upscaler x2 v1.1 — updated upscaler from Lightricks",
+      "New: Distilled LoRA rank-384 v1.0 (Official) and Dynamic LoRA rank-105 (Kijai)",
+      "New: Distilled 1.1 BF16 and MXFP8 transformer-only variants (Kijai)",
+      "New: Dev BF16, FP8 Scaled, and MXFP8 transformer-only variants (Kijai)",
+      "New: Distilled v1.0 BF16, FP8 v1/v2/Scaled, and MXFP8 transformer-only variants (Kijai)",
+    ],
+  },
+  {
     date: "2026-04-27",
     title: "New Models & One-time Payment Option",
     items: [
