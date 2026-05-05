@@ -19,9 +19,20 @@ export const metadata: Metadata = {
 const VRAM_GROUPS = [
   {
     id: "16gb",
-    label: "16GB VRAM — FP8 Quantized (RTX 40xx+)",
-    ids: ["ltx23-dev-fp8-official", "ltx23-distilled-fp8-official", "ltx23-distilled-lora-384-11", "ltx23-distilled-11-fp8", "ltx23-dev-fp8", "ltx23-distilled-11-lora"],
-    note: "Requires RTX 40-series or newer for fp8 matrix multiplication. Use v1.1 FP8 Distilled for fastest generation; use Dev FP8 + LoRA v1.1 if applying LoRA weights.",
+    label: "16GB VRAM — FP8 / MXFP8 Quantized (RTX 40xx+)",
+    ids: [
+      "ltx23-dev-fp8-official",
+      "ltx23-distilled-fp8-official",
+      "ltx23-distilled-11-fp8",
+      "ltx23-distilled-11-mxfp8",
+      "ltx23-dev-fp8",
+      "ltx23-dev-fp8-scaled",
+      "ltx23-dev-mxfp8",
+      "ltx23-distilled-lora-384-11",
+      "ltx23-distilled-11-lora",
+      "ltx23-distilled-lora-dynamic",
+    ],
+    note: "FP8 scaled requires RTX 40-series or newer. MXFP8 block-32 is an alternative format for compatible GPUs. Use v1.1 FP8 Distilled for fastest generation; use Dev FP8 + LoRA v1.1 if applying LoRA weights.",
   },
   {
     id: "24gb",
@@ -31,15 +42,45 @@ const VRAM_GROUPS = [
   },
   {
     id: "32gb",
-    label: "32GB VRAM — Official Full Precision",
-    ids: ["ltx23-distilled-11", "ltx23-dev"],
-    note: "Official Lightricks checkpoints at full bf16 precision. v1.1 Distilled is recommended for most use cases (8 steps, CFG=1).",
+    label: "32GB VRAM — Official Full Precision (BF16)",
+    ids: [
+      "ltx23-distilled-11",
+      "ltx23-distilled-11-bf16",
+      "ltx23-dev",
+      "ltx23-dev-bf16",
+      "ltx23-distilled-lora-384-11",
+      "ltx23-distilled-lora-384",
+    ],
+    note: "Official Lightricks checkpoints at full bf16 precision. v1.1 Distilled recommended for most use cases (8 steps, CFG=1). BF16 transformer-only variants from Kijai are also available.",
+  },
+  {
+    id: "previous",
+    label: "Previous Versions — v1.0 Models",
+    ids: [
+      "ltx23-distilled",
+      "ltx23-distilled-fp8",
+      "ltx23-distilled-fp8-v1",
+      "ltx23-distilled-fp8-v2",
+      "ltx23-distilled-fp8-scaled",
+      "ltx23-distilled-mxfp8",
+      "ltx23-distilled-bf16",
+    ],
+    note: "v1.0 variants superseded by v1.1. Listed for reference or compatibility with existing workflows.",
   },
   {
     id: "required",
-    label: "Required for All Setups",
-    ids: ["ltx23-vae", "ltx23-spatial-upscaler-x15", "ltx23-temporal-upscaler", "ltx23-spatial-upscaler"],
-    note: "Download taeltx2_3.safetensors (VAE) regardless of your VRAM — all ComfyUI workflows require it. Upscalers are optional.",
+    label: "Required & Optional Components",
+    ids: [
+      "ltx23-vae",
+      "ltx23-audio-vae",
+      "ltx23-video-vae",
+      "ltx23-text-projection",
+      "ltx23-spatial-upscaler-x2-11",
+      "ltx23-spatial-upscaler",
+      "ltx23-spatial-upscaler-x15",
+      "ltx23-temporal-upscaler",
+    ],
+    note: "taeltx2_3.safetensors (VAE) is required for all setups. Audio VAE enables audio-conditioned workflows. Upscalers are optional — place in models/latent_upscale_models/.",
   },
 ];
 
@@ -175,14 +216,16 @@ export default function ModelsPage() {
             <p><strong className="text-gray-300">Dev</strong> — Full model. Use only if you need LoRA training or fine-tuning. Slower, more flexible.</p>
           </div>
           <div className="space-y-1">
-            <p className="font-medium text-gray-200">FP8 vs Full Precision</p>
-            <p><strong className="text-gray-300">FP8 (Kijai)</strong> — Quantized to 8-bit float. Runs on 16GB VRAM. Requires RTX 40xx+ for hardware fp8 support. Slight quality trade-off.</p>
-            <p><strong className="text-gray-300">Full bf16</strong> — Official Lightricks weights. Best quality. Needs 32GB VRAM, or 24GB with sequential offloading.</p>
+            <p className="font-medium text-gray-200">FP8 vs MXFP8 vs BF16</p>
+            <p><strong className="text-gray-300">FP8 scaled (Kijai)</strong> — Standard 8-bit float. Runs on 16GB. Requires RTX 40xx+. Slight quality trade-off.</p>
+            <p><strong className="text-gray-300">MXFP8 block-32 (Kijai)</strong> — Alternative FP8 format. Try if standard FP8 causes errors on your GPU.</p>
+            <p><strong className="text-gray-300">BF16 (Official / Kijai)</strong> — Full precision. Best quality. Needs 32GB+ VRAM.</p>
           </div>
           <div className="space-y-1">
             <p className="font-medium text-gray-200">Quick decision</p>
             <ul className="space-y-0.5">
-              <li>→ <strong className="text-gray-300">16GB, RTX 40xx+:</strong> Distilled 1.1 FP8</li>
+              <li>→ <strong className="text-gray-300">16GB, RTX 40xx+:</strong> Distilled 1.1 FP8 scaled</li>
+              <li>→ <strong className="text-gray-300">16GB, FP8 issues:</strong> Distilled 1.1 MXFP8 block-32</li>
               <li>→ <strong className="text-gray-300">16GB + LoRA:</strong> Dev FP8 + LoRA 1.1</li>
               <li>→ <strong className="text-gray-300">24GB:</strong> Official Distilled 1.1 + offloading</li>
               <li>→ <strong className="text-gray-300">32GB+:</strong> Official Distilled 1.1 (recommended)</li>
@@ -190,7 +233,7 @@ export default function ModelsPage() {
           </div>
           <div className="space-y-1">
             <p className="font-medium text-gray-200">Always required</p>
-            <p><strong className="text-gray-300">taeltx2_3.safetensors</strong> (VAE) — place in <code className="text-green-400">models/vae/</code>. Every workflow needs this regardless of which checkpoint you use.</p>
+            <p><strong className="text-gray-300">taeltx2_3.safetensors</strong> (VAE) — place in <code className="text-green-400">models/vae/</code>. Every workflow needs this regardless of which checkpoint you use. For audio-to-video workflows, also download <strong className="text-gray-300">LTX23_audio_vae_bf16.safetensors</strong>.</p>
             <a href="https://github.com/Lightricks/ComfyUI-LTXVideo" target="_blank" rel="noopener noreferrer" className="text-violet-400 hover:text-violet-300 underline">
               Official ComfyUI-LTXVideo README →
             </a>

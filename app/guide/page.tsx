@@ -31,14 +31,18 @@ const steps = [
     title: "3. Download LTX 2.3 Model",
     content: "Choose the right model for your VRAM. Place checkpoint files in ComfyUI/models/checkpoints/.",
     items: [
-      { label: "32GB+ VRAM", value: "ltx-2.3-22b-dev.safetensors or ltx-2.3-22b-distilled.safetensors (official, ~42GB)" },
-      { label: "16GB VRAM", value: "ltx-2.3-22b-dev_transformer_only_fp8_input_scaled.safetensors (FP8 by Kijai, ~25GB, requires 40xx+ GPU)" },
+      { label: "16GB, RTX 40xx+", value: "ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors — v1.1 Distilled FP8 by Kijai (~25GB). Fastest, best quality for 16GB." },
+      { label: "16GB + LoRA", value: "ltx-2.3-22b-dev_transformer_only_fp8_scaled.safetensors — Dev FP8 by Kijai (~25GB). Use this if you want to apply LoRA weights." },
+      { label: "16GB, older GPU", value: "ltx-2.3-22b-distilled-1.1_transformer_only_mxfp8_block32.safetensors — MXFP8 variant for GPUs without standard FP8 support." },
+      { label: "24GB VRAM", value: "ltx-2.3-22b-distilled-1.1.safetensors — Official v1.1 with sequential offloading enabled in ComfyUI settings." },
+      { label: "32GB+ VRAM", value: "ltx-2.3-22b-distilled-1.1.safetensors — Official v1.1 full bf16 precision. Best quality, recommended for 32GB." },
+      { label: "32GB, training", value: "ltx-2.3-22b-dev.safetensors — Full dev model. Use only for LoRA training or fine-tuning." },
     ],
   },
   {
     title: "4. Download Required VAE",
-    content: "The TAE (Tiny AutoEncoder) is required for all LTX 2.3 workflows. Place in ComfyUI/models/vae/.",
-    code: "# Download from: https://huggingface.co/Kijai/LTX2.3_comfy\n# File: taeltx2_3.safetensors → ComfyUI/models/vae/",
+    content: "The TAE (Tiny AutoEncoder) is required for all LTX 2.3 workflows. Place in ComfyUI/models/vae/. For audio-conditioned workflows, also download the Audio VAE.",
+    code: "# Required — Download from: https://huggingface.co/Kijai/LTX2.3_comfy\n# File: taeltx2_3.safetensors → ComfyUI/models/vae/\n\n# Audio-to-video workflows only:\n# File: LTX23_audio_vae_bf16.safetensors → ComfyUI/models/vae/",
   },
   {
     title: "5. Load a Workflow",
@@ -49,9 +53,11 @@ const steps = [
     items: [
       { label: "Resolution", value: "Must be divisible by 32. Recommended: 768×512 or 1280×720" },
       { label: "Frames", value: "Must be 8n+1: 25, 49, or 97 frames" },
-      { label: "Steps (Distilled)", value: "8 steps max, CFG=1" },
-      { label: "Steps (Dev)", value: "20–50 steps, CFG=3–7" },
+      { label: "Steps (Distilled)", value: "8 steps max, CFG=1. Use v1.1 Distilled for best results." },
+      { label: "Steps (Dev)", value: "20–50 steps, CFG=3–7. Required for LoRA training." },
       { label: "Scheduler", value: "euler recommended for most cases" },
+      { label: "FP8 vs MXFP8", value: "FP8 scaled: standard RTX 40xx+ FP8. MXFP8 block-32: alternative format, try if standard FP8 causes issues." },
+      { label: "Upscalers", value: "Spatial x1.5 / x2 for resolution upscaling (models/latent_upscale_models/). Temporal x2 to double frame count." },
     ],
   },
 ];
