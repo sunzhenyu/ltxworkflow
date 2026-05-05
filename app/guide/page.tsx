@@ -71,7 +71,7 @@ export default async function GuidePage() {
     .not("video_url", "is", null)
     .eq("is_published", true)
     .order("created_at", { ascending: false })
-    .limit(3);
+    .limit(6);
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
@@ -152,33 +152,41 @@ export default async function GuidePage() {
       {videoTutorials && videoTutorials.length > 0 && (
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">📹 Video Tutorials</h2>
-            <Link href="/resources/tutorials" className="text-sm text-violet-400 hover:text-violet-300">
+            <div className="space-y-1">
+              <h2 className="text-2xl font-bold">Video Tutorials</h2>
+              <p className="text-gray-400 text-sm">Step-by-step video guides to master LTX 2.3 and ComfyUI workflows.</p>
+            </div>
+            <Link href="/resources/tutorials" className="text-sm text-violet-400 hover:text-violet-300 shrink-0">
               View All →
             </Link>
           </div>
-          <p className="text-gray-400 text-sm">
-            Watch step-by-step video guides to master LTX 2.3 and ComfyUI workflows.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {videoTutorials.map((tutorial) => (
-              <Link
-                key={tutorial.slug}
-                href={`/resources/tutorials/${tutorial.slug}`}
-                className="bg-gray-900 rounded-xl p-5 hover:bg-gray-800 transition-colors group space-y-3"
-              >
-                <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center">
-                  <svg className="w-12 h-12 text-violet-400" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-                <h3 className="font-bold text-sm text-gray-100 group-hover:text-violet-300 transition-colors line-clamp-2">
-                  {tutorial.title}
-                </h3>
-                <p className="text-xs text-gray-400 line-clamp-2">{tutorial.excerpt}</p>
-                <p className="text-xs text-violet-400 group-hover:text-violet-300">Watch Tutorial →</p>
-              </Link>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {videoTutorials.map((tutorial) => {
+              const isBilibili = tutorial.video_url?.includes("bilibili");
+              return (
+                <Link
+                  key={tutorial.slug}
+                  href={`/resources/tutorials/${tutorial.slug}`}
+                  className="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition-colors group flex gap-4 items-start"
+                >
+                  <div className="w-24 h-16 shrink-0 bg-gray-800 rounded-lg flex items-center justify-center relative">
+                    <svg className="w-8 h-8 text-violet-400" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                    <span className={`absolute bottom-1 right-1 text-[9px] font-bold px-1 py-0.5 rounded ${isBilibili ? "bg-pink-600 text-white" : "bg-red-600 text-white"}`}>
+                      {isBilibili ? "B站" : "YT"}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0 space-y-1">
+                    <h3 className="font-semibold text-sm text-gray-100 group-hover:text-violet-300 transition-colors line-clamp-2 leading-snug">
+                      {tutorial.title}
+                    </h3>
+                    <p className="text-xs text-gray-500 line-clamp-2">{tutorial.excerpt}</p>
+                    <p className="text-xs text-violet-400 group-hover:text-violet-300">Watch →</p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}
