@@ -26,10 +26,16 @@ const DEFAULT_RES_BY_VRAM: Record<Vram, WorkflowConfig["resolution"]> = {
 };
 
 const FRAME_OPTIONS: { value: WorkflowConfig["frames"]; label: string; sub: string }[] = [
-  { value: 25, label: "25 f", sub: "~3 s" },
-  { value: 49, label: "49 f", sub: "~6 s" },
-  { value: 97, label: "97 f", sub: "~10 s" },
-  { value: 121, label: "121 f", sub: "~15 s" },
+  { value: 65, label: "65 f", sub: "~3–5 s" },
+  { value: 97, label: "97 f", sub: "~5–7 s" },
+  { value: 121, label: "121 f", sub: "~5–8 s ★" },
+  { value: 161, label: "161 f", sub: "~7–11 s" },
+];
+
+const FPS_OPTIONS: { value: WorkflowConfig["fps"]; label: string }[] = [
+  { value: 24, label: "24 fps (cinematic)" },
+  { value: 25, label: "25 fps (default)" },
+  { value: 30, label: "30 fps (smooth)" },
 ];
 
 function ToggleBtn({
@@ -59,8 +65,8 @@ export default function WorkflowBuilder() {
     mode: "i2v",
     priority: "speed",
     resolution: "768x512",
-    frames: 49,
-    fps: 25,
+    frames: 121,
+    fps: 24,
     useHDR: false,
     useUpscaler: false,
   });
@@ -198,8 +204,27 @@ export default function WorkflowBuilder() {
                   </button>
                 ))}
                 {config.vram === "16gb" && (
-                  <span className="px-3 py-1.5 text-xs text-gray-600 italic">1280×720+ needs 24GB+</span>
+                  <span className="px-3 py-1.5 text-xs text-gray-600 italic">720p+ needs 24 GB</span>
                 )}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-gray-300 mb-2 block">Frame rate</label>
+              <div className="flex gap-2">
+                {FPS_OPTIONS.map((o) => (
+                  <button
+                    key={o.value}
+                    onClick={() => set("fps", o.value)}
+                    className={`flex-1 py-1.5 rounded text-xs transition-colors ${
+                      config.fps === o.value
+                        ? "bg-violet-600 text-white"
+                        : "bg-gray-800 hover:bg-gray-700 text-gray-300"
+                    }`}
+                  >
+                    {o.label}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
@@ -251,11 +276,20 @@ export default function WorkflowBuilder() {
             <code className="text-xs text-emerald-300 break-all leading-relaxed block">{modelFile}</code>
             <p className="text-xs text-gray-500">
               {config.vram === "16gb"
-                ? "FP8 quantized — fits in 16GB VRAM with RTX 40xx+ hardware"
-                : config.vram === "24gb" && config.priority === "quality"
-                ? "Full BF16 dev model — enable sequential offloading in ComfyUI settings"
-                : "Full BF16 model — runs comfortably on 32GB VRAM"}
+                ? "FP8 quantized (~25 GB) — requires RTX 40xx+ for fp8 matmuls. On RTX 30xx, use GGUF Q4 instead."
+                : config.vram === "24gb" && (config.priority === "quality" || config.useHDR)
+                ? "Official FP8 dev model (29.1 GB) — reliable on 24 GB without extra offloading."
+                : config.vram === "24gb"
+                ? "FP8 distilled (~25 GB) — runs fast on 24 GB, no offloading needed."
+                : config.priority === "speed"
+                ? "Full BF16 distilled (46 GB) — enable sequential offloading in ComfyUI settings."
+                : "Official FP8 dev model (29.1 GB) — best quality/VRAM balance on 32 GB."}
             </p>
+            {config.vram === "16gb" && (
+              <p className="text-xs text-amber-500">
+                ⚠ RTX 30xx user? Download the <span className="font-mono">fp8_e5m2</span> variant from Kijai instead — scaled-fp8 needs Ada/Blackwell hardware.
+              </p>
+            )}
           </div>
 
           {/* Recommended workflow */}

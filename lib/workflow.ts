@@ -3,8 +3,8 @@ export type WorkflowConfig = {
   mode: "t2v" | "i2v";
   priority: "speed" | "quality";
   resolution: "768x512" | "1024x576" | "1280x720" | "1920x1080";
-  frames: 25 | 49 | 97 | 121;
-  fps: 8 | 16 | 24 | 25;
+  frames: 65 | 97 | 121 | 161;
+  fps: 24 | 25 | 30;
   useHDR: boolean;
   useUpscaler: boolean;
 };
@@ -26,20 +26,20 @@ export type NodeInstruction = {
 };
 
 export function deriveModelFile(config: WorkflowConfig): string {
-  if (config.useHDR) return "ltx-2.3-22b-dev.safetensors";
+  // HDR uses the dev base + distilled LoRA — same routing as quality
   if (config.vram === "16gb") {
-    return config.priority === "quality"
-      ? "ltx-2.3-22b-dev-fp8.safetensors"
+    return config.priority === "quality" || config.useHDR
+      ? "ltx-2.3-22b-dev_transformer_only_fp8_scaled.safetensors"
       : "ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors";
   }
   if (config.vram === "24gb") {
-    return config.priority === "quality"
-      ? "ltx-2.3-22b-dev.safetensors"
-      : "ltx-2.3-22b-distilled-1.1.safetensors";
+    return config.priority === "quality" || config.useHDR
+      ? "ltx-2.3-22b-dev-fp8.safetensors"          // official fp8 dev, 29.1 GB — fits 24 GB
+      : "ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors";
   }
-  // 32gb
-  return config.priority === "quality"
-    ? "ltx-2.3-22b-dev.safetensors"
+  // 32gb: bf16 distilled fits with sequential offload; quality → fp8 dev is more reliable than bf16 dev (42GB)
+  return config.priority === "quality" || config.useHDR
+    ? "ltx-2.3-22b-dev-fp8.safetensors"
     : "ltx-2.3-22b-distilled-1.1.safetensors";
 }
 
@@ -104,32 +104,9 @@ export function recommendWorkflow(config: WorkflowConfig): WorkflowRecommendatio
     };
   }
 
-  // I2V with LoRA control
-  if (config.mode === "i2v" && isDev) {
-    return {
-      workflowName: "ICLoRA Union Control Distilled",
-      workflowFile: "LTX-2.3_ICLoRA_Union_Control_Distilled.json",
-      reason: "Image-to-video with LoRA + control signal for precise generation from a reference image.",
-      requiredFiles: [
-        modelFile,
-        "taeltx2_3.safetensors",
-        "comfy_gemma_3_12B_it.safetensors",
-        "ltx-2.3-22b-distilled-lora-384.safetensors",
-        "ltx-2.3-22b-ic-lora-union-control-ref0.5.safetensors",
-      ],
-      nodeInstructions: [
-        { nodeName: "CheckpointLoaderSimple", field: "ckpt_name", value: modelFile },
-        { nodeName: "LoadImage", field: "image", value: "your-reference-image.png", note: "Drag your image into this node" },
-        { nodeName: "EmptyLTXVLatentVideo", field: "width / height", value: config.resolution.replace("x", " / ") },
-        { nodeName: "EmptyLTXVLatentVideo", field: "length", value: String(config.frames), note: "Must be 8n+1" },
-        { nodeName: "LTXVConditioning", field: "frame_rate", value: String(config.fps) },
-        { nodeName: "LTXVScheduler", field: "steps", value: String(steps) },
-      ],
-      warnings: ["Requires DepthCrafter model (auto-downloaded on first run)"],
-    };
-  }
-
   // Default: Single Stage (T2V + I2V, best for beginners)
+  // Note: i2v is the same workflow as t2v — image feeds into LTXVImgToVideoConditioning node.
+  // ICLoRA Union Control is a ControlNet adapter (canny/depth/pose), not a generic i2v path.
   return {
     workflowName: "T2V / I2V Single Stage Distilled",
     workflowFile: "LTX-2.3_T2V_I2V_Single_Stage_Distilled_Full.json",
