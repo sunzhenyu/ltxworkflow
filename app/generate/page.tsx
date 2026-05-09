@@ -7,13 +7,12 @@ import { getBalance, WELCOME_CREDITS } from "@/lib/credits";
 import Generator from "./Generator";
 
 export const metadata: Metadata = {
-  title:
-    "LTX 2.3 Image-to-Video Generator Online — Fast / Pro / 22B Models, No GPU | LTX Workflow",
-  description: `Generate cinematic LTX 2.3 video from any image in your browser. Powered by official Lightricks LTX 2.3 weights — Fast, Pro, and the new 22B models. No ComfyUI, no GPU, no 16GB+ VRAM. ${WELCOME_CREDITS} free credits at signup.`,
+  title: "LTX 2.3 Image-to-Video Generator — Free Online, No GPU",
+  description: `Animate any image with LTX 2.3 online — no GPU or ComfyUI needed. Official Lightricks weights: Fast, Pro, and 22B models. Get ${WELCOME_CREDITS} free credits at signup.`,
   alternates: { canonical: "https://ltxworkflow.com/generate" },
   openGraph: {
-    title: "LTX 2.3 Image-to-Video Generator — No GPU, No ComfyUI",
-    description: `Animate any image with official LTX 2.3 weights online. Fast, Pro, and 22B models available. ${WELCOME_CREDITS} free credits at signup.`,
+    title: "LTX 2.3 Image-to-Video Generator — Free, No GPU",
+    description: `Animate any image with LTX 2.3 online. Official Lightricks weights, Fast/Pro/22B. ${WELCOME_CREDITS} free credits at signup.`,
     url: "https://ltxworkflow.com/generate",
     type: "website",
   },
@@ -99,6 +98,15 @@ function SignedOutPitch() {
       </section>
 
       <section className="space-y-4">
+        <h2 className="text-2xl font-bold text-white text-center">How to generate a video in 3 steps</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <StepCard step="1" title="Upload your image" body="Drop any photo, illustration, or AI-generated still. JPG, PNG, WebP all work." />
+          <StepCard step="2" title="Describe the motion" body="Type a short prompt — 'camera slowly pushes in, leaves rustle in the wind'. Use our AI suggestions if you're stuck." />
+          <StepCard step="3" title="Download your video" body="LTX 2.3 generates a 1080p clip in ~30 seconds. Download it or watch it directly in the browser." />
+        </div>
+      </section>
+
+      <section className="space-y-4">
         <h2 className="text-2xl font-bold text-white text-center">Why use LTX Workflow online?</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <ValueCard
@@ -117,7 +125,7 @@ function SignedOutPitch() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-white text-center">FAQ</h2>
+        <h2 className="text-2xl font-bold text-white text-center">Frequently asked questions</h2>
         <div className="space-y-3">
           <Faq q="What do I get for signing up?">
             {WELCOME_CREDITS} free credits, no card needed. 1 credit = 1 second of 1080p Fast
@@ -150,6 +158,16 @@ function SignedOutPitch() {
   );
 }
 
+function StepCard({ step, title, body }: { step: string; title: string; body: string }) {
+  return (
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-2">
+      <div className="text-xs text-violet-400 font-bold uppercase tracking-wide">Step {step}</div>
+      <h3 className="font-bold text-white">{title}</h3>
+      <p className="text-sm text-gray-400 leading-relaxed">{body}</p>
+    </div>
+  );
+}
+
 function ValueCard({ title, body }: { title: string; body: string }) {
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-2">
@@ -162,9 +180,9 @@ function ValueCard({ title, body }: { title: string; body: string }) {
 function Faq({ q, children }: { q: string; children: React.ReactNode }) {
   return (
     <details className="bg-gray-900 rounded-lg p-5 group">
-      <summary className="font-semibold text-white cursor-pointer list-none flex items-center justify-between">
-        <span>{q}</span>
-        <span className="text-gray-400 group-open:rotate-180 transition-transform">▼</span>
+      <summary className="cursor-pointer list-none flex items-center justify-between">
+        <h3 className="font-semibold text-white text-base">{q}</h3>
+        <span className="text-gray-400 group-open:rotate-180 transition-transform shrink-0 ml-2">▼</span>
       </summary>
       <div className="text-gray-400 text-sm mt-3 leading-relaxed">{children}</div>
     </details>

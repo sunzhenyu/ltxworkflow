@@ -858,7 +858,7 @@ function HistoryRow({ item }: { item: HistoryItem }) {
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={item.imageUrl}
-            alt=""
+            alt="Source image for this generation"
             className="w-16 h-16 object-cover rounded shrink-0 bg-black"
           />
         ) : (
