@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { auth } from "@/auth";
 import { getBalance, WELCOME_CREDITS } from "@/lib/credits";
 import Generator from "./Generator";
+import GoogleOneTap from "./GoogleOneTap";
 
 export const metadata: Metadata = {
   title: "LTX 2.3 Image-to-Video Generator — Free Online, No GPU",
@@ -20,16 +20,15 @@ export const metadata: Metadata = {
 
 export default async function GeneratePage() {
   const session = await auth();
-
-  if (!session?.user?.email) {
-    return <SignedOutPitch />;
-  }
+  const isAuthenticated = !!session?.user?.email;
 
   let balance = 0;
-  try {
-    balance = await getBalance(session.user.email);
-  } catch (e) {
-    console.error("[/generate] balance load failed:", e);
+  if (isAuthenticated) {
+    try {
+      balance = await getBalance(session!.user!.email!);
+    } catch (e) {
+      console.error("[/generate] balance load failed:", e);
+    }
   }
 
   return (
@@ -57,46 +56,19 @@ export default async function GeneratePage() {
 
       <Generator initialBalance={balance} />
 
+      {/* SEO sections — visible to anonymous visitors and search bots */}
+      {!isAuthenticated && <AnonymousSEOContent />}
+
+      <GoogleOneTap />
+
       <Footer />
     </main>
   );
 }
 
-function SignedOutPitch() {
+function AnonymousSEOContent() {
   return (
-    <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
-      <Nav activeHref="/generate" />
-
-      <section className="text-center space-y-4 pt-4">
-        <span className="inline-block bg-amber-700/30 border border-amber-600/50 text-amber-200 text-xs px-3 py-1 rounded-full font-medium uppercase tracking-wide">
-          {WELCOME_CREDITS} free credits at signup
-        </span>
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white">
-          Run LTX 2.3 in your browser.
-          <br />
-          <span className="text-violet-400">No GPU. No setup. No ComfyUI.</span>
-        </h1>
-        <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-          Upload an image, type a prompt, get a video — using the same LTX 2.3 weights you&apos;d
-          download. Sign up and get {WELCOME_CREDITS} free credits — one full LTX 2.3 Fast
-          generation, no card required.
-        </p>
-        <div className="flex gap-3 justify-center pt-4 flex-wrap">
-          <Link
-            href="/sign-in"
-            className="bg-amber-500 hover:bg-amber-400 text-gray-950 font-semibold px-6 py-3 rounded-lg text-sm transition-colors"
-          >
-            Sign in — claim {WELCOME_CREDITS} free credits
-          </Link>
-          <Link
-            href="/models"
-            className="bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold px-6 py-3 rounded-lg text-sm transition-colors"
-          >
-            Or download models for ComfyUI
-          </Link>
-        </div>
-      </section>
-
+    <div className="space-y-10">
       <section className="space-y-4">
         <h2 className="text-2xl font-bold text-white text-center">How to generate a video in 3 steps</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -152,9 +124,7 @@ function SignedOutPitch() {
           </Faq>
         </div>
       </section>
-
-      <Footer />
-    </main>
+    </div>
   );
 }
 

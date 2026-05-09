@@ -3,6 +3,7 @@ import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import { createClient } from "@supabase/supabase-js";
 import bcrypt from "bcryptjs";
+import { OAuth2Client } from "google-auth-library";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -31,6 +32,49 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const valid = await bcrypt.compare(credentials.password as string, user.password_hash);
         if (!valid) return null;
         return { id: user.id, email: user.email, name: user.name };
+      },
+    }),
+    Credentials({
+      id: "google-one-tap",
+      name: "Google One Tap",
+      credentials: { credential: { type: "text" } },
+      async authorize(credentials) {
+        const token = credentials?.credential as string | undefined;
+        if (!token) return null;
+        try {
+          const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+          const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+          });
+          const payload = ticket.getPayload();
+          if (!payload?.email) return null;
+
+          const { data: existing } = await supabase
+            .from("users")
+            .select("id, email, name")
+            .eq("email", payload.email)
+            .single();
+
+          if (!existing) {
+            const { data: created } = await supabase
+              .from("users")
+              .insert({
+                email: payload.email,
+                name: payload.name ?? payload.email,
+                avatar_url: payload.picture,
+                provider: "google",
+              })
+              .select("id, email, name")
+              .single();
+            if (!created) return null;
+            return { id: created.id, email: created.email, name: created.name };
+          }
+
+          return { id: existing.id, email: existing.email, name: existing.name };
+        } catch {
+          return null;
+        }
       },
     }),
   ],

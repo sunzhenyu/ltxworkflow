@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import {
   ALLOWED_DURATIONS,
   aspectsForModel,
@@ -14,6 +16,7 @@ import {
   type ModelKey,
   type Resolution,
 } from "@/lib/credit-cost";
+import { WELCOME_CREDITS } from "@/lib/credits";
 
 type ApiStatus = "pending" | "running" | "completed" | "failed";
 type UiStatus = "idle" | "submitting" | "running" | "completed" | "failed";
@@ -58,6 +61,10 @@ export default function Generator({
 }: {
   initialBalance: number;
 }) {
+  const { data: session } = useSession();
+  const isAuthed = !!session;
+  const router = useRouter();
+
   // Account state
   const [balance, setBalance] = useState(initialBalance);
 
@@ -112,6 +119,7 @@ export default function Generator({
 
   // ── Side effects ────────────────────────────────────────────────────────
   const refreshHistory = useCallback(async () => {
+    if (!isAuthed) return;
     try {
       const res = await fetch("/api/generations?limit=20", { cache: "no-store" });
       if (!res.ok) return;
@@ -121,13 +129,14 @@ export default function Generator({
     } catch {
       /* non-fatal */
     }
-  }, []);
+  }, [isAuthed]);
 
   useEffect(() => {
     refreshHistory();
   }, [refreshHistory]);
 
   async function refreshBalance() {
+    if (!isAuthed) return;
     try {
       const res = await fetch("/api/credits/balance", { cache: "no-store" });
       const data = await res.json();
@@ -190,6 +199,10 @@ export default function Generator({
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!isAuthed) {
+      router.push("/sign-in?callbackUrl=/generate");
+      return;
+    }
     setErrorMsg(null);
     setUploading(true);
     try {
@@ -208,6 +221,7 @@ export default function Generator({
   }
 
   async function handleSuggest() {
+    if (!isAuthed) { router.push("/sign-in?callbackUrl=/generate"); return; }
     if (suggesting) return;
     setSuggesting(true);
     setErrorMsg(null);
@@ -229,6 +243,7 @@ export default function Generator({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!isAuthed) { router.push("/sign-in?callbackUrl=/generate"); return; }
     if (!canSubmit) return;
 
     setStatus("submitting");
@@ -282,22 +297,34 @@ export default function Generator({
     <div className="space-y-8">
       <div className="space-y-5 w-full">
         {/* Balance */}
-        <div className="flex items-center justify-between bg-gray-900 border border-gray-800 rounded-xl px-5 py-3 text-sm gap-3">
-          <span className="text-gray-300">
-            <span className="text-white font-bold">{balance}</span>{" "}
-            {balance === 1 ? "credit" : "credits"}
-          </span>
-          {balance < cost ? (
-            <a
-              href="/pricing"
-              className="text-xs bg-amber-500 hover:bg-amber-400 text-gray-950 font-semibold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
-            >
-              Buy more credits →
-            </a>
-          ) : (
-            <span className="text-xs text-gray-500">{cost} credits / clip</span>
-          )}
-        </div>
+        {isAuthed ? (
+          <div className="flex items-center justify-between bg-gray-900 border border-gray-800 rounded-xl px-5 py-3 text-sm gap-3">
+            <span className="text-gray-300">
+              <span className="text-white font-bold">{balance}</span>{" "}
+              {balance === 1 ? "credit" : "credits"}
+            </span>
+            {balance < cost ? (
+              <a
+                href="/pricing"
+                className="text-xs bg-amber-500 hover:bg-amber-400 text-gray-950 font-semibold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+              >
+                Buy more credits →
+              </a>
+            ) : (
+              <span className="text-xs text-gray-500">{cost} credits / clip</span>
+            )}
+          </div>
+        ) : (
+          <a
+            href="/sign-in?callbackUrl=/generate"
+            className="flex items-center justify-between bg-gray-900 border border-gray-800 rounded-xl px-5 py-3 text-sm gap-3 hover:border-violet-700 transition-colors"
+          >
+            <span className="text-gray-400">Sign in to claim your free credits</span>
+            <span className="text-xs bg-amber-500 text-gray-950 font-semibold px-3 py-1.5 rounded-lg whitespace-nowrap">
+              Get {WELCOME_CREDITS} free credits →
+            </span>
+          </a>
+        )}
 
         {/* Prompt + image card */}
         <form
@@ -421,12 +448,15 @@ export default function Generator({
               </button>
               <button
                 type="submit"
-                disabled={!canSubmit}
+                disabled={isAuthed && !canSubmit}
                 className="bg-violet-600 hover:bg-violet-500 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed text-white font-semibold px-6 py-2.5 rounded-lg transition-colors inline-flex items-center gap-2"
               >
                 {status === "submitting" && <>Starting…</>}
                 {status === "running" && <>Generating… {elapsedSec}s</>}
-                {status !== "submitting" && status !== "running" && (
+                {status !== "submitting" && status !== "running" && !isAuthed && (
+                  <>Sign in to generate →</>
+                )}
+                {status !== "submitting" && status !== "running" && isAuthed && (
                   <>
                     <span aria-hidden>✨</span>
                     Generate
@@ -492,8 +522,8 @@ export default function Generator({
         )}
       </div>
 
-      {/* History — fills container */}
-      <section className="space-y-3 pt-4 border-t border-gray-800">
+      {/* History — signed-in only */}
+      {isAuthed && <section className="space-y-3 pt-4 border-t border-gray-800">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-white">Your recent generations</h2>
           {history.length > 0 && (
@@ -513,7 +543,7 @@ export default function Generator({
             ))}
           </div>
         )}
-      </section>
+      </section>}
     </div>
   );
 }
