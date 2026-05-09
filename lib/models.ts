@@ -156,7 +156,7 @@ export const MODELS: ModelVariant[] = [
     description: "BF16 dev transformer-only by Kijai. Full precision for 32GB VRAM. Place in models/checkpoints/.",
     badge: "Dev BF16",
     recommendation: "Transformer-only BF16 dev model. Use when training LoRA with full BF16 precision.",
-    isNew: true,
+    isNew: false,
   },
   {
     id: "ltx23-dev-fp8-scaled",
@@ -170,7 +170,7 @@ export const MODELS: ModelVariant[] = [
     description: "FP8 scaled dev model by Kijai. 16GB VRAM. Supports LoRA. Place in models/checkpoints/.",
     badge: "Dev FP8",
     recommendation: "Alternative FP8 quantization for dev. Use when fp8_input_scaled has compatibility issues.",
-    isNew: true,
+    isNew: false,
   },
   {
     id: "ltx23-dev-mxfp8",
@@ -184,7 +184,7 @@ export const MODELS: ModelVariant[] = [
     description: "MXFP8 block-32 dev model by Kijai. 16GB VRAM. Supports LoRA. Place in models/checkpoints/.",
     badge: "Dev MXFP8",
     recommendation: "MXFP8 dev model for 16GB VRAM. Requires RTX 40xx+.",
-    isNew: true,
+    isNew: false,
   },
   // ── Distilled v1.0 additional variants (Kijai) ────────────────────────────
   {
@@ -197,7 +197,7 @@ export const MODELS: ModelVariant[] = [
     hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy",
     description: "BF16 distilled v1.0 transformer-only by Kijai. Full precision on 32GB VRAM.",
     recommendation: "BF16 variant of v1.0 distilled. Use v1.1 BF16 for latest quality.",
-    isNew: true,
+    isNew: false,
   },
   {
     id: "ltx23-distilled-fp8-v1",
@@ -210,7 +210,7 @@ export const MODELS: ModelVariant[] = [
     hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy",
     description: "FP8 distilled v1 by Kijai. Earliest FP8 release, superseded by v3.",
     recommendation: "Previous version. Use FP8 v3 or v1.1 FP8 for better quality.",
-    isNew: true,
+    isNew: false,
   },
   {
     id: "ltx23-distilled-fp8-v2",
@@ -223,7 +223,7 @@ export const MODELS: ModelVariant[] = [
     hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy",
     description: "FP8 distilled v2 by Kijai. Superseded by v3.",
     recommendation: "Previous version. Use FP8 v3 or v1.1 FP8 for better quality.",
-    isNew: true,
+    isNew: false,
   },
   {
     id: "ltx23-distilled-fp8-scaled",
@@ -236,7 +236,7 @@ export const MODELS: ModelVariant[] = [
     hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy",
     description: "FP8 scaled distilled by Kijai. Alternative FP8 quantization method.",
     recommendation: "Alternative FP8 quantization. Use v1.1 FP8 for latest quality.",
-    isNew: true,
+    isNew: false,
   },
   {
     id: "ltx23-distilled-mxfp8",
@@ -249,7 +249,7 @@ export const MODELS: ModelVariant[] = [
     hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy",
     description: "MXFP8 block-32 distilled v1.0 by Kijai. Block-32 quantization format.",
     recommendation: "Previous v1.0 MXFP8. Use v1.1 MXFP8 for latest quality.",
-    isNew: true,
+    isNew: false,
   },
   // ── Official FP8 models (Lightricks) ─────────────────────────────────────
   {
@@ -264,7 +264,7 @@ export const MODELS: ModelVariant[] = [
     description: "Official FP8 dev model from Lightricks. 29.1GB, runs on 16GB VRAM.",
     badge: "Official FP8",
     recommendation: "Official FP8 from Lightricks. Alternative to Kijai's FP8 dev model.",
-    isNew: true,
+    isNew: false,
   },
   {
     id: "ltx23-distilled-fp8-official",
@@ -278,7 +278,7 @@ export const MODELS: ModelVariant[] = [
     description: "Official FP8 distilled model from Lightricks. 8 steps, CFG=1.",
     badge: "Official FP8",
     recommendation: "Official FP8 distilled from Lightricks. Alternative to Kijai's FP8.",
-    isNew: true,
+    isNew: false,
   },
   // ── LoRA v1.1 ─────────────────────────────────────────────────────────────
   {
@@ -292,7 +292,7 @@ export const MODELS: ModelVariant[] = [
     description: "Official distilled LoRA rank-384 v1.1. Use with dev model. Place in models/loras/.",
     badge: "v1.1 LoRA",
     recommendation: "Latest official LoRA. Pair with dev model for distilled-quality output.",
-    isNew: true,
+    isNew: false,
   },
   // ── LoRA v1.0 ─────────────────────────────────────────────────────────────
   {
@@ -306,7 +306,7 @@ export const MODELS: ModelVariant[] = [
     description: "Official distilled LoRA rank-384 v1.0. Pair with dev model. Place in models/loras/.",
     badge: "v1.0 LoRA",
     recommendation: "Previous v1.0 LoRA. Use v1.1 LoRA for latest quality.",
-    isNew: true,
+    isNew: false,
   },
   {
     id: "ltx23-distilled-lora-dynamic",
@@ -319,7 +319,7 @@ export const MODELS: ModelVariant[] = [
     description: "Dynamic rank LoRA (avg rank 105) by Kijai. Pair with dev model. Place in models/loras/.",
     badge: "Dynamic LoRA",
     recommendation: "v1.0 dynamic LoRA. Use v1.1 dynamic LoRA (rank 111) for latest quality.",
-    isNew: true,
+    isNew: false,
   },
   // ── Upscalers ─────────────────────────────────────────────────────────────
   {
@@ -332,7 +332,7 @@ export const MODELS: ModelVariant[] = [
     hfUrl: "https://huggingface.co/Lightricks/LTX-2.3",
     description: "Spatial upscaler x1.5 for two-stage pipelines. Place in models/latent_upscale_models/.",
     recommendation: "Use when x2 upscale is too aggressive. Gentler upscaling option.",
-    isNew: true,
+    isNew: false,
   },
   {
     id: "ltx23-temporal-upscaler",
@@ -344,7 +344,7 @@ export const MODELS: ModelVariant[] = [
     hfUrl: "https://huggingface.co/Lightricks/LTX-2.3",
     description: "Temporal upscaler x2 for frame interpolation. Place in models/latent_upscale_models/.",
     recommendation: "Optional. Use to double frame count (e.g. 25→49 frames) for smoother motion.",
-    isNew: true,
+    isNew: false,
   },
   {
     id: "ltx23-spatial-upscaler-x2-11",
@@ -357,7 +357,7 @@ export const MODELS: ModelVariant[] = [
     description: "Updated spatial upscaler x2 v1.1. Place in models/latent_upscale_models/.",
     badge: "v1.1",
     recommendation: "Updated upscaler. Prefer over v1.0 for better upscaling quality.",
-    isNew: true,
+    isNew: false,
   },
   // ── required for all setups ───────────────────────────────────────────────
   {
@@ -407,7 +407,7 @@ export const MODELS: ModelVariant[] = [
     hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy",
     description: "Standalone video VAE BF16 by Kijai. Alternative to taeltx2_3. Place in models/vae/.",
     recommendation: "Alternative VAE option. Use in workflows that require the separate BF16 VAE component.",
-    isNew: true,
+    isNew: false,
   },
   {
     id: "ltx23-text-projection",
@@ -419,7 +419,7 @@ export const MODELS: ModelVariant[] = [
     hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy",
     description: "Text projection BF16 component by Kijai. Place in models/text_encoders/.",
     recommendation: "Required for workflows using separate text encoder components.",
-    isNew: true,
+    isNew: false,
   },
 ];
 

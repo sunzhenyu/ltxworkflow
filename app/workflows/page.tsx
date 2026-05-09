@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import PromptEnhancer from "@/components/PromptEnhancer";
 import WorkflowBuilder from "@/components/WorkflowBuilder";
 
 export const metadata: Metadata = {
@@ -73,7 +72,6 @@ export default function WorkflowsPage() {
         </p>
       </div>
 
-      <PromptEnhancer />
       <WorkflowBuilder />
 
       <section className="space-y-4">

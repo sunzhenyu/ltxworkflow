@@ -4,7 +4,19 @@ import Link from "next/link";
 import { MODELS } from "@/lib/models";
 
 const VRAM_OPTIONS = [16, 24, 32];
-const REQUIRED_IDS = ["ltx23-vae", "ltx23-spatial-upscaler", "ltx23-spatial-upscaler-x15", "ltx23-temporal-upscaler"];
+const REQUIRED_IDS = [
+  // Required VAE
+  "ltx23-vae",
+  // Optional / specialized components (audio support is the new LTX 2.3 feature)
+  "ltx23-audio-vae",
+  "ltx23-video-vae",
+  "ltx23-text-projection",
+  // Spatial / temporal upscalers
+  "ltx23-spatial-upscaler",
+  "ltx23-spatial-upscaler-x2-11",
+  "ltx23-spatial-upscaler-x15",
+  "ltx23-temporal-upscaler",
+];
 
 function ModelRow({ m }: { m: typeof MODELS[0] }) {
   return (
@@ -83,7 +95,9 @@ export default function VramMatcher() {
       </div>
 
       <div className="space-y-2">
-        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Required for all setups</p>
+        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
+          Required &amp; optional components
+        </p>
         <div className="grid gap-3">
           {required.map((m) => <ModelRow key={m.id} m={m} />)}
         </div>

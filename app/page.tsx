@@ -6,7 +6,7 @@ import Link from "next/link";
 import ModelCards from "@/components/ModelCards";
 import VramMatcher from "@/components/VramMatcher";
 import WorkflowBuilder from "@/components/WorkflowBuilder";
-import PromptEnhancer from "@/components/PromptEnhancer";
+import EmailSubscribe from "@/components/EmailSubscribe";
 import UserMenu from "@/components/UserMenu";
 
 export default async function Home() {
@@ -65,12 +65,29 @@ export default async function Home() {
           <span className="bg-gray-800 px-3 py-1 rounded-full">✓ Direct Links</span>
           <span className="bg-gray-800 px-3 py-1 rounded-full">✓ ComfyUI Ready</span>
         </div>
+
+        <div className="flex gap-3 justify-center flex-wrap pt-3">
+          <Link
+            href="/generate"
+            className="bg-amber-500 hover:bg-amber-400 text-gray-950 font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors inline-flex items-center gap-2"
+          >
+            ▶ Try LTX 2.3 Online — Free
+          </Link>
+          <Link
+            href="/models"
+            className="bg-violet-600 hover:bg-violet-500 text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors inline-flex items-center gap-2"
+          >
+            Download Models →
+          </Link>
+        </div>
       </section>
 
       <VramMatcher />
       <ModelCards />
-      <PromptEnhancer />
       <WorkflowBuilder />
+
+      <EmailSubscribe />
+
 
       <section className="border-t border-gray-800 pt-8">
         <h2 className="text-lg font-bold mb-4">Official Resources</h2>

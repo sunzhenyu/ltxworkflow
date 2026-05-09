@@ -113,7 +113,10 @@ export default function ModelsPage() {
           Start with <strong className="text-gray-200">taeltx2_3.safetensors</strong> (VAE, required for all setups),
           then choose a checkpoint: FP8 quantized for 16GB VRAM or official full precision for 32GB+.
         </p>
-        <div className="flex gap-3 pt-1">
+        <div className="flex gap-3 pt-1 flex-wrap">
+          <Link href="/generate" className="text-sm bg-amber-500 hover:bg-amber-400 text-gray-950 px-4 py-2 rounded-lg transition-colors font-semibold inline-flex items-center gap-1.5">
+            ▶ Try Online — Free
+          </Link>
           <a href="#downloads" className="text-sm bg-violet-700 hover:bg-violet-600 text-white px-4 py-2 rounded-lg transition-colors font-medium">
             Download Models ↓
           </a>
@@ -121,6 +124,24 @@ export default function ModelsPage() {
             How to Choose ↓
           </a>
         </div>
+      </section>
+
+      {/* No GPU? Online generation banner */}
+      <section className="bg-gradient-to-r from-amber-900/30 via-orange-900/20 to-amber-900/30 border border-amber-600/50 rounded-xl p-5 md:p-6 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+        <div className="space-y-1">
+          <h2 className="text-lg md:text-xl font-bold text-white">
+            No GPU? Try LTX 2.3 online — free generation included
+          </h2>
+          <p className="text-sm text-amber-100/80">
+            Skip the 16GB+ VRAM card and ComfyUI setup. Image-to-video, no install, ~30 seconds per clip.
+          </p>
+        </div>
+        <Link
+          href="/generate"
+          className="shrink-0 inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-gray-950 font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors whitespace-nowrap"
+        >
+          Try free →
+        </Link>
       </section>
 
       {/* Quick Start Guide */}
@@ -166,9 +187,13 @@ export default function ModelsPage() {
                         )}
                       </div>
                     </div>
-                    <code className="text-xs text-green-400 bg-gray-800 px-2 py-1 rounded font-mono break-all">
+                    <Link
+                      href={`/models/${m.id}`}
+                      className="text-xs text-green-400 hover:text-green-300 bg-gray-800 hover:bg-gray-750 px-2 py-1 rounded font-mono break-all block transition-colors"
+                      title={`View details for ${m.filename}`}
+                    >
                       {m.filename}
-                    </code>
+                    </Link>
                     {m.recommendation && (
                       <p className="text-xs text-gray-300">{m.recommendation}</p>
                     )}
@@ -186,14 +211,12 @@ export default function ModelsPage() {
                       >
                         Download →
                       </a>
-                      {(m.type === "full" || m.type === "distilled" || m.type === "fp8") && (
-                        <Link
-                          href="/workflows"
-                          className="flex-1 text-center text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-2 rounded-lg transition-colors font-medium"
-                        >
-                          Generate Workflow →
-                        </Link>
-                      )}
+                      <Link
+                        href={`/models/${m.id}`}
+                        className="flex-1 text-center text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-2 rounded-lg transition-colors font-medium"
+                      >
+                        Details →
+                      </Link>
                     </div>
                   </div>
                 ))}

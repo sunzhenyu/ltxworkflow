@@ -5,15 +5,24 @@ import Logo from "./Logo";
 import UserMenu from "./UserMenu";
 import { useState } from "react";
 
-type NavLink = { href: string; label: string } | { label: string; submenu: { href: string; label: string }[] };
+export type NavLink =
+  | { href: string; label: string; primary?: boolean }
+  | { label: string; submenu: { href: string; label: string }[] };
 
-export default function NavClient({ links, activeHref, session }: { links: NavLink[]; activeHref?: string; session: any }) {
+export default function NavClient({
+  links,
+  activeHref,
+  session,
+}: {
+  links: NavLink[];
+  activeHref?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  session: any;
+}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Check if any submenu item is active
-  const isSubmenuActive = (submenu: { href: string; label: string }[]) => {
-    return submenu.some(sub => activeHref?.startsWith(sub.href));
-  };
+  const isSubmenuActive = (submenu: { href: string; label: string }[]) =>
+    submenu.some((sub) => activeHref?.startsWith(sub.href));
 
   return (
     <>
@@ -27,10 +36,24 @@ export default function NavClient({ links, activeHref, session }: { links: NavLi
               const isActive = isSubmenuActive(l.submenu);
               return (
                 <div key={l.label} className="relative group">
-                  <button className={`transition-colors flex items-center gap-1 ${isActive ? "text-violet-400" : "text-gray-400 hover:text-gray-200"}`}>
+                  <button
+                    className={`transition-colors flex items-center gap-1 ${
+                      isActive ? "text-violet-400" : "text-gray-400 hover:text-gray-200"
+                    }`}
+                  >
                     {l.label}
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <svg
+                      className="w-3 h-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </button>
                   <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
@@ -40,7 +63,9 @@ export default function NavClient({ links, activeHref, session }: { links: NavLi
                           key={sub.href}
                           href={sub.href}
                           className={`block px-4 py-2 text-sm transition-colors ${
-                            activeHref === sub.href ? "text-violet-400 bg-gray-800" : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
+                            activeHref === sub.href
+                              ? "text-violet-400 bg-gray-800"
+                              : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
                           }`}
                         >
                           {sub.label}
@@ -51,18 +76,43 @@ export default function NavClient({ links, activeHref, session }: { links: NavLi
                 </div>
               );
             }
+
+            // Primary link — render as prominent amber CTA button.
+            if (l.primary) {
+              const isActive = activeHref === l.href;
+              return (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className={`bg-amber-500 hover:bg-amber-400 text-gray-950 text-sm font-semibold px-4 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 ${
+                    isActive ? "ring-2 ring-amber-300/60" : ""
+                  }`}
+                >
+                  <span aria-hidden>✨</span>
+                  {l.label}
+                </Link>
+              );
+            }
+
             return (
               <Link
                 key={l.href}
                 href={l.href}
-                className={`transition-colors ${activeHref === l.href ? "text-violet-400" : "text-gray-400 hover:text-gray-200"}`}
+                className={`transition-colors ${
+                  activeHref === l.href
+                    ? "text-violet-400"
+                    : "text-gray-400 hover:text-gray-200"
+                }`}
               >
                 {l.label}
               </Link>
             );
           })}
           {session ? (
-            <UserMenu email={session.user?.email || ""} name={session.user?.name} />
+            <UserMenu
+              email={session.user?.email || ""}
+              name={session.user?.name}
+            />
           ) : (
             <Link
               href="/sign-in"
@@ -79,11 +129,26 @@ export default function NavClient({ links, activeHref, session }: { links: NavLi
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Toggle menu"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             {mobileMenuOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             )}
           </svg>
         </button>
@@ -96,14 +161,25 @@ export default function NavClient({ links, activeHref, session }: { links: NavLi
             if ("submenu" in l) {
               const isActive = isSubmenuActive(l.submenu);
               return (
-                <div key={l.label} className="border-b border-gray-800 last:border-0">
-                  <div className={`px-4 py-2 text-sm font-medium ${isActive ? "text-violet-400" : "text-gray-500"}`}>{l.label}</div>
+                <div
+                  key={l.label}
+                  className="border-b border-gray-800 last:border-0"
+                >
+                  <div
+                    className={`px-4 py-2 text-sm font-medium ${
+                      isActive ? "text-violet-400" : "text-gray-500"
+                    }`}
+                  >
+                    {l.label}
+                  </div>
                   {l.submenu.map((sub) => (
                     <Link
                       key={sub.href}
                       href={sub.href}
                       className={`block px-6 py-2 text-sm transition-colors ${
-                        activeHref === sub.href ? "text-violet-400 bg-gray-800" : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
+                        activeHref === sub.href
+                          ? "text-violet-400 bg-gray-800"
+                          : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
                       }`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
@@ -113,12 +189,29 @@ export default function NavClient({ links, activeHref, session }: { links: NavLi
                 </div>
               );
             }
+
+            // Primary mobile entry — keep button styling so it stands out.
+            if (l.primary) {
+              return (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="block mx-4 my-2 bg-amber-500 hover:bg-amber-400 text-gray-950 text-sm font-semibold px-4 py-2 rounded-lg text-center transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  ✨ {l.label}
+                </Link>
+              );
+            }
+
             return (
               <Link
                 key={l.href}
                 href={l.href}
                 className={`block px-4 py-2 text-sm transition-colors ${
-                  activeHref === l.href ? "text-violet-400 bg-gray-800" : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
+                  activeHref === l.href
+                    ? "text-violet-400 bg-gray-800"
+                    : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -127,20 +220,23 @@ export default function NavClient({ links, activeHref, session }: { links: NavLi
             );
           })}
           {session ? (
-              <div className="border-t border-gray-800 mt-2 pt-2">
-                <UserMenu email={session.user?.email || ""} name={session.user?.name} />
-              </div>
-            ) : (
-              <div className="border-t border-gray-800 mt-2 pt-2 px-4">
-                <Link
-                  href="/sign-in"
-                  className="block text-sm text-violet-400 hover:text-violet-300 py-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Sign In
-                </Link>
-              </div>
-            )}
+            <div className="border-t border-gray-800 mt-2 pt-2">
+              <UserMenu
+                email={session.user?.email || ""}
+                name={session.user?.name}
+              />
+            </div>
+          ) : (
+            <div className="border-t border-gray-800 mt-2 pt-2 px-4">
+              <Link
+                href="/sign-in"
+                className="block text-sm text-violet-400 hover:text-violet-300 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Sign In
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </>
