@@ -5,12 +5,12 @@ import Footer from "@/components/Footer";
 import WorkflowBuilder from "@/components/WorkflowBuilder";
 
 export const metadata: Metadata = {
-  title: "LTX 2.3 ComfyUI Workflow JSON Download — LTX-2.3_T2V_I2V_Single_Stage_Distilled_Full.json",
-  description: "Download official LTX 2.3 ComfyUI workflow JSON files: LTX-2.3_T2V_I2V_Single_Stage_Distilled_Full.json, LTX-2.3_T2V_I2V_Two_Stage_Distilled.json, ICLoRA Union Control, Motion Track. Plus AI workflow generator.",
+  title: "LTX 2.3 ComfyUI Workflow JSON Download — T2V / I2V / HDR / ICLoRA",
+  description: "Download official LTX 2.3 ComfyUI workflow JSON files: Single Stage Distilled, Two Stage Distilled, ICLoRA Union Control, Motion Track, and the new HDR workflow. Plus AI workflow generator.",
   alternates: { canonical: "https://ltxworkflow.com/workflows" },
   openGraph: {
-    title: "LTX 2.3 ComfyUI Workflow JSON Download",
-    description: "Download LTX-2.3_T2V_I2V_Single_Stage_Distilled_Full.json and all official LTX 2.3 ComfyUI workflow templates. Plus AI-powered workflow generator.",
+    title: "LTX 2.3 ComfyUI Workflow JSON Download — T2V / I2V / HDR / ICLoRA",
+    description: "All official LTX 2.3 ComfyUI workflows in one place: Distilled, Two-Stage, ICLoRA Union Control, Motion Track, and HDR. Drag into ComfyUI to start.",
     url: "https://ltxworkflow.com/workflows",
     type: "website",
   },
@@ -53,6 +53,20 @@ const workflows = [
     useCase: "Motion tracking with ICLoRA. Define motion trajectories to control how objects or subjects move through the generated video.",
     requires: ["taeltx2_3.safetensors (VAE)", "ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors (16GB) or ltx-2.3-22b-distilled-1.1.safetensors (32GB)", "A compatible LTX 2.3 LoRA file"],
   },
+  {
+    name: "ICLoRA HDR Distilled",
+    file: "LTX-2.3_ICLoRA_HDR_Distilled.json",
+    tags: ["ICLoRA", "HDR", "LoRA", "Distilled", "Advanced"],
+    vram: "16GB+",
+    steps: "8 steps, CFG=1",
+    useCase: "Generate HDR video with enhanced dynamic range. Uses the ICLoRA HDR LoRA and Gemma 3 text encoder for better color grading and highlight/shadow detail.",
+    requires: [
+      "ltx-2.3-22b-dev.safetensors",
+      "comfy_gemma_3_12B_it.safetensors (text encoder)",
+      "ltx-2.3-22b-ic-lora-hdr-0.9.safetensors",
+      "ltx-2.3-22b-distilled-lora-384-1.1.safetensors",
+    ],
+  },
 ];
 
 export default function WorkflowsPage() {
@@ -68,7 +82,7 @@ export default function WorkflowsPage() {
           <Link href="/models" className="text-violet-400 hover:text-violet-300 underline">download it here</Link> first.
         </p>
         <p className="text-xs text-gray-600">
-          Available: ltx-2.3_t2v_i2v_single_stage_distilled_full.json · ltx-2.3_t2v_i2v_two_stage_distilled.json · ltx-2.3_iclora_union_control_distilled.json · ltx-2.3_iclora_motion_track_distilled.json
+          Available: ltx-2.3_t2v_i2v_single_stage_distilled_full.json · ltx-2.3_t2v_i2v_two_stage_distilled.json · ltx-2.3_iclora_union_control_distilled.json · ltx-2.3_iclora_motion_track_distilled.json · ltx-2.3_iclora_hdr_distilled.json
         </p>
       </div>
 
@@ -144,6 +158,7 @@ export default function WorkflowsPage() {
             { q: "Want higher resolution output?", a: "Two Stage Distilled", detail: "Generate at low res, then upscale 2× with the spatial upscaler model." },
             { q: "Have a LTX 2.3 LoRA?", a: "ICLoRA Union Control", detail: "Apply LoRA + control signal together. Use with a reference image." },
             { q: "Want to control motion paths?", a: "ICLoRA Motion Track", detail: "Draw motion trajectories to control how subjects move in the video." },
+            { q: "Want HDR / cinematic dynamic range?", a: "ICLoRA HDR", detail: "Uses the HDR LoRA + Gemma 3 encoder for enhanced highlights and shadows." },
           ].map((item) => (
             <div key={item.q} className="bg-gray-800 rounded-lg px-4 py-3 space-y-1">
               <p className="text-xs text-gray-400">{item.q}</p>
