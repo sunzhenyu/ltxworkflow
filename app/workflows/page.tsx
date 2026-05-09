@@ -75,11 +75,11 @@ export default function WorkflowsPage() {
       <Nav activeHref="/workflows" />
 
       <div className="space-y-2">
-        <h1 className="text-3xl font-extrabold">LTX 2.3 Workflow Generator</h1>
+        <h1 className="text-3xl font-extrabold">LTX 2.3 ComfyUI Workflow Configurator</h1>
         <p className="text-gray-400">
-          Generate custom ComfyUI workflow JSON with AI-enhanced prompts, or download official workflow templates below.
-          All workflows require <strong className="text-gray-200">taeltx2_3.safetensors</strong> (VAE) —{" "}
-          <Link href="/models" className="text-violet-400 hover:text-violet-300 underline">download it here</Link> first.
+          Select your model, resolution, and generation mode — we&apos;ll recommend the right official workflow and tell you exactly which nodes to update.
+          All workflows require <strong className="text-gray-200">taeltx2_3.safetensors</strong> (VAE) or <strong className="text-gray-200">comfy_gemma_3_12B_it.safetensors</strong> —{" "}
+          <Link href="/models" className="text-violet-400 hover:text-violet-300 underline">download models here</Link> first.
         </p>
         <p className="text-xs text-gray-600">
           Available: ltx-2.3_t2v_i2v_single_stage_distilled_full.json · ltx-2.3_t2v_i2v_two_stage_distilled.json · ltx-2.3_iclora_union_control_distilled.json · ltx-2.3_iclora_motion_track_distilled.json · ltx-2.3_iclora_hdr_distilled.json
