@@ -1,20 +1,64 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { recommendWorkflow, WorkflowConfig } from "@/lib/workflow";
-import { MODELS } from "@/lib/models";
+import { recommendWorkflow, deriveModelFile, WorkflowConfig } from "@/lib/workflow";
 
-const RESOLUTIONS: WorkflowConfig["resolution"][] = ["768x512", "1024x576", "1280x720", "1920x1080"];
-const FRAMES: WorkflowConfig["frames"][] = [25, 49, 97, 121];
-const FPS_OPTIONS: WorkflowConfig["fps"][] = [8, 16, 24, 25];
+type Vram = WorkflowConfig["vram"];
+type Mode = WorkflowConfig["mode"];
+type Priority = WorkflowConfig["priority"];
 
-const DEFAULT_MODEL_FILE = "ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors";
+const VRAM_OPTIONS: { value: Vram; label: string; sub: string }[] = [
+  { value: "16gb", label: "16 GB", sub: "RTX 3080 / 4080 / etc." },
+  { value: "24gb", label: "24 GB", sub: "RTX 3090 / 4090" },
+  { value: "32gb", label: "32 GB+", sub: "A100 / H100 / Pro" },
+];
+
+const RESOLUTIONS_BY_VRAM: Record<Vram, WorkflowConfig["resolution"][]> = {
+  "16gb": ["768x512", "1024x576"],
+  "24gb": ["768x512", "1024x576", "1280x720", "1920x1080"],
+  "32gb": ["768x512", "1024x576", "1280x720", "1920x1080"],
+};
+
+const DEFAULT_RES_BY_VRAM: Record<Vram, WorkflowConfig["resolution"]> = {
+  "16gb": "768x512",
+  "24gb": "1024x576",
+  "32gb": "1280x720",
+};
+
+const FRAME_OPTIONS: { value: WorkflowConfig["frames"]; label: string; sub: string }[] = [
+  { value: 25, label: "25 f", sub: "~3 s" },
+  { value: 49, label: "49 f", sub: "~6 s" },
+  { value: 97, label: "97 f", sub: "~10 s" },
+  { value: 121, label: "121 f", sub: "~15 s" },
+];
+
+function ToggleBtn({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+        active ? "bg-violet-600 text-white" : "bg-gray-800 hover:bg-gray-700 text-gray-300"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
 
 export default function WorkflowBuilder() {
   const [config, setConfig] = useState<WorkflowConfig>({
+    vram: "16gb",
     mode: "i2v",
-    modelFile: DEFAULT_MODEL_FILE,
-    resolution: "1024x576",
+    priority: "speed",
+    resolution: "768x512",
     frames: 49,
     fps: 25,
     useHDR: false,
@@ -25,133 +69,160 @@ export default function WorkflowBuilder() {
     setConfig((c) => ({ ...c, [k]: v }));
   }
 
-  function changeModel(filename: string) {
-    setConfig((c) => ({ ...c, modelFile: filename }));
+  function changeVram(vram: Vram) {
+    const validRes = RESOLUTIONS_BY_VRAM[vram];
+    const currentOk = validRes.includes(config.resolution);
+    setConfig((c) => ({
+      ...c,
+      vram,
+      resolution: currentOk ? c.resolution : DEFAULT_RES_BY_VRAM[vram],
+      useHDR: vram === "16gb" ? false : c.useHDR,
+    }));
   }
 
   const rec = recommendWorkflow(config);
+  const modelFile = deriveModelFile(config);
+  const availableRes = RESOLUTIONS_BY_VRAM[config.vram];
 
   return (
     <section className="bg-gray-900 rounded-xl p-6">
-      <div className="mb-4 space-y-1">
+      <div className="mb-5 space-y-1">
         <h2 className="text-xl font-bold">ComfyUI Workflow Configurator</h2>
         <p className="text-sm text-gray-400">
-          Tell us what you want to generate — we&apos;ll recommend the right official workflow and tell you exactly which nodes to update.
+          Answer 4 questions — we&apos;ll pick the right workflow and model for your GPU.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* ── Left: Controls ── */}
-        <div className="space-y-5">
+        {/* ── Left: Questions ── */}
+        <div className="space-y-6">
 
-          {/* Mode */}
+          {/* Q1: VRAM */}
           <div>
-            <label className="text-xs text-gray-400 mb-1.5 block">What are you generating?</label>
+            <label className="text-xs font-semibold text-gray-300 mb-2 block">
+              1 · How much GPU VRAM do you have?
+            </label>
             <div className="flex gap-2">
-              {(["i2v", "t2v"] as const).map((m) => (
+              {VRAM_OPTIONS.map((o) => (
                 <button
-                  key={m}
-                  onClick={() => set("mode", m)}
-                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    config.mode === m ? "bg-violet-600 text-white" : "bg-gray-800 hover:bg-gray-700 text-gray-300"
+                  key={o.value}
+                  onClick={() => changeVram(o.value)}
+                  className={`flex-1 py-2.5 px-2 rounded-lg text-center transition-colors border ${
+                    config.vram === o.value
+                      ? "bg-violet-600 border-violet-500 text-white"
+                      : "bg-gray-800 border-gray-700 hover:bg-gray-700 text-gray-300"
                   }`}
                 >
-                  {m === "i2v" ? "Image → Video" : "Text → Video"}
+                  <div className="text-sm font-bold">{o.label}</div>
+                  <div className="text-xs text-gray-400 mt-0.5">{o.sub}</div>
                 </button>
               ))}
             </div>
-          </div>
-
-          {/* Model */}
-          <div>
-            <label className="text-xs text-gray-400 mb-1.5 block">Model</label>
-            <select
-              className="w-full bg-gray-800 rounded-lg px-3 py-2 text-sm"
-              value={config.modelFile}
-              onChange={(e) => changeModel(e.target.value)}
-            >
-              {MODELS.filter((m) => m.type !== "lora").map((m) => (
-                <option key={m.id} value={m.filename}>
-                  {m.isNew ? "🔥 " : ""}{m.name} — {m.vram}GB VRAM
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-gray-500 mt-1">
-              {MODELS.find((m) => m.filename === config.modelFile)?.recommendation ?? ""}
+            <p className="text-xs text-gray-600 mt-1.5">
+              The most important setting — determines which model fits in your GPU memory.
             </p>
           </div>
 
-          {/* Resolution */}
+          {/* Q2: Mode */}
           <div>
-            <label className="text-xs text-gray-400 mb-1.5 block">Resolution</label>
-            <div className="flex gap-2 flex-wrap">
-              {RESOLUTIONS.map((r) => (
-                <button
-                  key={r}
-                  onClick={() => set("resolution", r)}
-                  className={`px-3 py-1.5 rounded text-xs font-mono transition-colors ${
-                    config.resolution === r ? "bg-violet-600 text-white" : "bg-gray-800 hover:bg-gray-700 text-gray-300"
-                  }`}
-                >
-                  {r}
-                </button>
-              ))}
+            <label className="text-xs font-semibold text-gray-300 mb-2 block">
+              2 · What are you generating?
+            </label>
+            <div className="flex gap-2">
+              <ToggleBtn active={config.mode === "i2v"} onClick={() => set("mode", "i2v")}>
+                Image → Video
+              </ToggleBtn>
+              <ToggleBtn active={config.mode === "t2v"} onClick={() => set("mode", "t2v")}>
+                Text → Video
+              </ToggleBtn>
             </div>
           </div>
 
-          {/* Frames + FPS */}
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <label className="text-xs text-gray-400 mb-1.5 block">Frames</label>
-              <div className="flex gap-2 flex-wrap">
-                {FRAMES.map((f) => (
+          {/* Q3: Priority */}
+          <div>
+            <label className="text-xs font-semibold text-gray-300 mb-2 block">
+              3 · What matters more to you?
+            </label>
+            <div className="flex gap-2">
+              <ToggleBtn active={config.priority === "speed"} onClick={() => set("priority", "speed")}>
+                <span className="block text-sm">Fast</span>
+                <span className="block text-xs text-gray-400">8 steps · ~1 min</span>
+              </ToggleBtn>
+              <ToggleBtn active={config.priority === "quality"} onClick={() => set("priority", "quality")}>
+                <span className="block text-sm">Quality</span>
+                <span className="block text-xs text-gray-400">20+ steps · ~5 min</span>
+              </ToggleBtn>
+            </div>
+          </div>
+
+          {/* Q4: Length + Resolution */}
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-semibold text-gray-300 mb-2 block">
+                4 · Video length
+              </label>
+              <div className="flex gap-2">
+                {FRAME_OPTIONS.map((o) => (
                   <button
-                    key={f}
-                    onClick={() => set("frames", f)}
-                    className={`px-3 py-1.5 rounded text-xs transition-colors ${
-                      config.frames === f ? "bg-violet-600 text-white" : "bg-gray-800 hover:bg-gray-700 text-gray-300"
+                    key={o.value}
+                    onClick={() => set("frames", o.value)}
+                    className={`flex-1 py-2 rounded text-center transition-colors ${
+                      config.frames === o.value
+                        ? "bg-violet-600 text-white"
+                        : "bg-gray-800 hover:bg-gray-700 text-gray-300"
                     }`}
                   >
-                    {f}
+                    <div className="text-xs font-mono">{o.label}</div>
+                    <div className="text-xs text-gray-500">{o.sub}</div>
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-gray-600 mt-1">Must be 8n+1</p>
             </div>
-            <div className="flex-1">
-              <label className="text-xs text-gray-400 mb-1.5 block">FPS</label>
+
+            <div>
+              <label className="text-xs font-semibold text-gray-300 mb-2 block">
+                Resolution <span className="text-gray-500 font-normal">(filtered for your VRAM)</span>
+              </label>
               <div className="flex gap-2 flex-wrap">
-                {FPS_OPTIONS.map((f) => (
+                {availableRes.map((r) => (
                   <button
-                    key={f}
-                    onClick={() => set("fps", f)}
-                    className={`px-3 py-1.5 rounded text-xs transition-colors ${
-                      config.fps === f ? "bg-violet-600 text-white" : "bg-gray-800 hover:bg-gray-700 text-gray-300"
+                    key={r}
+                    onClick={() => set("resolution", r)}
+                    className={`px-3 py-1.5 rounded text-xs font-mono transition-colors ${
+                      config.resolution === r
+                        ? "bg-violet-600 text-white"
+                        : "bg-gray-800 hover:bg-gray-700 text-gray-300"
                     }`}
                   >
-                    {f}
+                    {r}
                   </button>
                 ))}
+                {config.vram === "16gb" && (
+                  <span className="px-3 py-1.5 text-xs text-gray-600 italic">1280×720+ needs 24GB+</span>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Feature toggles */}
+          {/* Optional features */}
           <div className="space-y-2">
-            <label className="text-xs text-gray-400 block">Options</label>
+            <label className="text-xs font-semibold text-gray-300 block">Options</label>
             <label className="flex items-center gap-3 cursor-pointer group">
               <input
                 type="checkbox"
                 checked={config.useUpscaler}
-                onChange={(e) => set("useUpscaler", e.target.checked)}
+                onChange={(e) => {
+                  set("useUpscaler", e.target.checked);
+                  if (e.target.checked) set("useHDR", false);
+                }}
                 disabled={config.useHDR}
                 className="w-4 h-4 accent-violet-500"
               />
               <span className="text-sm text-gray-300 group-hover:text-white transition-colors">
-                Use 2× spatial upscaler <span className="text-xs text-gray-500">(better quality, slower)</span>
+                2× spatial upscaler <span className="text-xs text-gray-500">(doubles resolution after generation)</span>
               </span>
             </label>
-            <label className="flex items-center gap-3 cursor-pointer group">
+            <label className={`flex items-center gap-3 group ${config.vram === "16gb" ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}>
               <input
                 type="checkbox"
                 checked={config.useHDR}
@@ -159,10 +230,14 @@ export default function WorkflowBuilder() {
                   set("useHDR", e.target.checked);
                   if (e.target.checked) set("useUpscaler", false);
                 }}
+                disabled={config.vram === "16gb" || config.useUpscaler}
                 className="w-4 h-4 accent-violet-500"
               />
               <span className="text-sm text-gray-300 group-hover:text-white transition-colors">
-                HDR output <span className="text-xs text-gray-500">(requires Gemma 3 12B + HDR LoRA)</span>
+                HDR output{" "}
+                <span className="text-xs text-gray-500">
+                  {config.vram === "16gb" ? "(requires 24GB+ VRAM)" : "(requires Gemma 3 12B + HDR LoRA)"}
+                </span>
               </span>
             </label>
           </div>
@@ -170,6 +245,19 @@ export default function WorkflowBuilder() {
 
         {/* ── Right: Recommendation ── */}
         <div className="space-y-4">
+          {/* Model auto-selected */}
+          <div className="bg-gray-800/80 rounded-xl p-4 space-y-1.5">
+            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Model for your GPU</p>
+            <code className="text-xs text-emerald-300 break-all leading-relaxed block">{modelFile}</code>
+            <p className="text-xs text-gray-500">
+              {config.vram === "16gb"
+                ? "FP8 quantized — fits in 16GB VRAM with RTX 40xx+ hardware"
+                : config.vram === "24gb" && config.priority === "quality"
+                ? "Full BF16 dev model — enable sequential offloading in ComfyUI settings"
+                : "Full BF16 model — runs comfortably on 32GB VRAM"}
+            </p>
+          </div>
+
           {/* Recommended workflow */}
           <div className="bg-gray-800 rounded-xl p-4 space-y-3">
             <div className="flex items-start justify-between gap-2">
@@ -187,7 +275,6 @@ export default function WorkflowBuilder() {
             </div>
             <p className="text-xs text-gray-400 leading-relaxed">{rec.reason}</p>
 
-            {/* Warnings */}
             {rec.warnings.length > 0 && (
               <div className="space-y-1">
                 {rec.warnings.map((w, i) => (

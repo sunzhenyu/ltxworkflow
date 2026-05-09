@@ -1,6 +1,7 @@
 export type WorkflowConfig = {
+  vram: "16gb" | "24gb" | "32gb";
   mode: "t2v" | "i2v";
-  modelFile: string;
+  priority: "speed" | "quality";
   resolution: "768x512" | "1024x576" | "1280x720" | "1920x1080";
   frames: 25 | 49 | 97 | 121;
   fps: 8 | 16 | 24 | 25;
@@ -24,9 +25,28 @@ export type NodeInstruction = {
   note?: string;
 };
 
+export function deriveModelFile(config: WorkflowConfig): string {
+  if (config.useHDR) return "ltx-2.3-22b-dev.safetensors";
+  if (config.vram === "16gb") {
+    return config.priority === "quality"
+      ? "ltx-2.3-22b-dev-fp8.safetensors"
+      : "ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors";
+  }
+  if (config.vram === "24gb") {
+    return config.priority === "quality"
+      ? "ltx-2.3-22b-dev.safetensors"
+      : "ltx-2.3-22b-distilled-1.1.safetensors";
+  }
+  // 32gb
+  return config.priority === "quality"
+    ? "ltx-2.3-22b-dev.safetensors"
+    : "ltx-2.3-22b-distilled-1.1.safetensors";
+}
+
 export function recommendWorkflow(config: WorkflowConfig): WorkflowRecommendation {
-  const isDistilled = config.modelFile.includes("distilled");
-  const isDev = config.modelFile.includes("dev");
+  const modelFile = deriveModelFile(config);
+  const isDistilled = modelFile.includes("distilled");
+  const isDev = modelFile.includes("dev");
   const steps = isDistilled ? 8 : 20;
   const cfg = isDistilled ? 1 : 3.5;
   const warnings: string[] = [];
@@ -65,14 +85,14 @@ export function recommendWorkflow(config: WorkflowConfig): WorkflowRecommendatio
       workflowFile: "LTX-2.3_T2V_I2V_Two_Stage_Distilled.json",
       reason: "Two-stage pipeline: generate at lower resolution then upscale 2× in latent space. Best quality-to-time ratio for high-res output.",
       requiredFiles: [
-        config.modelFile,
+        modelFile,
         "taeltx2_3.safetensors",
         "ltx-2.3-spatial-upscaler-x2-1.0.safetensors",
         "comfy_gemma_3_12B_it.safetensors",
       ],
       nodeInstructions: [
-        { nodeName: "CheckpointLoaderSimple", field: "ckpt_name", value: config.modelFile },
-        { nodeName: "LTXVAudioVAELoader", field: "model_name", value: config.modelFile },
+        { nodeName: "CheckpointLoaderSimple", field: "ckpt_name", value: modelFile },
+        { nodeName: "LTXVAudioVAELoader", field: "model_name", value: modelFile },
         { nodeName: "LatentUpscaleModelLoader", field: "model_name", value: "ltx-2.3-spatial-upscaler-x2-1.0.safetensors" },
         { nodeName: "EmptyLTXVLatentVideo", field: "width / height", value: config.resolution.replace("x", " / "), note: "Set to HALF your target — upscaler doubles it" },
         { nodeName: "EmptyLTXVLatentVideo", field: "length", value: String(config.frames), note: "Must be 8n+1" },
@@ -91,14 +111,14 @@ export function recommendWorkflow(config: WorkflowConfig): WorkflowRecommendatio
       workflowFile: "LTX-2.3_ICLoRA_Union_Control_Distilled.json",
       reason: "Image-to-video with LoRA + control signal for precise generation from a reference image.",
       requiredFiles: [
-        config.modelFile,
+        modelFile,
         "taeltx2_3.safetensors",
         "comfy_gemma_3_12B_it.safetensors",
         "ltx-2.3-22b-distilled-lora-384.safetensors",
         "ltx-2.3-22b-ic-lora-union-control-ref0.5.safetensors",
       ],
       nodeInstructions: [
-        { nodeName: "CheckpointLoaderSimple", field: "ckpt_name", value: config.modelFile },
+        { nodeName: "CheckpointLoaderSimple", field: "ckpt_name", value: modelFile },
         { nodeName: "LoadImage", field: "image", value: "your-reference-image.png", note: "Drag your image into this node" },
         { nodeName: "EmptyLTXVLatentVideo", field: "width / height", value: config.resolution.replace("x", " / ") },
         { nodeName: "EmptyLTXVLatentVideo", field: "length", value: String(config.frames), note: "Must be 8n+1" },
@@ -117,14 +137,14 @@ export function recommendWorkflow(config: WorkflowConfig): WorkflowRecommendatio
       ? "Best all-in-one workflow for image-to-video with the distilled model. Fast and works on 16GB VRAM."
       : "Best starting point for text-to-video. Handles both T2V and I2V in one workflow.",
     requiredFiles: [
-      config.modelFile,
+      modelFile,
       "taeltx2_3.safetensors",
       "comfy_gemma_3_12B_it.safetensors",
       "ltx-2.3-22b-distilled-lora-384.safetensors",
     ],
     nodeInstructions: [
-      { nodeName: "CheckpointLoaderSimple", field: "ckpt_name", value: config.modelFile },
-      { nodeName: "LTXVAudioVAELoader", field: "model_name", value: config.modelFile },
+      { nodeName: "CheckpointLoaderSimple", field: "ckpt_name", value: modelFile },
+      { nodeName: "LTXVAudioVAELoader", field: "model_name", value: modelFile },
       ...(config.mode === "i2v" ? [
         { nodeName: "LoadImage", field: "image", value: "your-image.png", note: "Drag your source image into this node" },
       ] : []),
@@ -134,7 +154,7 @@ export function recommendWorkflow(config: WorkflowConfig): WorkflowRecommendatio
       { nodeName: "SamplerCustomAdvanced (CFGGuider)", field: "cfg", value: String(cfg) },
       { nodeName: "LTXVScheduler", field: "steps", value: String(steps) },
     ],
-    warnings: isDistilled ? [] : ["Dev model needs 20+ steps and CFG ~3.5 — much slower than distilled"],
+    warnings: isDistilled ? [] : ["Dev model needs 20+ steps and CFG ~3.5 — slower but sharper quality"],
   };
 }
 
