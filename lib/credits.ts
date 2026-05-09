@@ -29,9 +29,7 @@ const adminClient = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
 );
 
-// 8 credits = exactly one LTX 2.3 Fast generation at 6s or 8s (1080p).
-// Lowered from 15 after launch — see migration 20260510. CAC ≈ $0.32/signup.
-export const WELCOME_CREDITS = 8;
+export { WELCOME_CREDITS } from "./credits-constants";
 
 export type DeductReason = "spend" | "adjust";
 export type GrantReason = "purchase" | "refund" | "adjust";

@@ -16,7 +16,7 @@ import {
   type ModelKey,
   type Resolution,
 } from "@/lib/credit-cost";
-import { WELCOME_CREDITS } from "@/lib/credits";
+import { WELCOME_CREDITS } from "@/lib/credits-constants";
 
 type ApiStatus = "pending" | "running" | "completed" | "failed";
 type UiStatus = "idle" | "submitting" | "running" | "completed" | "failed";
