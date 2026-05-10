@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { recommendWorkflow, deriveModelFile, WorkflowConfig } from "@/lib/workflow";
+import { recommendWorkflow, deriveModelFile, deriveGemmaFile, WorkflowConfig } from "@/lib/workflow";
 
 type Vram = WorkflowConfig["vram"];
 type Mode = WorkflowConfig["mode"];
@@ -15,14 +15,14 @@ const VRAM_OPTIONS: { value: Vram; label: string; sub: string }[] = [
 
 const RESOLUTIONS_BY_VRAM: Record<Vram, WorkflowConfig["resolution"][]> = {
   "16gb": ["768x512", "1024x576"],
-  "24gb": ["768x512", "1024x576", "1280x720", "1920x1080"],
-  "32gb": ["768x512", "1024x576", "1280x720", "1920x1080"],
+  "24gb": ["768x512", "1024x576", "1280x704", "1920x1088"],
+  "32gb": ["768x512", "1024x576", "1280x704", "1920x1088"],
 };
 
 const DEFAULT_RES_BY_VRAM: Record<Vram, WorkflowConfig["resolution"]> = {
   "16gb": "768x512",
   "24gb": "1024x576",
-  "32gb": "1280x720",
+  "32gb": "1280x704",
 };
 
 const FRAME_OPTIONS: { value: WorkflowConfig["frames"]; label: string; sub: string }[] = [
@@ -88,6 +88,7 @@ export default function WorkflowBuilder() {
 
   const rec = recommendWorkflow(config);
   const modelFile = deriveModelFile(config);
+  const gemmaFile = deriveGemmaFile(config.vram);
   const availableRes = RESOLUTIONS_BY_VRAM[config.vram];
 
   return (
@@ -271,23 +272,32 @@ export default function WorkflowBuilder() {
         {/* ── Right: Recommendation ── */}
         <div className="space-y-4">
           {/* Model auto-selected */}
-          <div className="bg-gray-800/80 rounded-xl p-4 space-y-1.5">
-            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Model for your GPU</p>
-            <code className="text-xs text-emerald-300 break-all leading-relaxed block">{modelFile}</code>
+          <div className="bg-gray-800/80 rounded-xl p-4 space-y-2">
+            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Models for your GPU</p>
+            <div className="space-y-1.5">
+              <div>
+                <p className="text-xs text-gray-500">Transformer</p>
+                <code className="text-xs text-emerald-300 break-all">{modelFile}</code>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Text encoder (Gemma 3 12B)</p>
+                <code className="text-xs text-emerald-300 break-all">{gemmaFile}</code>
+              </div>
+            </div>
             <p className="text-xs text-gray-500">
               {config.vram === "16gb"
-                ? "FP8 quantized (~25 GB) — requires RTX 40xx+ for fp8 matmuls. On RTX 30xx, use GGUF Q4 instead."
+                ? "FP8 transformer (~25 GB) — RTX 40xx+ only. FP4 Gemma (9.5 GB) is required; full bf16 Gemma won't fit."
                 : config.vram === "24gb" && (config.priority === "quality" || config.useHDR)
-                ? "Official FP8 dev model (29.1 GB) — reliable on 24 GB without extra offloading."
+                ? "FP8 dev transformer (29.1 GB) + FP4 Gemma (9.5 GB) — fits on 24 GB without offloading."
                 : config.vram === "24gb"
-                ? "FP8 distilled (~25 GB) — runs fast on 24 GB, no offloading needed."
+                ? "FP8 distilled (~25 GB) + FP4 Gemma (9.5 GB) — fast on 24 GB."
                 : config.priority === "speed"
-                ? "Full BF16 distilled (46 GB) — enable sequential offloading in ComfyUI settings."
-                : "Official FP8 dev model (29.1 GB) — best quality/VRAM balance on 32 GB."}
+                ? "BF16 distilled (46 GB) — enable sequential offloading in ComfyUI if needed."
+                : "FP8 dev (29.1 GB) + full Gemma BF16 (~24 GB) — fits comfortably on 32 GB."}
             </p>
             {config.vram === "16gb" && (
               <p className="text-xs text-amber-500">
-                ⚠ RTX 30xx user? Download the <span className="font-mono">fp8_e5m2</span> variant from Kijai instead — scaled-fp8 needs Ada/Blackwell hardware.
+                ⚠ RTX 30xx? Use <span className="font-mono">fp8_e5m2</span> transformer instead — scaled-fp8 requires Ada/Blackwell (RTX 40xx+).
               </p>
             )}
           </div>

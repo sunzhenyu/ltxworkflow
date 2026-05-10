@@ -51,10 +51,10 @@ const steps = [
   {
     title: "6. Key Parameters",
     items: [
-      { label: "Resolution", value: "Must be divisible by 32. Recommended: 768×512 or 1280×720" },
-      { label: "Frames", value: "Must be 8n+1: 25, 49, or 97 frames" },
-      { label: "Steps (Distilled)", value: "8 steps max, CFG=1. Use v1.1 Distilled for best results." },
-      { label: "Steps (Dev)", value: "20–50 steps, CFG=3–7. Required for LoRA training." },
+      { label: "Resolution", value: "Both width and height must be divisible by 32. Use 1280×704 (not 1280×720) and 1920×1088 (not 1920×1080)" },
+      { label: "Frames", value: "Must be 8n+1: 65, 97, 121, or 161 frames. Official range: 65–257." },
+      { label: "Steps (Distilled)", value: "8 steps, CFG=1, sampler=euler. Do NOT raise CFG — doubles VRAM without quality gain." },
+      { label: "Steps (Dev)", value: "20–50 steps, CFG=3–5. Required for LoRA training." },
       { label: "Scheduler", value: "euler recommended for most cases" },
       { label: "FP8 vs MXFP8", value: "FP8 scaled: standard RTX 40xx+ FP8. MXFP8 block-32: alternative format, try if standard FP8 causes issues." },
       { label: "Upscalers", value: "Spatial x1.5 / x2 for resolution upscaling (models/latent_upscale_models/). Temporal x2 to double frame count." },
