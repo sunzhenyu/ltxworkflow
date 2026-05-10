@@ -370,7 +370,7 @@ function GpuCompatibilityTable({
   type: ModelVariant["type"];
 }) {
   const isFp8 = type === "fp8";
-  const rows: { gpu: string; vramAmt: number; isRtx30: boolean }[] = [
+  const rows: { gpu: string; vramAmt: number; isRtx30: boolean; verdict: string }[] = [
     { gpu: "RTX 3060 12GB", vramAmt: 12, isRtx30: true },
     { gpu: "RTX 4060 Ti / 4070 (16GB)", vramAmt: 16, isRtx30: false },
     { gpu: "RTX 4070 Ti SUPER / 4080 (16GB)", vramAmt: 16, isRtx30: false },
