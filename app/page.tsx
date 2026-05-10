@@ -29,7 +29,7 @@ export default async function Home() {
 
       <section className="text-center space-y-4">
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-          <span className="text-violet-400">LTX 2.3</span> for ComfyUI — Model Downloads, Workflow Templates &amp; Online Image-to-Video
+          <span className="text-violet-400">LTX 2.3</span>{" "}for ComfyUI — Model Downloads, Workflow Templates &amp; Online Image-to-Video
         </h1>
         <p className="text-gray-400 max-w-2xl mx-auto text-lg">
           Download <strong className="text-gray-200">LTX 2.3</strong> models with direct links —{" "}
