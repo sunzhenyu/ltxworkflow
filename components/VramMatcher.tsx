@@ -18,6 +18,8 @@ const REQUIRED_IDS = [
   "ltx23-temporal-upscaler",
 ];
 
+const DEFAULT_VISIBLE = 3;
+
 function ModelRow({ m }: { m: typeof MODELS[0] }) {
   return (
     <div className="bg-gray-800 rounded-lg px-4 py-3 space-y-1.5">
@@ -37,6 +39,32 @@ function ModelRow({ m }: { m: typeof MODELS[0] }) {
       <code className="text-xs text-green-400 font-mono break-all">{m.filename}</code>
       {m.recommendation && (
         <p className="text-xs text-gray-400">{m.recommendation}</p>
+      )}
+    </div>
+  );
+}
+
+function CollapsibleList({ items, label }: { items: typeof MODELS; label: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const visible = expanded ? items : items.slice(0, DEFAULT_VISIBLE);
+  const hidden = items.length - DEFAULT_VISIBLE;
+
+  return (
+    <div className="space-y-2">
+      <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{label}</p>
+      <div className="grid gap-3">
+        {visible.map((m) => <ModelRow key={m.id} m={m} />)}
+        {items.length === 0 && (
+          <p className="text-gray-500 text-sm">No checkpoints available for this VRAM.</p>
+        )}
+      </div>
+      {hidden > 0 && (
+        <button
+          onClick={() => setExpanded((e) => !e)}
+          className="w-full text-xs text-gray-500 hover:text-gray-300 py-2 border border-gray-800 rounded-lg transition-colors"
+        >
+          {expanded ? "Show less ↑" : `Show ${hidden} more ↓`}
+        </button>
       )}
     </div>
   );
@@ -84,24 +112,8 @@ export default function VramMatcher() {
         ))}
       </div>
 
-      <div className="space-y-2">
-        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Checkpoints for {selected}GB</p>
-        <div className="grid gap-3">
-          {checkpoints.map((m) => <ModelRow key={m.id} m={m} />)}
-          {checkpoints.length === 0 && (
-            <p className="text-gray-500 text-sm">No checkpoints available for this VRAM.</p>
-          )}
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
-          Required &amp; optional components
-        </p>
-        <div className="grid gap-3">
-          {required.map((m) => <ModelRow key={m.id} m={m} />)}
-        </div>
-      </div>
+      <CollapsibleList items={checkpoints} label={`Checkpoints for ${selected}GB`} />
+      <CollapsibleList items={required} label="Required & optional components" />
     </section>
   );
 }
