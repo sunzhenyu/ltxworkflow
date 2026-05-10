@@ -1,58 +1,56 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { recommendWorkflow, deriveModelFile, deriveGemmaFile, WorkflowConfig } from "@/lib/workflow";
+import {
+  recommendWorkflow, deriveModelFile, deriveGemmaFile,
+  resolveResolution, RESOLUTION_TIERS_BY_VRAM, DEFAULT_TIER_BY_VRAM,
+  WorkflowConfig,
+} from "@/lib/workflow";
 
 type Vram = WorkflowConfig["vram"];
-type Mode = WorkflowConfig["mode"];
-type Priority = WorkflowConfig["priority"];
 
 const VRAM_OPTIONS: { value: Vram; label: string; sub: string }[] = [
-  { value: "16gb", label: "16 GB", sub: "RTX 3080 / 4080 / etc." },
-  { value: "24gb", label: "24 GB", sub: "RTX 3090 / 4090" },
+  { value: "16gb", label: "16 GB", sub: "RTX 4080 / 4070 Ti" },
+  { value: "24gb", label: "24 GB", sub: "RTX 4090 / 3090" },
   { value: "32gb", label: "32 GB+", sub: "A100 / H100 / Pro" },
 ];
 
-const RESOLUTIONS_BY_VRAM: Record<Vram, WorkflowConfig["resolution"][]> = {
-  "16gb": ["768x512", "1024x576"],
-  "24gb": ["768x512", "1024x576", "1280x704", "1920x1088"],
-  "32gb": ["768x512", "1024x576", "1280x704", "1920x1088"],
-};
-
-const DEFAULT_RES_BY_VRAM: Record<Vram, WorkflowConfig["resolution"]> = {
-  "16gb": "768x512",
-  "24gb": "1024x576",
-  "32gb": "1280x704",
+const TIER_LABELS: Record<WorkflowConfig["resolutionTier"], string> = {
+  low:   "Low",
+  mid:   "Mid",
+  high:  "High",
+  ultra: "Ultra",
 };
 
 const FRAME_OPTIONS: { value: WorkflowConfig["frames"]; label: string; sub: string }[] = [
-  { value: 65, label: "65 f", sub: "~3–5 s" },
-  { value: 97, label: "97 f", sub: "~5–7 s" },
-  { value: 121, label: "121 f", sub: "~5–8 s ★" },
-  { value: 161, label: "161 f", sub: "~7–11 s" },
+  { value: 65,  label: "65 f",  sub: "~3 s" },
+  { value: 97,  label: "97 f",  sub: "~5 s" },
+  { value: 121, label: "121 f", sub: "~6 s ★" },
+  { value: 161, label: "161 f", sub: "~8 s" },
 ];
 
 const FPS_OPTIONS: { value: WorkflowConfig["fps"]; label: string }[] = [
-  { value: 24, label: "24 fps (cinematic)" },
-  { value: 25, label: "25 fps (default)" },
-  { value: 30, label: "30 fps (smooth)" },
+  { value: 24, label: "24 fps — cinematic" },
+  { value: 25, label: "25 fps — default" },
+  { value: 30, label: "30 fps — smooth" },
 ];
 
-function ToggleBtn({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
+const CONTROL_OPTIONS: { value: WorkflowConfig["controlMode"]; label: string; desc: string }[] = [
+  { value: "none",           label: "None",             desc: "Standard T2V or I2V" },
+  { value: "v2v-composition", label: "V2V Composition",  desc: "Copy pose/depth/edges from a reference video" },
+  { value: "motion-track",   label: "Motion Track",     desc: "Draw motion paths on a still image" },
+];
+
+function Btn({
+  active, onClick, className = "", children,
+}: { active: boolean; onClick: () => void; className?: string; children: React.ReactNode }) {
   return (
     <button
       onClick={onClick}
-      className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-        active ? "bg-violet-600 text-white" : "bg-gray-800 hover:bg-gray-700 text-gray-300"
-      }`}
+      className={`transition-colors ${active
+        ? "bg-violet-600 text-white"
+        : "bg-gray-800 hover:bg-gray-700 text-gray-300"
+      } ${className}`}
     >
       {children}
     </button>
@@ -64,9 +62,11 @@ export default function WorkflowBuilder() {
     vram: "16gb",
     mode: "i2v",
     priority: "speed",
-    resolution: "768x512",
+    orientation: "landscape",
+    resolutionTier: "low",
     frames: 121,
     fps: 24,
+    controlMode: "none",
     useHDR: false,
     useUpscaler: false,
   });
@@ -76,38 +76,53 @@ export default function WorkflowBuilder() {
   }
 
   function changeVram(vram: Vram) {
-    const validRes = RESOLUTIONS_BY_VRAM[vram];
-    const currentOk = validRes.includes(config.resolution);
+    const validTiers = RESOLUTION_TIERS_BY_VRAM[vram];
+    const tierOk = validTiers.includes(config.resolutionTier);
     setConfig((c) => ({
       ...c,
       vram,
-      resolution: currentOk ? c.resolution : DEFAULT_RES_BY_VRAM[vram],
+      resolutionTier: tierOk ? c.resolutionTier : DEFAULT_TIER_BY_VRAM[vram],
       useHDR: vram === "16gb" ? false : c.useHDR,
+    }));
+  }
+
+  function changeControlMode(mode: WorkflowConfig["controlMode"]) {
+    setConfig((c) => ({
+      ...c,
+      controlMode: mode,
+      // control modes need dev model — force quality priority
+      priority: mode !== "none" ? "quality" : c.priority,
+      // disable incompatible options
+      useHDR: false,
+      useUpscaler: false,
     }));
   }
 
   const rec = recommendWorkflow(config);
   const modelFile = deriveModelFile(config);
   const gemmaFile = deriveGemmaFile(config.vram);
-  const availableRes = RESOLUTIONS_BY_VRAM[config.vram];
+  const resolution = resolveResolution(config);
+  const availableTiers = RESOLUTION_TIERS_BY_VRAM[config.vram];
+
+  const isControlMode = config.controlMode !== "none";
 
   return (
     <section className="bg-gray-900 rounded-xl p-6">
       <div className="mb-5 space-y-1">
         <h2 className="text-xl font-bold">ComfyUI Workflow Configurator</h2>
         <p className="text-sm text-gray-400">
-          Answer 4 questions — we&apos;ll pick the right workflow and model for your GPU.
+          Answer a few questions — we&apos;ll pick the right workflow, model files, and node settings for your GPU.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* ── Left: Questions ── */}
-        <div className="space-y-6">
+        <div className="space-y-5">
 
           {/* Q1: VRAM */}
           <div>
             <label className="text-xs font-semibold text-gray-300 mb-2 block">
-              1 · How much GPU VRAM do you have?
+              1 · How much GPU VRAM?
             </label>
             <div className="flex gap-2">
               {VRAM_OPTIONS.map((o) => (
@@ -125,48 +140,84 @@ export default function WorkflowBuilder() {
                 </button>
               ))}
             </div>
-            <p className="text-xs text-gray-600 mt-1.5">
-              The most important setting — determines which model fits in your GPU memory.
-            </p>
+            {config.vram === "16gb" && (
+              <p className="text-xs text-amber-500 mt-1.5">
+                ⚠ RTX 30xx? Use <span className="font-mono">fp8_e5m2</span> variant instead — fp8_scaled requires RTX 40xx+ hardware.
+              </p>
+            )}
           </div>
 
-          {/* Q2: Mode */}
+          {/* Q2: What to generate */}
           <div>
             <label className="text-xs font-semibold text-gray-300 mb-2 block">
               2 · What are you generating?
             </label>
             <div className="flex gap-2">
-              <ToggleBtn active={config.mode === "i2v"} onClick={() => set("mode", "i2v")}>
+              <Btn active={config.mode === "i2v"} onClick={() => set("mode", "i2v")} className="flex-1 py-2 rounded-lg text-sm font-medium">
                 Image → Video
-              </ToggleBtn>
-              <ToggleBtn active={config.mode === "t2v"} onClick={() => set("mode", "t2v")}>
+              </Btn>
+              <Btn active={config.mode === "t2v"} onClick={() => set("mode", "t2v")} className="flex-1 py-2 rounded-lg text-sm font-medium">
                 Text → Video
-              </ToggleBtn>
+              </Btn>
             </div>
           </div>
 
-          {/* Q3: Priority */}
+          {/* Q3: Speed vs Quality */}
           <div>
             <label className="text-xs font-semibold text-gray-300 mb-2 block">
-              3 · What matters more to you?
+              3 · What matters more?
             </label>
             <div className="flex gap-2">
-              <ToggleBtn active={config.priority === "speed"} onClick={() => set("priority", "speed")}>
-                <span className="block text-sm">Fast</span>
-                <span className="block text-xs text-gray-400">8 steps · ~1 min</span>
-              </ToggleBtn>
-              <ToggleBtn active={config.priority === "quality"} onClick={() => set("priority", "quality")}>
-                <span className="block text-sm">Quality</span>
-                <span className="block text-xs text-gray-400">20+ steps · ~5 min</span>
-              </ToggleBtn>
+              <Btn
+                active={config.priority === "speed" && !isControlMode}
+                onClick={() => set("priority", "speed")}
+                className={`flex-1 py-2.5 rounded-lg text-center ${isControlMode ? "opacity-40 cursor-not-allowed" : ""}`}
+              >
+                <div className="text-sm font-medium">Fast</div>
+                <div className="text-xs text-gray-400">8 steps · ~1 min</div>
+              </Btn>
+              <Btn
+                active={config.priority === "quality" || isControlMode}
+                onClick={() => set("priority", "quality")}
+                className="flex-1 py-2.5 rounded-lg text-center"
+              >
+                <div className="text-sm font-medium">Quality</div>
+                <div className="text-xs text-gray-400">20+ steps · ~5 min</div>
+              </Btn>
+            </div>
+            {isControlMode && (
+              <p className="text-xs text-gray-500 mt-1">Control modes use the dev model (quality path).</p>
+            )}
+          </div>
+
+          {/* Q4: Control mode */}
+          <div>
+            <label className="text-xs font-semibold text-gray-300 mb-2 block">
+              4 · Advanced control?
+            </label>
+            <div className="space-y-1.5">
+              {CONTROL_OPTIONS.map((o) => (
+                <button
+                  key={o.value}
+                  onClick={() => changeControlMode(o.value)}
+                  className={`w-full text-left px-3 py-2 rounded-lg transition-colors border ${
+                    config.controlMode === o.value
+                      ? "bg-violet-600 border-violet-500 text-white"
+                      : "bg-gray-800 border-gray-700 hover:bg-gray-700 text-gray-300"
+                  }`}
+                >
+                  <span className="text-sm font-medium">{o.label}</span>
+                  <span className="text-xs text-gray-400 ml-2">{o.desc}</span>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Q4: Length + Resolution */}
-          <div className="space-y-4">
+          {/* Q5: Length + Resolution + Orientation */}
+          <div className="space-y-3">
             <div>
               <label className="text-xs font-semibold text-gray-300 mb-2 block">
-                4 · Video length
+                5 · Video length
               </label>
               <div className="flex gap-2">
                 {FRAME_OPTIONS.map((o) => (
@@ -188,24 +239,44 @@ export default function WorkflowBuilder() {
 
             <div>
               <label className="text-xs font-semibold text-gray-300 mb-2 block">
-                Resolution <span className="text-gray-500 font-normal">(filtered for your VRAM)</span>
+                Orientation
               </label>
-              <div className="flex gap-2 flex-wrap">
-                {availableRes.map((r) => (
-                  <button
-                    key={r}
-                    onClick={() => set("resolution", r)}
-                    className={`px-3 py-1.5 rounded text-xs font-mono transition-colors ${
-                      config.resolution === r
-                        ? "bg-violet-600 text-white"
-                        : "bg-gray-800 hover:bg-gray-700 text-gray-300"
-                    }`}
-                  >
-                    {r}
-                  </button>
-                ))}
+              <div className="flex gap-2">
+                <Btn active={config.orientation === "landscape"} onClick={() => set("orientation", "landscape")} className="flex-1 py-1.5 rounded text-sm">
+                  Landscape
+                </Btn>
+                <Btn active={config.orientation === "portrait"} onClick={() => set("orientation", "portrait")} className="flex-1 py-1.5 rounded text-sm">
+                  Portrait 9:16
+                </Btn>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-gray-300 mb-2 block">
+                Resolution tier <span className="text-gray-500 font-normal">(filtered for your VRAM)</span>
+              </label>
+              <div className="flex gap-2">
+                {availableTiers.map((tier) => {
+                  const res = config.orientation === "landscape"
+                    ? { low: "768×512", mid: "1024×576", high: "1280×704", ultra: "1920×1088" }[tier]
+                    : { low: "512×768", mid: "576×1024", high: "704×1280", ultra: "1088×1920" }[tier];
+                  return (
+                    <button
+                      key={tier}
+                      onClick={() => set("resolutionTier", tier)}
+                      className={`flex-1 py-2 rounded text-center transition-colors ${
+                        config.resolutionTier === tier
+                          ? "bg-violet-600 text-white"
+                          : "bg-gray-800 hover:bg-gray-700 text-gray-300"
+                      }`}
+                    >
+                      <div className="text-xs font-semibold">{TIER_LABELS[tier]}</div>
+                      <div className="text-xs text-gray-500 font-mono">{res}</div>
+                    </button>
+                  );
+                })}
                 {config.vram === "16gb" && (
-                  <span className="px-3 py-1.5 text-xs text-gray-600 italic">720p+ needs 24 GB</span>
+                  <span className="flex-1 flex items-center justify-center text-xs text-gray-600 italic">High+: 24 GB</span>
                 )}
               </div>
             </div>
@@ -230,53 +301,42 @@ export default function WorkflowBuilder() {
             </div>
           </div>
 
-          {/* Optional features */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-gray-300 block">Options</label>
-            <label className="flex items-center gap-3 cursor-pointer group">
-              <input
-                type="checkbox"
-                checked={config.useUpscaler}
-                onChange={(e) => {
+          {/* Options — only when no control mode */}
+          {!isControlMode && (
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-gray-300 block">Options</label>
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input type="checkbox" checked={config.useUpscaler} onChange={(e) => {
                   set("useUpscaler", e.target.checked);
                   if (e.target.checked) set("useHDR", false);
-                }}
-                disabled={config.useHDR}
-                className="w-4 h-4 accent-violet-500"
-              />
-              <span className="text-sm text-gray-300 group-hover:text-white transition-colors">
-                2× spatial upscaler <span className="text-xs text-gray-500">(doubles resolution after generation)</span>
-              </span>
-            </label>
-            <label className={`flex items-center gap-3 group ${config.vram === "16gb" ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}>
-              <input
-                type="checkbox"
-                checked={config.useHDR}
-                onChange={(e) => {
+                }} disabled={config.useHDR} className="w-4 h-4 accent-violet-500" />
+                <span className="text-sm text-gray-300 group-hover:text-white transition-colors">
+                  2× spatial upscaler <span className="text-xs text-gray-500">(doubles resolution; use v1.1 file)</span>
+                </span>
+              </label>
+              <label className={`flex items-center gap-3 group ${config.vram === "16gb" ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}>
+                <input type="checkbox" checked={config.useHDR} onChange={(e) => {
                   set("useHDR", e.target.checked);
                   if (e.target.checked) set("useUpscaler", false);
-                }}
-                disabled={config.vram === "16gb" || config.useUpscaler}
-                className="w-4 h-4 accent-violet-500"
-              />
-              <span className="text-sm text-gray-300 group-hover:text-white transition-colors">
-                HDR output{" "}
-                <span className="text-xs text-gray-500">
-                  {config.vram === "16gb" ? "(requires 24GB+ VRAM)" : "(requires Gemma 3 12B + HDR LoRA)"}
+                }} disabled={config.vram === "16gb" || config.useUpscaler} className="w-4 h-4 accent-violet-500" />
+                <span className="text-sm text-gray-300 group-hover:text-white transition-colors">
+                  HDR output <span className="text-xs text-gray-500">
+                    {config.vram === "16gb" ? "(needs 24 GB+)" : "(Gemma 3 + HDR LoRA, outputs EXR)"}
+                  </span>
                 </span>
-              </span>
-            </label>
-          </div>
+              </label>
+            </div>
+          )}
         </div>
 
         {/* ── Right: Recommendation ── */}
         <div className="space-y-4">
-          {/* Model auto-selected */}
+          {/* Models */}
           <div className="bg-gray-800/80 rounded-xl p-4 space-y-2">
             <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Models for your GPU</p>
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <div>
-                <p className="text-xs text-gray-500">Transformer</p>
+                <p className="text-xs text-gray-500">Transformer · <span className="text-gray-600">{resolution}</span></p>
                 <code className="text-xs text-emerald-300 break-all">{modelFile}</code>
               </div>
               <div>
@@ -284,22 +344,13 @@ export default function WorkflowBuilder() {
                 <code className="text-xs text-emerald-300 break-all">{gemmaFile}</code>
               </div>
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-600">
               {config.vram === "16gb"
-                ? "FP8 transformer (~25 GB) — RTX 40xx+ only. FP4 Gemma (9.5 GB) is required; full bf16 Gemma won't fit."
-                : config.vram === "24gb" && (config.priority === "quality" || config.useHDR)
-                ? "FP8 dev transformer (29.1 GB) + FP4 Gemma (9.5 GB) — fits on 24 GB without offloading."
+                ? "FP8 transformer (~25 GB) + FP4 Gemma (9.5 GB)"
                 : config.vram === "24gb"
-                ? "FP8 distilled (~25 GB) + FP4 Gemma (9.5 GB) — fast on 24 GB."
-                : config.priority === "speed"
-                ? "BF16 distilled (46 GB) — enable sequential offloading in ComfyUI if needed."
-                : "FP8 dev (29.1 GB) + full Gemma BF16 (~24 GB) — fits comfortably on 32 GB."}
+                ? "FP8 transformer + FP4 Gemma — fits 24 GB without offloading"
+                : "FP8 dev (29 GB) or BF16 distilled (46 GB) + full Gemma BF16"}
             </p>
-            {config.vram === "16gb" && (
-              <p className="text-xs text-amber-500">
-                ⚠ RTX 30xx? Use <span className="font-mono">fp8_e5m2</span> transformer instead — scaled-fp8 requires Ada/Blackwell (RTX 40xx+).
-              </p>
-            )}
           </div>
 
           {/* Recommended workflow */}
@@ -320,10 +371,10 @@ export default function WorkflowBuilder() {
             <p className="text-xs text-gray-400 leading-relaxed">{rec.reason}</p>
 
             {rec.warnings.length > 0 && (
-              <div className="space-y-1">
+              <div className="space-y-1 border-t border-gray-700 pt-2">
                 {rec.warnings.map((w, i) => (
-                  <p key={i} className="text-xs text-amber-400 flex gap-1.5">
-                    <span className="shrink-0">⚠</span>{w}
+                  <p key={i} className={`text-xs flex gap-1.5 ${w.startsWith("IMPORTANT") ? "text-red-400" : "text-amber-400"}`}>
+                    <span className="shrink-0">{w.startsWith("IMPORTANT") ? "!" : "⚠"}</span>{w}
                   </p>
                 ))}
               </div>
@@ -348,7 +399,7 @@ export default function WorkflowBuilder() {
 
           {/* Node instructions */}
           <div className="bg-gray-800/60 rounded-xl p-4 space-y-2">
-            <p className="text-xs text-gray-400 font-medium">What to change after loading the workflow</p>
+            <p className="text-xs text-gray-400 font-medium">Node settings after loading the workflow</p>
             <div className="space-y-2">
               {rec.nodeInstructions.map((inst, i) => (
                 <div key={i} className="text-xs space-y-0.5">
