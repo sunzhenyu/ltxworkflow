@@ -4,9 +4,8 @@ import Providers from "@/components/Providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "LTX 2.3 Download — taeltx2_3.safetensors, FP8, ComfyUI Workflows",
-  description: "Download LTX 2.3 models with direct links: taeltx2_3.safetensors VAE, FP8 quantized (16GB VRAM), official checkpoints (32GB). Generate ComfyUI workflow JSON instantly. Supports T2V, I2V, LoRA.",
-  keywords: "ltx 2.3 download, taeltx2_3.safetensors download, comfyui ltx 2.3, ltx 2.3 fp8, ltx 2.3 lora, ltx-2.3-22b-distilled, direct download",
+  title: "LTX 2.3 ComfyUI: Model Downloads, Workflows & Online i2v",
+  description: "Match your VRAM, download LTX 2.3 FP8 + taeltx2_3.safetensors + Gemma 3 encoder, grab the right ComfyUI workflow JSON, or run i2v online — no GPU needed.",
   metadataBase: new URL("https://ltxworkflow.com"),
   alternates: { canonical: "https://ltxworkflow.com" },
   icons: {
@@ -17,16 +16,16 @@ export const metadata: Metadata = {
     apple: [{ url: "/icon", type: "image/png", sizes: "32x32" }],
   },
   openGraph: {
-    title: "LTX 2.3 Download — Direct Links to All Models",
-    description: "Download taeltx2_3.safetensors, FP8 & official LTX 2.3 models. Generate ComfyUI workflows for 16GB–32GB VRAM.",
+    title: "LTX 2.3 ComfyUI Hub — Models, Workflows & Online i2v",
+    description: "Free LTX 2.3 model downloads, ComfyUI workflow templates for every VRAM tier, and online image-to-video. No GPU required.",
     url: "https://ltxworkflow.com",
     siteName: "ltx workflow",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "LTX 2.3 Download — taeltx2_3.safetensors & FP8",
-    description: "Download LTX 2.3 models with direct HuggingFace links. Generate ComfyUI workflow JSON.",
+    title: "LTX 2.3 ComfyUI Hub — Models, Workflows & Online i2v",
+    description: "Free LTX 2.3 model downloads, ComfyUI workflow templates for every VRAM tier, and online image-to-video. No GPU required.",
   },
 };
 

@@ -142,7 +142,12 @@ export default function WorkflowBuilder() {
             </div>
             {config.vram === "16gb" && (
               <p className="text-xs text-amber-500 mt-1.5">
-                ⚠ RTX 30xx? Use <span className="font-mono">fp8_e5m2</span> variant instead — fp8_scaled requires RTX 40xx+ hardware.
+                ⚠ RTX 30xx? The selected FP8 model needs RTX 40xx+ hardware. Use the <span className="font-mono">mxfp8_block32</span> variant or BF16 instead.
+              </p>
+            )}
+            {config.vram === "24gb" && (
+              <p className="text-xs text-amber-500 mt-1.5">
+                ⚠ RTX 3090? FP8 scaled matmul requires RTX 40xx+. Use the <span className="font-mono">mxfp8_block32</span> or BF16 variant.
               </p>
             )}
           </div>
@@ -349,7 +354,7 @@ export default function WorkflowBuilder() {
                 ? "FP8 transformer (~25 GB) + FP4 Gemma (9.5 GB)"
                 : config.vram === "24gb"
                 ? "FP8 transformer + FP4 Gemma — fits 24 GB without offloading"
-                : "FP8 dev (29 GB) or BF16 distilled (46 GB) + full Gemma BF16"}
+                : "FP8 distilled/dev (29 GB, fits resident) + full Gemma BF16. BF16 distilled (46 GB) also available with offloading."}
             </p>
           </div>
 

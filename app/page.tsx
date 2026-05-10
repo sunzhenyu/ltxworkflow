@@ -16,19 +16,20 @@ export default async function Home() {
     <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "ltx workflow",
+        "@type": "SoftwareApplication",
+        "name": "LTX Workflow — ComfyUI Workflow Generator for LTX 2.3",
         "url": "https://ltxworkflow.com",
-        "description": "Generate ComfyUI workflow JSON for LTX 2.3 video model. Match GPU VRAM, download models, enhance prompts with AI.",
+        "description": "Generate ComfyUI workflow JSON for LTX 2.3 video model. Match GPU VRAM, download FP8 + taeltx2_3.safetensors + Gemma 3 text encoder, run image-to-video online.",
         "applicationCategory": "MultimediaApplication",
         "operatingSystem": "Web",
+        "featureList": ["T2V workflow generation", "I2V workflow generation", "FP8 model matching", "LoRA workflow support", "VRAM-based GPU matching", "ICLoRA Union Control", "ICLoRA Motion Track", "HDR workflow"],
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
       })}} />
       <Nav />
 
       <section className="text-center space-y-4">
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-          <span className="text-violet-400">LTX 2.3</span> Download & ComfyUI Workflow Generator
+          <span className="text-violet-400">LTX 2.3</span> for ComfyUI — Model Downloads, Workflow Templates &amp; Online Image-to-Video
         </h1>
         <p className="text-gray-400 max-w-2xl mx-auto text-lg">
           Download <strong className="text-gray-200">LTX 2.3</strong> models with direct links —{" "}

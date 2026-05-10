@@ -64,10 +64,10 @@ export function deriveModelFile(config: WorkflowConfig): string {
       ? "ltx-2.3-22b-dev-fp8.safetensors"
       : "ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors";
   }
-  // 32gb
+  // 32gb — use fp8 distilled (29.5GB, fits resident) rather than bf16 (46GB, needs offloading)
   return needsDev
     ? "ltx-2.3-22b-dev-fp8.safetensors"
-    : "ltx-2.3-22b-distilled-1.1.safetensors";
+    : "ltx-2.3-22b-distilled-fp8.safetensors";
 }
 
 // Returns VRAM-appropriate Gemma 3 12B text encoder.

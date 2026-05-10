@@ -38,6 +38,11 @@ const nextConfig: NextConfig = {
         destination: "/blog",
         permanent: true,
       },
+      {
+        source: "/dashboard",
+        destination: "/generate",
+        permanent: true,
+      },
     ];
   },
 };

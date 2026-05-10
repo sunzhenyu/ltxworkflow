@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/dashboard", "/profile", "/api/"],
+        disallow: ["/profile", "/api/"],
       },
     ],
     sitemap: "https://ltxworkflow.com/sitemap.xml",

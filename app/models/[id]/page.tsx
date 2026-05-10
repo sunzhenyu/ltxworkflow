@@ -62,28 +62,49 @@ export default async function ModelDetailPage({
 
   // ComfyUI install location
   const installPath =
-    model.type === "lora"
-      ? "ComfyUI/models/loras/"
-      : model.id === "ltx23-vae"
+    ["ltx23-vae", "ltx23-audio-vae", "ltx23-video-vae"].includes(model.id)
       ? "ComfyUI/models/vae/"
+      : model.id === "ltx23-text-projection"
+      ? "ComfyUI/models/text_encoders/"
+      : model.id.includes("upscaler") || model.id.includes("temporal")
+      ? "ComfyUI/models/latent_upscale_models/"
+      : model.type === "lora"
+      ? "ComfyUI/models/loras/"
       : "ComfyUI/models/checkpoints/";
 
-  // Compatible workflows
+  // Compatible workflows — all ICLoRA workflows are distilled-only
+  const isDistilledModel =
+    model.type === "distilled" ||
+    (model.type === "fp8" && model.filename.includes("distilled")) ||
+    (model.type === "lora" && model.id.includes("distilled"));
+  const isVaeOrComponent = ["ltx23-vae", "ltx23-audio-vae", "ltx23-video-vae", "ltx23-text-projection"].includes(model.id);
+  const isUpscaler = model.id.includes("upscaler") || model.id.includes("temporal");
+
   const compatibleWorkflows = [
     {
       name: "T2V / I2V Single Stage Distilled",
       file: "LTX-2.3_T2V_I2V_Single_Stage_Distilled_Full.json",
-      compat: model.type !== "lora" || model.id.includes("distilled"),
+      compat: isDistilledModel && !isVaeOrComponent && !isUpscaler,
     },
     {
       name: "T2V / I2V Two Stage Distilled",
       file: "LTX-2.3_T2V_I2V_Two_Stage_Distilled.json",
-      compat: model.type !== "lora",
+      compat: (isDistilledModel || isUpscaler) && !isVaeOrComponent,
     },
     {
-      name: "ICLoRA Union Control",
+      name: "ICLoRA Union Control Distilled",
       file: "LTX-2.3_ICLoRA_Union_Control_Distilled.json",
-      compat: true,
+      compat: isDistilledModel && !isVaeOrComponent && !isUpscaler,
+    },
+    {
+      name: "ICLoRA Motion Track Distilled",
+      file: "LTX-2.3_ICLoRA_Motion_Track_Distilled.json",
+      compat: isDistilledModel && !isVaeOrComponent && !isUpscaler,
+    },
+    {
+      name: "ICLoRA HDR Distilled",
+      file: "LTX-2.3_ICLoRA_HDR_Distilled.json",
+      compat: isDistilledModel && !isVaeOrComponent && !isUpscaler,
     },
   ].filter((w) => w.compat);
 
@@ -348,24 +369,27 @@ function GpuCompatibilityTable({
   vram: number;
   type: ModelVariant["type"];
 }) {
-  const rows: { gpu: string; vramAmt: number; verdict: string }[] = [
-    { gpu: "RTX 3060 12GB", vramAmt: 12, verdict: "" },
-    { gpu: "RTX 4060 Ti / 4070 (16GB)", vramAmt: 16, verdict: "" },
-    { gpu: "RTX 4070 Ti SUPER / 4080 (16GB)", vramAmt: 16, verdict: "" },
-    { gpu: "RTX 3090 / 4090 (24GB)", vramAmt: 24, verdict: "" },
-    { gpu: "RTX 5090 / A6000 (32GB+)", vramAmt: 32, verdict: "" },
-  ].map((r) => ({
-    ...r,
-    verdict:
-      r.vramAmt < vram
-        ? "Insufficient VRAM"
-        : r.vramAmt === vram
-        ? "Tight fit"
-        : "Comfortable",
-  }));
-  const fp8Note =
-    type === "fp8" &&
-    "FP8 matmul requires RTX 40-series or newer. Older cards (3090/3060) cannot use this format.";
+  const isFp8 = type === "fp8";
+  const rows: { gpu: string; vramAmt: number; isRtx30: boolean }[] = [
+    { gpu: "RTX 3060 12GB", vramAmt: 12, isRtx30: true },
+    { gpu: "RTX 4060 Ti / 4070 (16GB)", vramAmt: 16, isRtx30: false },
+    { gpu: "RTX 4070 Ti SUPER / 4080 (16GB)", vramAmt: 16, isRtx30: false },
+    { gpu: "RTX 3090 (24GB)", vramAmt: 24, isRtx30: true },
+    { gpu: "RTX 4090 (24GB)", vramAmt: 24, isRtx30: false },
+    { gpu: "RTX 5090 / A6000 (32GB+)", vramAmt: 32, isRtx30: false },
+  ].map((r) => {
+    let verdict: string;
+    if (r.vramAmt < vram) {
+      verdict = "Insufficient VRAM";
+    } else if (isFp8 && r.isRtx30) {
+      verdict = "No FP8 support";
+    } else if (r.vramAmt === vram) {
+      verdict = "Tight fit";
+    } else {
+      verdict = "Comfortable";
+    }
+    return { ...r, verdict };
+  });
 
   return (
     <div className="text-xs">
@@ -383,7 +407,7 @@ function GpuCompatibilityTable({
           <span className="text-gray-500 font-mono">{r.vramAmt}GB</span>
           <span
             className={
-              r.verdict === "Insufficient VRAM"
+              r.verdict === "Insufficient VRAM" || r.verdict === "No FP8 support"
                 ? "text-red-400"
                 : r.verdict === "Tight fit"
                 ? "text-amber-400"
@@ -394,9 +418,9 @@ function GpuCompatibilityTable({
           </span>
         </div>
       ))}
-      {fp8Note && (
+      {isFp8 && (
         <p className="text-amber-300/80 text-xs mt-3 bg-amber-900/10 border border-amber-700/30 rounded p-2">
-          ⚠ {fp8Note}
+          ⚠ FP8 scaled matmul requires RTX 40-series or newer (Ada Lovelace architecture). RTX 30xx cannot run this format — use the MXFP8 block-32 or BF16 variant instead.
         </p>
       )}
     </div>
@@ -408,17 +432,19 @@ function buildTroubleshooting(
 ): { q: string; a: string }[] {
   const list: { q: string; a: string }[] = [];
 
+  const installPathForTrouble =
+    ["ltx23-vae", "ltx23-audio-vae", "ltx23-video-vae"].includes(model.id)
+      ? "ComfyUI/models/vae/"
+      : model.id === "ltx23-text-projection"
+      ? "ComfyUI/models/text_encoders/"
+      : model.id.includes("upscaler") || model.id.includes("temporal")
+      ? "ComfyUI/models/latent_upscale_models/"
+      : model.type === "lora"
+      ? "ComfyUI/models/loras/"
+      : "ComfyUI/models/checkpoints/";
   list.push({
     q: "ComfyUI doesn't see the file after I downloaded it",
-    a: `Make sure the file is in ${
-      model.type === "lora"
-        ? "ComfyUI/models/loras/"
-        : model.id === "ltx23-vae"
-        ? "ComfyUI/models/vae/"
-        : "ComfyUI/models/checkpoints/"
-    } (not a subfolder). Restart ComfyUI fully — the menu refresh sometimes misses new files. Filename must match exactly: ${
-      model.filename
-    }.`,
+    a: `Make sure the file is in ${installPathForTrouble} (not a subfolder). Restart ComfyUI fully — the menu refresh sometimes misses new files. Filename must match exactly: ${model.filename}.`,
   });
 
   if (model.type === "fp8") {
@@ -430,7 +456,7 @@ function buildTroubleshooting(
 
   list.push({
     q: "CUDA out of memory error when loading the model",
-    a: `${model.filename} needs ~${model.vram}GB VRAM minimum. If you're hitting OOM:\n• Enable Sequential Offloading in ComfyUI settings\n• Lower the resolution (512x512 instead of 1280x720)\n• Reduce frame count (25 frames instead of 97)\n• Use a smaller variant — see Related models below.`,
+    a: `${model.filename} needs ~${model.vram}GB VRAM minimum. If you're hitting OOM:\n• Enable Sequential Offloading in ComfyUI settings\n• Lower the resolution (768×512 instead of 1280×704) — both dimensions must be divisible by 32\n• Reduce frame count (65 frames instead of 161) — must be 8n+1\n• Use a smaller variant — see Related models below.`,
   });
 
   if (model.type === "distilled") {
