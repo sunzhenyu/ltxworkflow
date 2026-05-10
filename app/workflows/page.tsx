@@ -5,11 +5,11 @@ import Footer from "@/components/Footer";
 import WorkflowBuilder from "@/components/WorkflowBuilder";
 
 export const metadata: Metadata = {
-  title: "LTX 2.3 ComfyUI Workflow JSON Download — T2V / I2V / HDR / ICLoRA",
-  description: "Download official LTX 2.3 ComfyUI workflow JSON files: Single Stage Distilled, Two Stage Distilled, ICLoRA Union Control, Motion Track, and the new HDR workflow. Plus AI workflow generator.",
+  title: "LTX 2.3 ComfyUI Workflows: Download T2V, I2V, HDR & ICLoRA",
+  description: "Download official LTX 2.3 ComfyUI workflow JSON files: Single Stage Distilled, Two Stage Distilled, ICLoRA Union Control, Motion Track, and HDR. Plus VRAM-based configurator to pick the right workflow.",
   alternates: { canonical: "https://ltxworkflow.com/workflows" },
   openGraph: {
-    title: "LTX 2.3 ComfyUI Workflow JSON Download — T2V / I2V / HDR / ICLoRA",
+    title: "LTX 2.3 ComfyUI Workflows — T2V, I2V, HDR & ICLoRA",
     description: "All official LTX 2.3 ComfyUI workflows in one place: Distilled, Two-Stage, ICLoRA Union Control, Motion Track, and HDR. Drag into ComfyUI to start.",
     url: "https://ltxworkflow.com/workflows",
     type: "website",
