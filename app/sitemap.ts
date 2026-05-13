@@ -11,6 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: "https://ltxworkflow.com", lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
     { url: "https://ltxworkflow.com/generate", lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
     { url: "https://ltxworkflow.com/guide", lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },
+    { url: "https://ltxworkflow.com/guide/vram-requirements", lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },
     { url: "https://ltxworkflow.com/pack", lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
     { url: "https://ltxworkflow.com/blog", lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
     { url: "https://ltxworkflow.com/pricing", lastModified: new Date(), changeFrequency: "monthly", priority: 0.85 },

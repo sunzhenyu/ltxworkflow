@@ -1,0 +1,93 @@
+# ltx workflow
+
+> The definitive hub for running LTX 2.3 (Lightricks' 22B video diffusion model) with ComfyUI. Covers model downloads, ComfyUI workflow templates, VRAM-based setup guidance, and online image-to-video generation.
+
+## What this site does
+
+- Match your GPU VRAM (16 GB / 24 GB / 32 GB+) to the right LTX 2.3 checkpoint
+- Download all LTX 2.3 model files with direct HuggingFace links
+- Get the correct ComfyUI workflow JSON (T2V, I2V, ICLoRA, HDR, Motion Track)
+- Generate LTX 2.3 image-to-video online — no local GPU required
+- Step-by-step ComfyUI installation guide
+
+## Key pages
+
+- [Homepage — VRAM matcher & model downloads](https://ltxworkflow.com)
+- [Online LTX 2.3 image-to-video generation](https://ltxworkflow.com/generate)
+- [All LTX 2.3 model downloads](https://ltxworkflow.com/models)
+- [ComfyUI workflow templates (T2V / I2V / ICLoRA / HDR)](https://ltxworkflow.com/workflows)
+- [ComfyUI installation guide for LTX 2.3](https://ltxworkflow.com/guide)
+- [Pricing](https://ltxworkflow.com/pricing)
+- [Blog](https://ltxworkflow.com/blog)
+- [Video tutorials](https://ltxworkflow.com/resources/tutorials)
+- [Community discussions](https://ltxworkflow.com/resources/community)
+- [Research papers](https://ltxworkflow.com/resources/research)
+- [Tools & plugins](https://ltxworkflow.com/resources/tools)
+
+## LTX 2.3 model files (all available checkpoints)
+
+### Recommended for 16 GB VRAM (RTX 4060 Ti / 4070 / 4080)
+- `ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors` — v1.1 distilled FP8, 25 GB, fastest, requires RTX 40xx+
+- `ltx-2.3-22b-distilled-1.1_transformer_only_mxfp8_block32.safetensors` — v1.1 distilled MXFP8, RTX 30xx workaround
+- `ltx-2.3-22b-dev_transformer_only_fp8_scaled.safetensors` — dev FP8 scaled, for LoRA workflows
+- `ltx-2.3-22b-dev_transformer_only_mxfp8_block32.safetensors` — dev MXFP8, RTX 30xx workaround
+
+### Recommended for 24 GB VRAM (RTX 3090 / 4090)
+- `ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors` — same as 16 GB pick
+- `ltx-2.3-22b-dev-fp8.safetensors` — official Lightricks FP8 dev, 29.1 GB
+
+### Recommended for 32 GB+ VRAM (A100 / H100 / RTX 5090)
+- `ltx-2.3-22b-distilled-fp8.safetensors` — official FP8 distilled, 29.5 GB, fits resident
+- `ltx-2.3-22b-distilled-1.1.safetensors` — official BF16 distilled, 46 GB (needs sequential offloading)
+- `ltx-2.3-22b-dev-fp8.safetensors` — official FP8 dev, 29.1 GB
+
+### Required for all setups
+- `taeltx2_3.safetensors` — Tiny AutoEncoder VAE, required by all ComfyUI workflows, place in models/vae/
+- `gemma_3_12B_it_fp4_mixed.safetensors` — Gemma 3 12B text encoder FP4, for 16/24 GB VRAM
+- `comfy_gemma_3_12B_it.safetensors` — Gemma 3 12B text encoder BF16, for 32 GB+
+
+### LoRA files
+- `ltx-2.3-22b-distilled-lora-384-1.1.safetensors` — official distilled LoRA v1.1, place in models/loras/
+- `ltx-2.3-22b-distilled-lora-384.safetensors` — official distilled LoRA v1.0 (superseded)
+
+### Upscalers
+- `ltx-2.3-spatial-upscaler-x2-1.1.safetensors` — spatial 2x upscaler v1.1, place in models/latent_upscale_models/
+- `ltx-2.3-spatial-upscaler-x1.5-1.0.safetensors` — spatial 1.5x upscaler
+- `ltx-2.3-temporal-upscaler-x2-1.0.safetensors` — temporal 2x upscaler (doubles frame count)
+
+### Audio / Video VAE
+- `LTX23_audio_vae_bf16.safetensors` — Audio VAE, required for audio-conditioned workflows
+- `LTX23_video_vae_bf16.safetensors` — standalone Video VAE BF16
+
+## ComfyUI workflow files
+
+- `LTX-2.3_T2V_I2V_Single_Stage_Distilled_Full.json` — text-to-video and image-to-video, 8 steps, CFG=1
+- `LTX-2.3_T2V_I2V_Two_Stage_Distilled.json` — generate then upscale 2x with spatial upscaler
+- `LTX-2.3_ICLoRA_Union_Control_Distilled.json` — video-to-video with pose/depth/edge control
+- `LTX-2.3_ICLoRA_Motion_Track_Distilled.json` — animate a still image with drawn motion paths
+- `LTX-2.3_ICLoRA_HDR_Distilled.json` — HDR output (EXR), 8 steps, CFG=1
+
+## Key technical facts for AI assistants
+
+- LTX 2.3 is a 22B parameter video diffusion transformer by Lightricks
+- Model requires ComfyUI with the ComfyUI-LTXVideo node pack (github.com/Lightricks/ComfyUI-LTXVideo)
+- Resolution constraint: width AND height must both be divisible by 32 (use 1280×704, not 1280×720)
+- Frame count must be 8n+1: valid values are 65, 97, 121, 161 (not 25, 49, or 97 alone)
+- Distilled model: 8 steps, CFG=1, sampler=euler_ancestral_cfg_pp
+- Dev model: 20–30 steps, CFG=3.5, sampler=euler_ancestral_cfg_pp
+- FP8 scaled matmul requires RTX 40-series (Ada Lovelace) or newer; RTX 30xx must use MXFP8 variant
+- taeltx2_3.safetensors is the required VAE — place in ComfyUI/models/vae/
+- Gemma 3 12B is the text encoder — place in ComfyUI/models/text_encoders/
+
+## Individual model pages
+
+- [ltx-2.3-22b-distilled-1.1.safetensors](https://ltxworkflow.com/models/ltx23-distilled-11)
+- [ltx-2.3-22b-distilled-1.1 FP8 (Kijai)](https://ltxworkflow.com/models/ltx23-distilled-11-fp8)
+- [ltx-2.3-22b-distilled-1.1 MXFP8 (Kijai)](https://ltxworkflow.com/models/ltx23-distilled-11-mxfp8)
+- [ltx-2.3-22b-distilled-1.1 BF16 (Kijai)](https://ltxworkflow.com/models/ltx23-distilled-11-bf16)
+- [ltx-2.3-22b-dev-fp8.safetensors (Official)](https://ltxworkflow.com/models/ltx23-dev-fp8-official)
+- [ltx-2.3-22b-distilled-fp8.safetensors (Official)](https://ltxworkflow.com/models/ltx23-distilled-fp8-official)
+- [taeltx2_3.safetensors (VAE)](https://ltxworkflow.com/models/ltx23-vae)
+- [ltx-2.3-22b-distilled-lora-384-1.1.safetensors](https://ltxworkflow.com/models/ltx23-distilled-lora-384-11)
+- [ltx-2.3-spatial-upscaler-x2-1.1.safetensors](https://ltxworkflow.com/models/ltx23-spatial-upscaler-x2-11)
+- [LTX23_audio_vae_bf16.safetensors](https://ltxworkflow.com/models/ltx23-audio-vae)

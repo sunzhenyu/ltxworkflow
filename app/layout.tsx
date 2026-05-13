@@ -30,9 +30,32 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const orgSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "ltx workflow",
+    "url": "https://ltxworkflow.com",
+    "logo": "https://ltxworkflow.com/logo-128.png",
+    "sameAs": ["https://github.com/sunzhenyu/ltxworkflow"],
+    "description": "The definitive hub for LTX 2.3 ComfyUI model downloads, workflow templates, and online image-to-video generation.",
+  };
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "ltx workflow",
+    "url": "https://ltxworkflow.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": { "@type": "EntryPoint", "urlTemplate": "https://ltxworkflow.com/models?q={search_term_string}" },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <html lang="en" className="h-full" suppressHydrationWarning>
       <body className="min-h-full bg-gray-950 text-gray-100 antialiased">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-JM08TXQFMM" strategy="afterInteractive" />
         <Script id="gtag-init" strategy="afterInteractive">{`
           window.dataLayer = window.dataLayer || [];

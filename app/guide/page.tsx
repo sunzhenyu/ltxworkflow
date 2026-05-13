@@ -147,6 +147,10 @@ export default async function GuidePage() {
           <p className="text-sm font-medium text-violet-400 group-hover:text-violet-300">Workflow Templates →</p>
           <p className="text-xs text-gray-500 mt-0.5">Official T2V, I2V, ICLoRA workflow JSON files</p>
         </Link>
+        <Link href="/guide/vram-requirements" className="bg-gray-900 rounded-xl px-4 py-3 hover:bg-gray-800 transition-colors group">
+          <p className="text-sm font-medium text-violet-400 group-hover:text-violet-300">VRAM Requirements →</p>
+          <p className="text-xs text-gray-500 mt-0.5">Which GPU do you need? Full compatibility table</p>
+        </Link>
       </div>
 
       {videoTutorials && videoTutorials.length > 0 && (
