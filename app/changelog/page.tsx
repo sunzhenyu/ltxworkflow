@@ -10,6 +10,19 @@ export const metadata: Metadata = {
 
 const entries = [
   {
+    date: "2026-06-03",
+    title: "IC-LoRA Family + NVFP4 + Gemma 3 Text Encoder",
+    items: [
+      "New: IC-LoRA Union Control (Canny + Depth combined) — official Lightricks release",
+      "New: IC-LoRA Motion Track Control — guide motion with sparse point trajectories",
+      "New: IC-LoRA HDR + scene embeddings — 16-bit HDR generation, SDR→HDR via LogC3",
+      "New: IC-LoRA LipDub — joint audio-visual lip-dubbing (JustDubIt research)",
+      "New: LTX 2.3 Dev NVFP4 (21.7 GB) — official quantization for Blackwell / RTX 50xx",
+      "New: Gemma 3 12B IT text encoder (FP8 13.2 GB + full ~24 GB) from Comfy-Org — required for all ComfyUI workflows",
+      "New: Kijai dash-naming FP8 input-scaled variant (alias)",
+    ],
+  },
+  {
     date: "2026-05-27",
     title: "17 New Model Variants — Audio VAE, MXFP8 & More",
     items: [

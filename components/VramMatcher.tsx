@@ -7,10 +7,20 @@ const VRAM_OPTIONS = [16, 24, 32];
 const REQUIRED_IDS = [
   // Required VAE
   "ltx23-vae",
+  // Required text encoder (Gemma 3 12B)
+  "ltx23-gemma-fp4",
+  "ltx23-gemma-fp8",
+  "ltx23-gemma-full",
   // Optional / specialized components (audio support is the new LTX 2.3 feature)
   "ltx23-audio-vae",
   "ltx23-video-vae",
   "ltx23-text-projection",
+  // IC-LoRAs (Lightricks official)
+  "ltx23-ic-lora-union",
+  "ltx23-ic-lora-motion-track",
+  "ltx23-ic-lora-hdr",
+  "ltx23-ic-lora-hdr-emb",
+  "ltx23-ic-lora-lipdub",
   // Spatial / temporal upscalers
   "ltx23-spatial-upscaler",
   "ltx23-spatial-upscaler-x2-11",
