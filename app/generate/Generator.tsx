@@ -161,8 +161,25 @@ export default function Generator({
   useEffect(() => {
     if (!genId || status !== "running") return;
 
+    // Client-side watchdog: stop polling and surface failure after this many
+    // seconds. Matches the server-side watchdog in /api/generate/[id]; the
+    // server will refund. Without this, a bug or unreachable backend would
+    // leave the button stuck on "Generating…" indefinitely.
+    const MAX_POLL_SECONDS = 600;
+    const pollStartedAt = Date.now();
+
     let cancelled = false;
     const poll = async () => {
+      if (Date.now() - pollStartedAt > MAX_POLL_SECONDS * 1000) {
+        if (cancelled) return;
+        setErrorMsg(
+          "Generation took longer than 10 minutes. We've stopped waiting — if credits were charged, they'll be refunded automatically.",
+        );
+        setStatus("failed");
+        refreshBalance();
+        refreshHistory();
+        return;
+      }
       try {
         const res = await fetch(`/api/generate/${genId}`, { cache: "no-store" });
         if (!res.ok) return;

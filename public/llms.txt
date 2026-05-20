@@ -43,12 +43,24 @@
 
 ### Required for all setups
 - `taeltx2_3.safetensors` — Tiny AutoEncoder VAE, required by all ComfyUI workflows, place in models/vae/
-- `gemma_3_12B_it_fp4_mixed.safetensors` — Gemma 3 12B text encoder FP4, for 16/24 GB VRAM
-- `comfy_gemma_3_12B_it.safetensors` — Gemma 3 12B text encoder BF16, for 32 GB+
+- `gemma_3_12B_it_fp4_mixed.safetensors` — Gemma 3 12B text encoder FP4 (9.5 GB), for 16/24 GB VRAM
+- `gemma_3_12B_it_fp8_scaled.safetensors` — Gemma 3 12B text encoder FP8 (13.2 GB), alternative for 16/24 GB
+- `comfy_gemma_3_12B_it.safetensors` — Gemma 3 12B text encoder BF16 (24.4 GB), for 32 GB+. NOTE: download as `gemma_3_12B_it.safetensors` from Comfy-Org/ltx-2 and rename — every workflow JSON references the `comfy_` prefix.
 
 ### LoRA files
 - `ltx-2.3-22b-distilled-lora-384-1.1.safetensors` — official distilled LoRA v1.1, place in models/loras/
 - `ltx-2.3-22b-distilled-lora-384.safetensors` — official distilled LoRA v1.0 (superseded)
+
+### IC-LoRAs (Lightricks official, 2026-06)
+- `ltx-2.3-22b-ic-lora-union-control-ref0.5.safetensors` — Canny + Depth unified control IC-LoRA (654 MB), place in models/loras/
+- `ltx-2.3-22b-ic-lora-motion-track-control-ref0.5.safetensors` — sparse-point motion-track IC-LoRA (327 MB)
+- `ltx-2.3-22b-ic-lora-hdr-0.9.safetensors` — 16-bit HDR IC-LoRA (327 MB), pair with scene-emb file below
+- `ltx-2.3-22b-ic-lora-hdr-scene-emb.safetensors` — companion scene embeddings for HDR IC-LoRA (12.6 MB)
+- `ltx-2.3-22b-ic-lora-lipdub-0.9.safetensors` — joint audio-visual lip-dub IC-LoRA (2.47 GB)
+- All IC-LoRAs load via LTXICLoRALoaderModelOnly + LTXAddVideoICLoRAGuide (Reference Downscale Factor 0.5), NOT plain LoraLoader
+
+### Quantized variants (additions 2026-06)
+- `ltx-2.3-22b-dev-nvfp4.safetensors` — official NVFP4 dev (21.7 GB) for Blackwell / RTX 50xx
 
 ### Upscalers
 - `ltx-2.3-spatial-upscaler-x2-1.1.safetensors` — spatial 2x upscaler v1.1, place in models/latent_upscale_models/
@@ -87,7 +99,16 @@
 - [ltx-2.3-22b-distilled-1.1 BF16 (Kijai)](https://ltxworkflow.com/models/ltx23-distilled-11-bf16)
 - [ltx-2.3-22b-dev-fp8.safetensors (Official)](https://ltxworkflow.com/models/ltx23-dev-fp8-official)
 - [ltx-2.3-22b-distilled-fp8.safetensors (Official)](https://ltxworkflow.com/models/ltx23-distilled-fp8-official)
+- [ltx-2.3-22b-dev-nvfp4.safetensors (Blackwell)](https://ltxworkflow.com/models/ltx23-dev-nvfp4)
 - [taeltx2_3.safetensors (VAE)](https://ltxworkflow.com/models/ltx23-vae)
 - [ltx-2.3-22b-distilled-lora-384-1.1.safetensors](https://ltxworkflow.com/models/ltx23-distilled-lora-384-11)
 - [ltx-2.3-spatial-upscaler-x2-1.1.safetensors](https://ltxworkflow.com/models/ltx23-spatial-upscaler-x2-11)
 - [LTX23_audio_vae_bf16.safetensors](https://ltxworkflow.com/models/ltx23-audio-vae)
+- [IC-LoRA Union Control](https://ltxworkflow.com/models/ltx23-ic-lora-union)
+- [IC-LoRA Motion Track](https://ltxworkflow.com/models/ltx23-ic-lora-motion-track)
+- [IC-LoRA HDR](https://ltxworkflow.com/models/ltx23-ic-lora-hdr)
+- [IC-LoRA HDR scene embeddings](https://ltxworkflow.com/models/ltx23-ic-lora-hdr-emb)
+- [IC-LoRA LipDub](https://ltxworkflow.com/models/ltx23-ic-lora-lipdub)
+- [Gemma 3 12B IT FP4 mixed (16/24 GB)](https://ltxworkflow.com/models/ltx23-gemma-fp4)
+- [Gemma 3 12B IT FP8 scaled (alt)](https://ltxworkflow.com/models/ltx23-gemma-fp8)
+- [Gemma 3 12B IT BF16 (32 GB+)](https://ltxworkflow.com/models/ltx23-gemma-full)

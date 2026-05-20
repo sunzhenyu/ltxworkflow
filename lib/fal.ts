@@ -38,6 +38,15 @@ export type FalI2VModel =
 
 export type FalQueueStatus = "IN_QUEUE" | "IN_PROGRESS" | "COMPLETED" | "ERROR";
 
+// What `getStatusByUrl` returns after categorizing the HTTP response.
+// `fatal` means the worker rejected the job permanently (e.g. fal returns 422
+// when content moderation flags the input). We must stop polling and refund.
+// `transient` is a network blip / 5xx we expect to recover from.
+export type StatusFetchResult =
+  | { kind: "ok"; status: FalStatusResponse }
+  | { kind: "fatal"; httpStatus: number; message: string }
+  | { kind: "transient"; httpStatus: number; message: string };
+
 export type FalSubmitResponse = {
   request_id: string;
   status_url: string;
@@ -141,30 +150,103 @@ export async function submitI2V(params: SubmitI2VParams): Promise<SubmitI2VResul
 
 /**
  * Fetch current job status. Pass the EXACT URL fal handed us back at submit.
+ *
+ * Returns a `StatusFetchResult` so callers can distinguish:
+ *   - `ok` → normal status payload (IN_QUEUE / IN_PROGRESS / COMPLETED / ERROR)
+ *   - `fatal` → 4xx with a non-retryable error body (worker rejected the job —
+ *     e.g. 422 content-moderation rejection). Caller must stop polling, mark
+ *     the generation failed, and refund. Documented by fal: 422 is not retryable.
+ *   - `transient` → 5xx or network failure that may recover on the next poll.
  */
-export async function getStatusByUrl(statusUrl: string): Promise<FalStatusResponse> {
-  const res = await fetch(statusUrl, {
-    headers: { Authorization: `Key ${falKey()}` },
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`fal status failed (${res.status}) at ${statusUrl}: ${text.slice(0, 500)}`);
+export async function getStatusByUrl(statusUrl: string): Promise<StatusFetchResult> {
+  let res: Response;
+  try {
+    res = await fetch(statusUrl, {
+      headers: { Authorization: `Key ${falKey()}` },
+      cache: "no-store",
+    });
+  } catch (err) {
+    return {
+      kind: "transient",
+      httpStatus: 0,
+      message: err instanceof Error ? err.message : "network error contacting fal",
+    };
   }
-  return (await res.json()) as FalStatusResponse;
+
+  if (res.ok) {
+    const data = (await res.json()) as FalStatusResponse;
+    return { kind: "ok", status: data };
+  }
+
+  const text = await res.text().catch(() => "");
+  const message = extractFalErrorMessage(text) || `fal returned ${res.status}`;
+
+  if (res.status >= 400 && res.status < 500) {
+    return { kind: "fatal", httpStatus: res.status, message };
+  }
+  return { kind: "transient", httpStatus: res.status, message };
 }
 
 /**
- * Fetch the completed result. Pass the EXACT URL fal handed us back at submit.
+ * fal error bodies follow the FastAPI `{ detail: [...] }` shape, sometimes
+ * `{ detail: "string" }`, sometimes just `{ error: "..." }`. Pull the
+ * most informative human-readable message we can.
  */
-export async function getResultByUrl(responseUrl: string): Promise<FalI2VResult> {
-  const res = await fetch(responseUrl, {
-    headers: { Authorization: `Key ${falKey()}` },
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`fal result failed (${res.status}) at ${responseUrl}: ${text.slice(0, 500)}`);
+function extractFalErrorMessage(body: string): string | null {
+  if (!body) return null;
+  try {
+    const json = JSON.parse(body) as Record<string, unknown>;
+    const detail = json.detail;
+    if (typeof detail === "string") return detail;
+    if (Array.isArray(detail)) {
+      const parts = detail
+        .map((d) => (d && typeof d === "object" && "msg" in d ? String((d as { msg: unknown }).msg) : null))
+        .filter((s): s is string => !!s);
+      if (parts.length) return parts.join(" | ");
+    }
+    if (typeof json.error === "string") return json.error;
+    if (typeof json.message === "string") return json.message;
+  } catch {
+    /* not JSON — fall through */
   }
-  return (await res.json()) as FalI2VResult;
+  return body.slice(0, 300);
+}
+
+export type ResultFetchResult =
+  | { kind: "ok"; result: FalI2VResult }
+  | { kind: "fatal"; httpStatus: number; message: string }
+  | { kind: "transient"; httpStatus: number; message: string };
+
+/**
+ * Fetch the completed result. Pass the EXACT URL fal handed us back at submit.
+ * Categorizes 4xx as fatal (e.g. 422 content-moderation rejection surfacing
+ * on response_url) so the caller can mark the job failed.
+ */
+export async function getResultByUrl(responseUrl: string): Promise<ResultFetchResult> {
+  let res: Response;
+  try {
+    res = await fetch(responseUrl, {
+      headers: { Authorization: `Key ${falKey()}` },
+      cache: "no-store",
+    });
+  } catch (err) {
+    return {
+      kind: "transient",
+      httpStatus: 0,
+      message: err instanceof Error ? err.message : "network error contacting fal",
+    };
+  }
+
+  if (res.ok) {
+    const data = (await res.json()) as FalI2VResult;
+    return { kind: "ok", result: data };
+  }
+
+  const text = await res.text().catch(() => "");
+  const message = extractFalErrorMessage(text) || `fal returned ${res.status}`;
+
+  if (res.status >= 400 && res.status < 500) {
+    return { kind: "fatal", httpStatus: res.status, message };
+  }
+  return { kind: "transient", httpStatus: res.status, message };
 }

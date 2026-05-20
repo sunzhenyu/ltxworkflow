@@ -13,6 +13,12 @@ const supabase = createClient(
 // `expires_at` so the UI can warn the user to download.
 const FAL_URL_TTL_DAYS = 7;
 
+// Server-side watchdog: any generation still `pending`/`running` after this
+// many minutes is force-failed and refunded. Catches cases where fal stops
+// responding to status_url entirely (rare, but the alternative is an
+// indefinitely "Generating…" UI).
+const MAX_RUN_MINUTES = 10;
+
 // GET /api/generate/[id]
 // Returns the generation row, refreshing from fal if it's still in flight.
 export async function GET(
@@ -42,6 +48,33 @@ export async function GET(
     return NextResponse.json(serialize(gen));
   }
 
+  // Watchdog: stuck in non-terminal state longer than MAX_RUN_MINUTES.
+  // Force-fail + refund so the UI can recover.
+  const createdAt = new Date(gen.created_at as string);
+  const ageMinutes = (Date.now() - createdAt.getTime()) / 60_000;
+  if (ageMinutes > MAX_RUN_MINUTES) {
+    console.warn(
+      `[generate/status] gen=${gen.id} watchdog timeout age=${ageMinutes.toFixed(1)}m — force-failing`,
+    );
+    const { data: updated } = await supabase
+      .from("generations")
+      .update({
+        status: "failed",
+        error_message: `Timed out waiting for fal after ${MAX_RUN_MINUTES} minutes`,
+        completed_at: new Date().toISOString(),
+      })
+      .eq("id", gen.id)
+      .in("status", ["pending", "running"])
+      .select("*")
+      .maybeSingle();
+    if (updated) {
+      await grantCredits(userId, gen.credits_charged, "refund", gen.id).catch((err) => {
+        console.error("[generate/status] refund-after-watchdog failed:", err);
+      });
+    }
+    return NextResponse.json(serialize(updated ?? gen));
+  }
+
   // No request id / status URL yet — submission is still mid-flight.
   if (!gen.fal_request_id || !gen.fal_status_url) {
     return NextResponse.json(serialize(gen));
@@ -49,7 +82,42 @@ export async function GET(
 
   // Refresh from fal using the URLs fal handed us at submit time.
   try {
-    const status = await getStatusByUrl(gen.fal_status_url);
+    const fetched = await getStatusByUrl(gen.fal_status_url);
+
+    // fal returned a non-retryable error (commonly 422 content moderation).
+    // Mark failed + refund. Without this, the polling loop would never exit.
+    if (fetched.kind === "fatal") {
+      console.error(
+        `[generate/status] gen=${gen.id} fatal http=${fetched.httpStatus} msg=${fetched.message}`,
+      );
+      const { data: updated } = await supabase
+        .from("generations")
+        .update({
+          status: "failed",
+          error_message: fetched.message.slice(0, 1000),
+          completed_at: new Date().toISOString(),
+        })
+        .eq("id", gen.id)
+        .in("status", ["pending", "running"])
+        .select("*")
+        .maybeSingle();
+      if (updated) {
+        await grantCredits(userId, gen.credits_charged, "refund", gen.id).catch((err) => {
+          console.error("[generate/status] refund-after-fatal failed:", err);
+        });
+      }
+      return NextResponse.json(serialize(updated ?? gen));
+    }
+
+    if (fetched.kind === "transient") {
+      // Network or 5xx blip — return last known state and try again next poll.
+      console.warn(
+        `[generate/status] gen=${gen.id} transient http=${fetched.httpStatus} msg=${fetched.message}`,
+      );
+      return NextResponse.json(serialize(gen));
+    }
+
+    const status = fetched.status;
     console.log(
       `[generate/status] gen=${gen.id} fal_status=${status.status} queue_pos=${status.queue_position ?? "-"}`,
     );
@@ -60,8 +128,40 @@ export async function GET(
     const upper = String(status.status ?? "").toUpperCase();
 
     if (upper === "COMPLETED") {
-      const result = await getResultByUrl(gen.fal_response_url || gen.fal_status_url.replace(/\/status$/, ""));
-      const videoUrl = result.video?.url ?? null;
+      const responseUrl = gen.fal_response_url || gen.fal_status_url.replace(/\/status$/, "");
+      const resultFetched = await getResultByUrl(responseUrl);
+
+      if (resultFetched.kind === "fatal") {
+        console.error(
+          `[generate/status] gen=${gen.id} result fatal http=${resultFetched.httpStatus} msg=${resultFetched.message}`,
+        );
+        const { data: updated } = await supabase
+          .from("generations")
+          .update({
+            status: "failed",
+            error_message: resultFetched.message.slice(0, 1000),
+            completed_at: new Date().toISOString(),
+          })
+          .eq("id", gen.id)
+          .in("status", ["pending", "running"])
+          .select("*")
+          .maybeSingle();
+        if (updated) {
+          await grantCredits(userId, gen.credits_charged, "refund", gen.id).catch((err) => {
+            console.error("[generate/status] refund-after-result-fatal failed:", err);
+          });
+        }
+        return NextResponse.json(serialize(updated ?? gen));
+      }
+
+      if (resultFetched.kind === "transient") {
+        console.warn(
+          `[generate/status] gen=${gen.id} result transient http=${resultFetched.httpStatus} msg=${resultFetched.message}`,
+        );
+        return NextResponse.json(serialize(gen));
+      }
+
+      const videoUrl = resultFetched.result.video?.url ?? null;
       console.log(
         `[generate/status] gen=${gen.id} fetched result video_url=${videoUrl ? videoUrl.slice(0, 80) : "null"}`,
       );
