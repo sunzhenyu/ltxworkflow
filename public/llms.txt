@@ -112,3 +112,54 @@
 - [Gemma 3 12B IT FP4 mixed (16/24 GB)](https://ltxworkflow.com/models/ltx23-gemma-fp4)
 - [Gemma 3 12B IT FP8 scaled (alt)](https://ltxworkflow.com/models/ltx23-gemma-fp8)
 - [Gemma 3 12B IT BF16 (32 GB+)](https://ltxworkflow.com/models/ltx23-gemma-full)
+
+## Pricing — online LTX 2.3 generation
+
+Pricing for the in-browser image-to-video service. Local ComfyUI usage of the model files is free and unrelated. See https://ltxworkflow.com/pricing for the live page.
+
+- **Credit unit**: 1 credit = 1 second of 1080p LTX 2.3 Fast i2v video. A typical 6-second clip costs 6 credits. Higher resolutions (1440p ×1.5, 4K ×4) and the slower-but-higher-quality Standard variant cost more credits per second.
+- **Welcome grant**: 8 free credits on signup (no card required) — enough to fully generate one 6-second clip.
+- **Failed generations**: auto-refunded — credits are only burned once the video is delivered.
+- **Unused credits**: never expire. Subscription credits accumulate cycle-over-cycle.
+- **Refund policy**: payments are final and non-refundable. Use the welcome credits to evaluate before paying. Cancel future subscription billing anytime from the dashboard.
+- **Payment processor**: Creem. Accepts major credit cards, debit cards, and digital wallets.
+
+### Subscriptions (monthly recurring)
+- **Starter — $9.99/mo, 150 credits/mo** — ≈ 25 clips/mo at 1080p Fast 6s. For curious creators dipping into LTX 2.3.
+- **Pro — $24.99/mo, 380 credits/mo** — ≈ 63 clips/mo. Most popular. For active creators shipping every week.
+- **Studio — $79.99/mo, 1,230 credits/mo** — ≈ 205 clips/mo. For volume creators and small agencies.
+
+### One-time credit packs (never expire)
+- **Starter Pack — $4.99, 60 credits** — ≈ 10 clips. Zero-commitment trial after the welcome 8.
+- **Standard Pack — $14.99, 200 credits** — ≈ 33 clips. ~10% cheaper per credit than Starter Pack.
+- **Big Pack — $39.99, 600 credits** — ≈ 100 clips. ~20% cheaper per credit than Starter Pack — best per-credit value of any one-time tier.
+
+## Common questions
+
+**What is a credit?**
+1 credit buys 1 second of 1080p Fast video on LTX 2.3. A 6-second clip costs 6 credits. Higher resolutions (1440p, 4K) and the Standard quality variant cost more credits per second — see https://ltxworkflow.com/generate for exact multipliers.
+
+**Subscriptions vs one-time packs — which should I pick?**
+Subscriptions are cheaper per credit but auto-renew monthly. Packs cost slightly more per credit but you pay once and credits never expire. Most active users find subscriptions cheaper after the second month of use.
+
+**What happens to unused credits at the end of a subscription month?**
+They roll over. Each subscription cycle adds credits on top of whatever wasn't spent — there's no monthly reset.
+
+**What if a generation fails?**
+You're refunded automatically. The platform only deducts credits once a video is successfully delivered.
+
+**Can I still download the .safetensors files for local ComfyUI without paying?**
+Yes. All LTX 2.3 model download pages and ComfyUI workflow JSON files are free and stay free. Subscriptions and packs are only for the in-browser online generation service.
+
+**What payment methods are accepted?**
+All major credit cards, debit cards, and digital wallets via Creem (the payment processor).
+
+**Are refunds offered?**
+No. All payments are final and non-refundable. New users should test the service with the 8 free welcome credits before paying. Future subscription billing can be canceled at any time from the dashboard to prevent further charges.
+
+**Does the service work without a GPU?**
+Yes — that's the whole point of the online service. Generation runs on remote GPUs; the user only needs a browser. The downloadable .safetensors files are for users who want to run LTX 2.3 locally in ComfyUI and require 16 GB+ VRAM.
+
+**What model is used for online generation?**
+LTX 2.3 22B i2v Fast at 1080p by default — the same Lightricks weights distributed via the model download pages. The platform's online tier is image-to-video first; text-to-video is a secondary feature.
+

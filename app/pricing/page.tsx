@@ -37,8 +37,62 @@ export default async function PricingPage() {
 
   const hasAnyTier = subs.length + packs.length > 0;
 
+  // ── Structured data ────────────────────────────────────────────────────────
+  // One @graph payload covers both the FAQPage (for AI Overview / Perplexity
+  // direct-answer extraction) and a Product per tier (so LLMs can answer
+  // "how much does the Pro plan cost?" with correct, source-of-truth numbers).
+  const schemaGraph = [
+    {
+      "@type": "FAQPage",
+      mainEntity: FAQS.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    },
+    ...[...subs, ...packs].map((t) => ({
+      "@type": "Product",
+      name: `LTX Workflow — ${t.name}`,
+      description: `${t.tagline} ${t.credits.toLocaleString()} credits (~${t.approxClips} 6-second 1080p clips).`,
+      brand: { "@type": "Brand", name: "LTX Workflow" },
+      sku: t.id,
+      category: "Video Generation Credits",
+      offers: {
+        "@type": "Offer",
+        url: "https://ltxworkflow.com/pricing",
+        priceCurrency: "USD",
+        price: t.priceUsd.toFixed(2),
+        availability: t.creemProductId
+          ? "https://schema.org/InStock"
+          : "https://schema.org/PreOrder",
+        ...(t.cadence === "monthly" && {
+          priceSpecification: {
+            "@type": "UnitPriceSpecification",
+            price: t.priceUsd.toFixed(2),
+            priceCurrency: "USD",
+            billingDuration: "P1M",
+            referenceQuantity: {
+              "@type": "QuantitativeValue",
+              value: t.credits,
+              unitText: "credits per month",
+            },
+          },
+        }),
+      },
+    })),
+  ];
+
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": schemaGraph,
+          }),
+        }}
+      />
       <Nav activeHref="/pricing" />
 
       <section className="text-center space-y-4 py-6">
@@ -133,42 +187,53 @@ export default async function PricingPage() {
 
       <section className="max-w-5xl mx-auto space-y-4">
         <h2 className="text-2xl font-bold text-center text-white mb-6">FAQ</h2>
-        <Faq q="What is a credit?">
-          1 credit buys 1 second of 1080p Fast video on LTX 2.3. A typical 6-second clip costs 6
-          credits. Higher resolutions (1440p, 4K) and the slower-but-higher-quality standard
-          variant cost more credits per second — see /generate for the exact multipliers.
-        </Faq>
-        <Faq q="Subscriptions vs one-time packs?">
-          Subscriptions are cheaper per credit but auto-renew monthly. Packs are slightly more
-          per credit but you only pay once and the credits never expire. Most active users find
-          subscriptions cheaper after the second month.
-        </Faq>
-        <Faq q="What happens to unused credits at the end of a subscription month?">
-          They stay in your account. Subscriptions add credits each cycle on top of whatever you
-          haven&apos;t spent — there&apos;s no reset.
-        </Faq>
-        <Faq q="What if a generation fails?">
-          You&apos;re refunded automatically. We only charge once the video is delivered.
-        </Faq>
-        <Faq q="Can I still download the .safetensors files for local ComfyUI?">
-          Yes. The model download pages and ComfyUI workflows aren&apos;t going anywhere — they&apos;re
-          free and stay free. Subscriptions and packs are for in-browser online generation.
-        </Faq>
-        <Faq q="What payment methods do you accept?">
-          All major credit cards, debit cards, and digital wallets via Creem (our payment
-          processor).
-        </Faq>
-        <Faq q="Do you offer refunds?">
-          No — all payments are final and non-refundable. Try the free {WELCOME_CREDITS} credits
-          on a new account first to make sure the service fits before paying. You can cancel
-          future subscription billing anytime to prevent further charges.
-        </Faq>
+        {FAQS.map((f) => (
+          <Faq key={f.q} q={f.q}>
+            {f.a}
+          </Faq>
+        ))}
       </section>
 
       <Footer />
     </main>
   );
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FAQ data — single source of truth for both rendered Faq components AND the
+// FAQPage JSON-LD schema below. Keep answers as plain strings so they can be
+// serialized into structured data without losing fidelity.
+// ─────────────────────────────────────────────────────────────────────────────
+const FAQS: { q: string; a: string }[] = [
+  {
+    q: "What is a credit?",
+    a: "1 credit buys 1 second of 1080p Fast video on LTX 2.3. A typical 6-second clip costs 6 credits. Higher resolutions (1440p, 4K) and the slower-but-higher-quality standard variant cost more credits per second — see /generate for the exact multipliers.",
+  },
+  {
+    q: "Subscriptions vs one-time packs?",
+    a: "Subscriptions are cheaper per credit but auto-renew monthly. Packs are slightly more per credit but you only pay once and the credits never expire. Most active users find subscriptions cheaper after the second month.",
+  },
+  {
+    q: "What happens to unused credits at the end of a subscription month?",
+    a: "They stay in your account. Subscriptions add credits each cycle on top of whatever you haven't spent — there's no reset.",
+  },
+  {
+    q: "What if a generation fails?",
+    a: "You're refunded automatically. We only charge once the video is delivered.",
+  },
+  {
+    q: "Can I still download the .safetensors files for local ComfyUI?",
+    a: "Yes. The model download pages and ComfyUI workflows aren't going anywhere — they're free and stay free. Subscriptions and packs are for in-browser online generation.",
+  },
+  {
+    q: "What payment methods do you accept?",
+    a: "All major credit cards, debit cards, and digital wallets via Creem (our payment processor).",
+  },
+  {
+    q: "Do you offer refunds?",
+    a: `No — all payments are final and non-refundable. Try the free ${WELCOME_CREDITS} credits on a new account first to make sure the service fits before paying. You can cancel future subscription billing anytime to prevent further charges.`,
+  },
+];
 
 function TierCard({ tier }: { tier: PricingTier }) {
   const ppc = pricePerCredit(tier);
