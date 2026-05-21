@@ -17,6 +17,15 @@ import {
   type Resolution,
 } from "@/lib/credit-cost";
 import { WELCOME_CREDITS } from "@/lib/credits-constants";
+import { PRICING_TIERS } from "@/lib/pricing";
+
+// Single one-click upsell target — the smallest one-time pack. We surface it
+// at the two highest-intent moments (low-balance banner + post-success card)
+// so the user never needs to detour through /pricing to convert.
+const SMALL_PACK = PRICING_TIERS.find((t) => t.id === "pack-small");
+const UPSELL_HREF = SMALL_PACK?.creemProductId
+  ? `/checkout?productId=${SMALL_PACK.creemProductId}`
+  : "/pricing";
 
 type ApiStatus = "pending" | "running" | "completed" | "failed";
 type UiStatus = "idle" | "submitting" | "running" | "completed" | "failed";
@@ -322,10 +331,12 @@ export default function Generator({
             </span>
             {balance < cost ? (
               <a
-                href="/pricing"
+                href={UPSELL_HREF}
                 className="text-xs bg-amber-500 hover:bg-amber-400 text-gray-950 font-semibold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
               >
-                Buy more credits →
+                {SMALL_PACK?.creemProductId
+                  ? `Get ${SMALL_PACK.credits} credits — $${SMALL_PACK.priceUsd}`
+                  : "Buy more credits →"}
               </a>
             ) : (
               <span className="text-xs text-gray-500">{cost} credits / clip</span>
@@ -526,6 +537,36 @@ export default function Generator({
                 .
               </p>
             </div>
+            {/* Post-success upsell — only when they can't fund another clip.
+                This is the highest-intent moment: they just watched their
+                generation succeed and now hit a wall on the next one. */}
+            {SMALL_PACK?.creemProductId && balance < cost && (
+              <div className="bg-gradient-to-r from-amber-900/30 via-orange-900/20 to-amber-900/30 border border-amber-600/50 rounded-xl p-5 space-y-3">
+                <div>
+                  <p className="text-sm font-semibold text-white">
+                    Out of credits — keep going?
+                  </p>
+                  <p className="text-xs text-amber-100/80 mt-1">
+                    Add {SMALL_PACK.credits} credits for ${SMALL_PACK.priceUsd} —
+                    roughly {SMALL_PACK.approxClips}+ more clips. One-time, no subscription.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <a
+                    href={UPSELL_HREF}
+                    className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-gray-950 font-semibold px-5 py-2 rounded-lg text-sm transition-colors"
+                  >
+                    Get {SMALL_PACK.credits} credits — ${SMALL_PACK.priceUsd} →
+                  </a>
+                  <a
+                    href="/pricing"
+                    className="text-xs text-amber-200/80 hover:text-amber-100 underline"
+                  >
+                    or see subscription plans
+                  </a>
+                </div>
+              </div>
+            )}
             <div className="text-center">
               <button
                 type="button"

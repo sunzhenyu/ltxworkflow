@@ -10,8 +10,22 @@ const supabase = createClient(
 );
 
 // Helper: derive a stable user id (we use email as the canonical id throughout).
+// Preference order:
+//   1. metadata.user_email — we explicitly set this in /api/checkout so it's the
+//      most trustworthy value: it's the email the user is signed in with on our
+//      site at the moment they clicked "Buy". Survives even if the buyer edits
+//      the email field on the Creem checkout form.
+//   2. customer_email — Creem-managed, usually matches but the buyer can change
+//      it on the Creem form, which would orphan the credits.
+//   3. customer_id — last resort for legacy events without an email.
 function userIdFromEvent(data: Record<string, unknown>): string | undefined {
-  return (data.customer_email as string) || (data.customer_id as string) || undefined;
+  const metadata = (data.metadata as Record<string, unknown> | undefined) || {};
+  return (
+    (metadata.user_email as string) ||
+    (data.customer_email as string) ||
+    (data.customer_id as string) ||
+    undefined
+  );
 }
 
 export async function POST(request: NextRequest) {
