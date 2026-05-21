@@ -83,7 +83,7 @@ function AnonymousSEOContent() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <ValueCard
             title="No GPU required"
-            body="Skip the 16GB+ VRAM card and the 4-hour ComfyUI setup. Generate a 5-second clip in ~30 seconds from any device."
+            body="Skip the 16GB+ VRAM card and the 4-hour ComfyUI setup. Generate a 6-second clip in ~30 seconds from any device."
           />
           <ValueCard
             title="Same weights, presets done"

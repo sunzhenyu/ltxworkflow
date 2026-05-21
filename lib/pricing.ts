@@ -15,7 +15,7 @@ export type PricingTier = {
   tagline: string;
   priceUsd: number;
   credits: number;
-  /** approximate number of 5-second 1080p Fast clips */
+  /** approximate number of 6-second 1080p Fast clips (matches Generator default) */
   approxClips: number;
   cadence: "monthly" | "one_time";
   creemProductId: string | undefined;
@@ -27,7 +27,7 @@ const tier = (
   partial: Omit<PricingTier, "approxClips">,
 ): PricingTier => ({
   ...partial,
-  approxClips: Math.floor(partial.credits / 5),
+  approxClips: Math.floor(partial.credits / 6),
 });
 
 export const PRICING_TIERS: PricingTier[] = [

@@ -134,7 +134,7 @@ export default async function PricingPage() {
       <section className="max-w-5xl mx-auto space-y-4">
         <h2 className="text-2xl font-bold text-center text-white mb-6">FAQ</h2>
         <Faq q="What is a credit?">
-          1 credit buys 1 second of 1080p Fast video on LTX 2.3. A typical 5-second clip costs 5
+          1 credit buys 1 second of 1080p Fast video on LTX 2.3. A typical 6-second clip costs 6
           credits. Higher resolutions (1440p, 4K) and the slower-but-higher-quality standard
           variant cost more credits per second — see /generate for the exact multipliers.
         </Faq>
@@ -209,7 +209,7 @@ function TierCard({ tier }: { tier: PricingTier }) {
           )}
         </div>
         <div className="text-xs text-gray-500">
-          ≈ {tier.approxClips} 5-second clips at 1080p · ${ppc.toFixed(3)}/credit
+          ≈ {tier.approxClips} 6-second clips at 1080p · ${ppc.toFixed(3)}/credit
         </div>
       </div>
 

@@ -205,7 +205,7 @@ export default async function ModelDetailPage({
                 No {model.vram}GB GPU? Try {model.filename} online — free generation included
               </h2>
               <p className="text-sm text-amber-100/80">
-                Skip the {model.size} download and ComfyUI setup. Generate a 5-second video using
+                Skip the {model.size} download and ComfyUI setup. Generate a 6-second video using
                 this exact model in your browser, ~30 seconds.
               </p>
             </div>
