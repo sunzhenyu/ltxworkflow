@@ -349,6 +349,61 @@ export default async function ModelDetailPage({
           </div>
         </section>
 
+        {/* Workflow path variants — captures "cannot find model" path-prefix queries */}
+        {model.pathVariants && model.pathVariants.length > 0 && (
+          <section className="space-y-3">
+            <h2 className="text-2xl font-bold text-gray-100">
+              ComfyUI says it can&apos;t find {model.filename}?
+            </h2>
+            <div className="bg-gray-900 rounded-xl p-5 space-y-3 text-sm text-gray-300 leading-relaxed">
+              <p>
+                Some published workflow JSONs reference this file under a custom
+                subdirectory. If ComfyUI shows a &quot;cannot find model&quot; error and
+                your workflow references one of these path-prefixed variants:
+              </p>
+              <ul className="space-y-1 font-mono text-xs text-violet-300 bg-gray-950/50 rounded-lg p-3 break-all">
+                {model.pathVariants.map((v) => (
+                  <li key={v}>{v}</li>
+                ))}
+              </ul>
+              <p>
+                The prefix before the slash or backslash is a subdirectory the
+                workflow author used. The actual file is the same{" "}
+                <span className="font-mono text-violet-300">{model.filename}</span>{" "}
+                — you have two fixes:
+              </p>
+              <ol className="space-y-2 list-decimal list-inside">
+                <li>
+                  Create the matching subdirectory inside{" "}
+                  <span className="font-mono text-gray-200">{installPath}</span>{" "}
+                  and place the file there. Example: if the workflow references{" "}
+                  <span className="font-mono text-violet-300">
+                    {model.pathVariants[0]}
+                  </span>
+                  , create the corresponding subfolder under{" "}
+                  <span className="font-mono text-gray-200">{installPath}</span>{" "}
+                  and put {model.filename} inside it.
+                </li>
+                <li>
+                  Or open the workflow JSON in a text editor and replace the
+                  prefixed string with just{" "}
+                  <span className="font-mono text-violet-300">
+                    {model.filename}
+                  </span>
+                  . ComfyUI then resolves it directly from{" "}
+                  <span className="font-mono text-gray-200">{installPath}</span>.
+                </li>
+              </ol>
+              <p className="text-gray-400">
+                On Windows the separator is{" "}
+                <span className="font-mono">\</span>, on macOS/Linux it is{" "}
+                <span className="font-mono">/</span> — they refer to the same
+                nested folder regardless of platform.
+              </p>
+            </div>
+          </section>
+        )}
+
         {/* Troubleshooting */}
         {troubleshooting.length > 0 && (
           <section className="space-y-3">

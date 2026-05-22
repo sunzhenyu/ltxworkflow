@@ -17,6 +17,11 @@ export type ModelVariant = {
   whenToChoose?: string;
   knownIssues?: { error: string; cause: string; fix: string }[];
   releaseInfo?: { released: string; source: string; notes: string };
+  // Subdirectory-prefixed filename variants observed in published workflow JSONs.
+  // E.g. "ltx23\\taeltx2_3.safetensors" or "ltxvideo/v2/foo.safetensors". Used to
+  // help users whose ComfyUI shows "cannot find model" because the workflow author
+  // referenced the file under a nested path.
+  pathVariants?: string[];
 };
 
 // Source: https://github.com/Lightricks/ComfyUI-LTXVideo
@@ -78,6 +83,11 @@ export const MODELS: ModelVariant[] = [
       source: "Kijai/LTX2.3_comfy (HuggingFace)",
       notes: "v1.1 release improved fast-motion stability and character consistency over v1.0.",
     },
+    pathVariants: [
+      "ltxvideo\\v2\\ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors",
+      "ltx23\\ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors",
+      "diffusion_models/ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors",
+    ],
   },
   {
     id: "ltx23-distilled-11-lora",
@@ -90,6 +100,11 @@ export const MODELS: ModelVariant[] = [
     description: "Distilled LoRA v1.1 by Kijai. Use with the dev model for distilled-quality output on 16GB VRAM.",
     badge: "16GB LoRA",
     recommendation: "Pair with the dev FP8 model. Load as LoRA in ComfyUI models/loras/.",
+    pathVariants: [
+      "ltx2\\ltx-2.3-22b-distilled-1.1_lora-dynamic_fro09_avg_rank_111_bf16.safetensors",
+      "ltx-2\\ltx-2.3-22b-distilled-1.1_lora-dynamic_fro09_avg_rank_111_bf16.safetensors",
+      "loras/ltx-2.3-22b-distilled-1.1_lora-dynamic_fro09_avg_rank_111_bf16.safetensors",
+    ],
   },
   {
     id: "ltx23-distilled-condsafe-lora",
@@ -129,6 +144,11 @@ export const MODELS: ModelVariant[] = [
       source: "TenStrip/LTX2.3_Distilled_Lora_1.1_Experiments (HuggingFace)",
       notes: "Experimental community release in the v1.1 distillation LoRA experiments repo. Also mirrored at SulphurAI/Sulphur-2-base/distill_loras/.",
     },
+    pathVariants: [
+      "ltx23\\ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors",
+      "distill_loras/ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors",
+      "loras/ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors",
+    ],
   },
   // ── v1.1 BF16 / MXFP8 (Kijai) ───────────────────────────────────────────
   {
@@ -495,6 +515,10 @@ export const MODELS: ModelVariant[] = [
     badge: "Dynamic LoRA",
     recommendation: "v1.0 dynamic LoRA. Use v1.1 dynamic LoRA (rank 111) for latest quality.",
     isNew: false,
+    pathVariants: [
+      "ltx2\\ltx-2.3-22b-distilled-lora-dynamic_fro09_avg_rank_105_bf16.safetensors",
+      "loras/ltx-2.3-22b-distilled-lora-dynamic_fro09_avg_rank_105_bf16.safetensors",
+    ],
   },
   // ── Upscalers ─────────────────────────────────────────────────────────────
   {
@@ -583,6 +607,12 @@ export const MODELS: ModelVariant[] = [
       source: "Kijai/LTX2.3_comfy (HuggingFace)",
       notes: "Shipped alongside Kijai's initial LTX 2.3 ComfyUI port in March 2026.",
     },
+    pathVariants: [
+      "ltx/taeltx2_3.safetensors",
+      "ltx23\\taeltx2_3.safetensors",
+      "ltx 2.3\\taeltx2_3.safetensors",
+      "vae/taeltx2_3.safetensors",
+    ],
   },
   // ── Audio / Video VAE & Text Encoder components (Kijai) ──────────────────
   {
