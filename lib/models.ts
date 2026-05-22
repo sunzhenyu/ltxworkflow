@@ -11,6 +11,12 @@ export type ModelVariant = {
   badge?: string;
   recommendation?: string;
   isNew?: boolean;
+  // Per-model differentiation content. Rendered conditionally on detail pages.
+  // Only filled for high-impression files; others fall back to type-level defaults.
+  technicalNotes?: string;
+  whenToChoose?: string;
+  knownIssues?: { error: string; cause: string; fix: string }[];
+  releaseInfo?: { released: string; source: string; notes: string };
 };
 
 // Source: https://github.com/Lightricks/ComfyUI-LTXVideo
@@ -41,6 +47,37 @@ export const MODELS: ModelVariant[] = [
     description: "FP8 quantized v1.1 distilled by Kijai. Best for 16GB VRAM. 8 steps, CFG=1.",
     badge: "16GB Best",
     recommendation: "Best choice for 16GB VRAM. Latest v1.1 FP8 distilled. Requires RTX 40xx+ for fp8 matmuls.",
+    technicalNotes:
+      "FP8 scaled quantization stores transformer weights as 8-bit floats with per-channel scaling tables alongside. On hardware with native FP8 matmul (RTX 40-series Ada, H100, RTX 50-series Blackwell), this gives near-BF16 quality at roughly half the VRAM and a meaningful speedup; on older GPUs the math falls back to a slow path and you should use the MXFP8 variant instead.\n\n'transformer_only' means this file contains only the DiT/transformer weights — not the VAE, not the text encoder. You will not be able to run a workflow with just this file; pair it with taeltx2_3.safetensors (VAE) and a Gemma 3 12B text encoder (FP4 mixed on 16 GB, FP8 scaled on 24 GB, BF16 on 32 GB+).\n\nDistilled v1.1 inference settings are 8 steps with CFG=1 — roughly 4× faster than running the dev model with the standard 30-step sampler. The v1.1 weights are noticeably better than v1.0 distilled for fast camera motion and character consistency.",
+    whenToChoose:
+      "Default choice for 16 GB cards (RTX 4070, 4070 Ti SUPER, 4080, 4070 Ti) and the fastest path on 24 GB (RTX 4090). You get the latest distilled quality at FP8 size, with hardware-accelerated matmul.\n\nPick the MXFP8 block-32 variant of the same file instead if you are on RTX 30-series — it stores the same weights in a format your GPU's tensor cores can handle without falling back to a slow emulation path.\n\nPick the BF16 transformer-only variant instead if you have 32 GB+ VRAM and want maximum quality, or if you plan to apply LoRAs that the FP8 path does not accept cleanly.",
+    knownIssues: [
+      {
+        error: "RuntimeError: fp8 matmul not supported / 'unsupported dtype' on RTX 3090 / RTX 3060",
+        cause: "RTX 30-series GPUs lack native FP8 tensor cores. The runtime cannot dispatch the FP8 path.",
+        fix: "Switch to ltx-2.3-22b-distilled-1.1_transformer_only_mxfp8_block32.safetensors. Same weights, MXFP8 format runs on Ampere/Ada tensor cores. Same VRAM footprint.",
+      },
+      {
+        error: "OOM at first inference on 16 GB even though file is only 25 GB",
+        cause: "The full pipeline (transformer + Gemma text encoder + VAE + activations) exceeds 16 GB if you use the BF16 Gemma. Activations can spike to several GB at higher resolutions.",
+        fix: "Use gemma_3_12B_it_fp4_mixed.safetensors as the text encoder. Enable model offload in ComfyUI's manager if you still OOM at 768p. Drop resolution to 576p as a last resort.",
+      },
+      {
+        error: "First generation is very slow, later ones are fast",
+        cause: "torch.compile warmup on first call. The model is being compiled for your specific GPU and input shape.",
+        fix: "This is expected. Keep ComfyUI running and reuse the loaded model; subsequent generations skip compilation. If you change resolution or aspect, you'll get one more slow warmup.",
+      },
+      {
+        error: "Workflow references '_transformer_only_fp8_scaled.safetensors' but file is named slightly differently",
+        cause: "Older workflow JSONs reference the v1.0 filename (without '-1.1' in the name) — they need to be updated to use v1.1.",
+        fix: "Open the workflow JSON in a text editor and replace the v1.0 filename string with 'ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors'. Or edit the Load node in ComfyUI and reselect the v1.1 file from the dropdown.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-04-13",
+      source: "Kijai/LTX2.3_comfy (HuggingFace)",
+      notes: "v1.1 release improved fast-motion stability and character consistency over v1.0.",
+    },
   },
   {
     id: "ltx23-distilled-11-lora",
@@ -53,6 +90,45 @@ export const MODELS: ModelVariant[] = [
     description: "Distilled LoRA v1.1 by Kijai. Use with the dev model for distilled-quality output on 16GB VRAM.",
     badge: "16GB LoRA",
     recommendation: "Pair with the dev FP8 model. Load as LoRA in ComfyUI models/loras/.",
+  },
+  {
+    id: "ltx23-distilled-condsafe-lora",
+    name: "LTX 2.3 Distilled 1.1 LoRA — fro90_ceil72 cond-safe (TenStrip)",
+    filename: "ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors",
+    size: "662 MB",
+    vram: 16,
+    type: "lora",
+    hfUrl: "https://huggingface.co/TenStrip/LTX2.3_Distilled_Lora_1.1_Experiments",
+    description: "Experimental community distilled LoRA v1.1 by TenStrip. The 'cond-safe' variant zeroes cross-attention bridges, adaln/scale-shift tables, gate logits, and prompt scale-shift — making it better suited for I2V and input-conditioned workflows than the standard dynamic LoRA. Place in models/loras/.",
+    badge: "I2V LoRA",
+    recommendation: "Pair with the dev FP8 model when running image-to-video or other input-conditioned workflows. Use the standard Kijai dynamic-rank LoRA for T2V instead.",
+    isNew: true,
+    technicalNotes:
+      "This is one of TenStrip's experimental distillation LoRAs from the LTX2.3_Distilled_Lora_1.1_Experiments repo. 'fro90_ceil72' names the training schedule's hyperparameters (Frobenius norm target 0.90, ceiling 72). The decisive marker is the 'condsafe' suffix.\n\nIn the 'cond-safe' variant, the LoRA matrices for cross-attention bridges, adaLN scale/shift tables, gate logits, and prompt scale-shift are zeroed out. Why this matters: those are the exact paths that carry input-image conditioning in I2V workflows. The standard dynamic-rank distillation LoRA modifies them along with the rest of the network — which speeds up T2V but can subtly break I2V because the image features get routed differently than the base model expects.\n\n662 MB is small enough that you can keep this and the standard Kijai dynamic LoRA side-by-side and A/B test them per workflow. Place in ComfyUI/models/loras/ and select via the LoRA Loader node.",
+    whenToChoose:
+      "Use this LoRA when your workflow is image-to-video, first-frame conditioning, or any pipeline where preserving input-image fidelity matters more than maximum T2V quality. The cond-safe design specifically protects the conditioning paths that I2V relies on.\n\nFor pure text-to-video, the standard Kijai dynamic LoRA (ltx-2.3-22b-distilled-1.1_lora-dynamic_fro09_avg_rank_111_bf16.safetensors) is more proven and produces stronger motion. The cond-safe variant trades some T2V quality for I2V reliability.\n\nThis is an experimental release — try it against the standard LoRA on your own prompts before committing a production workflow to it.",
+    knownIssues: [
+      {
+        error: "I2V output looks blurry or loses the input image's structure",
+        cause: "LoRA is paired with the distilled base instead of the dev base. Distillation LoRAs are designed to convert the dev model into distilled-quality output — applying them on top of an already-distilled model double-distills and degrades quality.",
+        fix: "Pair this LoRA with ltx-2.3-22b-dev-fp8.safetensors or the BF16 dev model, not the distilled FP8.",
+      },
+      {
+        error: "No noticeable speedup vs running the dev model raw",
+        cause: "Distillation LoRAs only give the 8-step speedup if you also configure the sampler for distilled inference.",
+        fix: "Set sampler steps = 8 and CFG = 1 (matching the distilled model's inference profile). If you leave the sampler at the dev defaults (30 steps, CFG > 1), the LoRA does nothing useful.",
+      },
+      {
+        error: "ComfyUI errors with 'LoRA shape mismatch' when loading",
+        cause: "Loading the LoRA on top of a transformer whose weights have a different layout — typically a quantized variant whose internal layer naming was rewritten.",
+        fix: "Apply this LoRA before quantization-aware loading, or use it with the BF16 dev base (ltx-2.3-22b-dev.safetensors) which has the canonical layer names.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-05-01",
+      source: "TenStrip/LTX2.3_Distilled_Lora_1.1_Experiments (HuggingFace)",
+      notes: "Experimental community release in the v1.1 distillation LoRA experiments repo. Also mirrored at SulphurAI/Sulphur-2-base/distill_loras/.",
+    },
   },
   // ── v1.1 BF16 / MXFP8 (Kijai) ───────────────────────────────────────────
   {
@@ -94,6 +170,32 @@ export const MODELS: ModelVariant[] = [
     description: "Full BF16 dev model. Flexible and trainable. 42GB — requires 48GB VRAM or sequential offloading on 32GB.",
     badge: "Official",
     recommendation: "Best for LoRA training and fine-tuning. 42GB — enable Sequential Offloading on 32GB cards.",
+    technicalNotes:
+      "ltx-2.3-22b-dev.safetensors is the full-precision (BF16) base model from Lightricks — the source weights that every FP8, MXFP8, NVFP4, and distilled variant is derived from. 22B parameters at BF16 means ~42 GB on disk. This is the file you train against, not the file you reach for to make a quick clip.\n\nUnlike the distilled checkpoints, the dev model uses the full 30-step diffusion schedule with CFG > 1, accepts negative prompts meaningfully, and produces noticeably different output when you stack multiple LoRAs. The trade-off is roughly 4× slower inference and a much larger VRAM footprint.\n\nOn 32 GB cards (RTX 5090, A6000) you can run inference with ComfyUI's Sequential Offloading enabled — the model streams layers to and from GPU memory during the forward pass. This is slow but works. For comfortable inference you want 48 GB+ (A6000 Ada, H100 PCIe).",
+    whenToChoose:
+      "Pick the dev BF16 model when you are training LoRAs or fine-tuning — quantized checkpoints lose the gradient precision you need. Also pick it when you need maximum fidelity for a hero shot and inference time is not the constraint.\n\nFor day-to-day generation, ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors or ltx-2.3-22b-dev-fp8.safetensors are better defaults — they cut VRAM in half and inference time by ~4×, with a quality delta most users cannot see.\n\nFor LoRA training specifically, this file is non-negotiable. The official LoRA training scripts (and community trainers like ai-toolkit) expect BF16 source weights to compute meaningful gradients.",
+    knownIssues: [
+      {
+        error: "Loaded the model but OOM on first inference on a 32 GB card",
+        cause: "Activations + text encoder + VAE exceed remaining VRAM after the 42 GB transformer is loaded. Even with offloading enabled, peak memory during attention can spike.",
+        fix: "Enable Sequential Offloading in ComfyUI settings (not just Model Offload). Also drop to the FP4 Gemma text encoder (gemma_3_12B_it_fp4_mixed.safetensors). Reduce resolution to 576p as a fallback. For comfortable inference at 768p or 1024p you need 48 GB+ VRAM.",
+      },
+      {
+        error: "Download is extremely slow over residential connection",
+        cause: "42 GB file served via HuggingFace's xet protocol. Browser downloads max out at one TCP stream.",
+        fix: "Use `huggingface-cli download Lightricks/LTX-2.3 ltx-2.3-22b-dev.safetensors --local-dir .` for multi-stream parallel chunks. Or use aria2c with -x 8. Plan for the size — at 100 Mbps this is ~1 hour.",
+      },
+      {
+        error: "Training script crashes on backward pass with 'mixed precision' error",
+        cause: "Loading the BF16 weights in FP16 mixed precision causes overflow in attention.",
+        fix: "Use BF16 mixed precision, not FP16, in your training config. PyTorch's autocast(dtype=torch.bfloat16) is the standard setting for LTX training.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-03-04",
+      source: "Lightricks/LTX-2.3 (HuggingFace)",
+      notes: "Initial LTX 2.3 release. v1.1 weights live in the same repo as ltx-2.3-22b-distilled-1.1.safetensors.",
+    },
   },
   {
     id: "ltx23-distilled",
@@ -265,6 +367,27 @@ export const MODELS: ModelVariant[] = [
     badge: "Official FP8",
     recommendation: "Official FP8 from Lightricks. Alternative to Kijai's FP8 dev model.",
     isNew: false,
+    technicalNotes:
+      "This is Lightricks' first-party FP8 quantization of the LTX 2.3 dev base model. Unlike Kijai's transformer-only variants, the official file is a complete checkpoint — it includes the full set of submodules needed to run inference, which is why it weighs ~29 GB compared to ~25 GB for transformer-only quants.\n\n'Dev' means this is the non-distilled base model. It runs at full 30-step sampling with CFG > 1, which is slower than the 8-step distilled path but more flexible: it accepts LoRAs cleanly, responds to negative prompts, and is the right base for fine-tuning experiments.\n\nFP8 hardware is required (RTX 40-series Ada or newer, H100, Blackwell). On Ampere or older you'll either crash or fall back to a slow emulation path — switch to the BF16 dev file in that case.",
+    whenToChoose:
+      "Use this when you specifically want official Lightricks FP8 weights — for example, you're building a service that needs first-party-signed weights, or you're matching the exact reference output documented in Lightricks' release notes.\n\nFor most users, ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors is the better default — it's smaller, newer (v1.1), faster (8 steps), and from the community-trusted Kijai mirror that all current ComfyUI workflows reference. The official dev FP8 is what you reach for when you need LoRA support at FP8 size and the distilled path doesn't fit your use case.",
+    knownIssues: [
+      {
+        error: "Workflow expects a 'transformer_only' filename but I downloaded the full checkpoint",
+        cause: "Most published ComfyUI workflows are written against Kijai's transformer_only files, not Lightricks' full checkpoints.",
+        fix: "Either rewire the workflow's LoadCheckpoint to point at this file (instead of separate transformer + VAE + text encoder loads), or switch to ltx-2.3-22b-dev_transformer_only_fp8_scaled.safetensors from Kijai.",
+      },
+      {
+        error: "Generation looks correct but is slower than expected on a 4090",
+        cause: "This is the dev model, not distilled. It runs at 30 steps by default vs the distilled model's 8 steps.",
+        fix: "Either accept the speed for higher fidelity, or switch to ltx-2.3-22b-distilled-fp8.safetensors (also official, distilled) and use 8 steps with CFG=1.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-03-16",
+      source: "Lightricks/LTX-2.3-fp8 (HuggingFace)",
+      notes: "Official first-party FP8 release from Lightricks, posted shortly after the initial LTX 2.3 launch.",
+    },
   },
   {
     id: "ltx23-distilled-fp8-official",
@@ -279,6 +402,32 @@ export const MODELS: ModelVariant[] = [
     badge: "Official FP8",
     recommendation: "Official FP8 distilled from Lightricks. Alternative to Kijai's FP8.",
     isNew: false,
+    technicalNotes:
+      "Lightricks' first-party FP8 quantization of the v1.0 distilled model. Like the official dev FP8, this is a full checkpoint — transformer + VAE + text encoder integration glue — which is why the file is ~29.5 GB versus ~25 GB for a transformer-only quant.\n\nThe weights here are the v1.0 distilled checkpoint quantized to FP8. That means 8-step sampling with CFG=1, fast inference, and the v1.0 quality profile — not the v1.1 improvements that landed later in April 2026.\n\nFP8 hardware (RTX 40-series Ada or newer) is required. On RTX 30-series the matmul falls back to a slow path; switch to the MXFP8 block-32 variant from Kijai if that's your GPU.",
+    whenToChoose:
+      "Use this when you need official Lightricks distilled weights at FP8 size — for example, building a reproducible reference pipeline or matching the exact outputs documented in Lightricks' v1.0 distilled release notes.\n\nFor most ComfyUI users, ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors (Kijai, v1.1) is a better default: newer weights, smaller file, and the filename every current workflow JSON references.\n\nIf you need v1.0 specifically (for reproducibility or comparison), this is the cleanest source — official, signed, in the same repo as the official dev FP8.",
+    knownIssues: [
+      {
+        error: "Output quality is lower than the Kijai v1.1 FP8 file at the same settings",
+        cause: "This file is v1.0 weights, not v1.1. v1.1 is a meaningfully better release for fast motion and consistency.",
+        fix: "Switch to ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors if you don't need v1.0 specifically for reproducibility.",
+      },
+      {
+        error: "Workflow expects a 'transformer_only' file but downloaded this full checkpoint",
+        cause: "Most community workflow JSONs load the transformer, VAE, and text encoder separately and expect Kijai-style transformer-only files.",
+        fix: "Either rewire the workflow to load the full checkpoint (single LoadCheckpoint node), or download ltx-2.3-22b-distilled_transformer_only_fp8_scaled.safetensors from Kijai for the v1.0 transformer-only equivalent.",
+      },
+      {
+        error: "Generation is slower than expected even on a 4090",
+        cause: "Activations + Gemma BF16 text encoder + VAE add up. The 29.5 GB on-disk size grows substantially during inference.",
+        fix: "Use gemma_3_12B_it_fp4_mixed.safetensors as the text encoder. Cap resolution at 768p on 16 GB cards. On 24 GB you can run 1024p comfortably.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-03-16",
+      source: "Lightricks/LTX-2.3-fp8 (HuggingFace)",
+      notes: "First-party FP8 distilled release. Same v1.0 weights as the non-FP8 distilled, quantized to FP8. Lightricks did not publish a v1.1 FP8 in this repo — use the Kijai mirror for v1.1.",
+    },
   },
   // ── LoRA v1.1 ─────────────────────────────────────────────────────────────
   {
@@ -307,6 +456,32 @@ export const MODELS: ModelVariant[] = [
     badge: "v1.0 LoRA",
     recommendation: "Previous v1.0 LoRA. Use v1.1 LoRA for latest quality.",
     isNew: false,
+    technicalNotes:
+      "ltx-2.3-22b-distilled-lora-384.safetensors is the official Lightricks distillation LoRA at rank 384 — the v1.0 release that shipped with the initial LTX 2.3 launch. Applying it on top of the dev model gives output equivalent to the distilled checkpoint: 8-step sampling with CFG=1 at distilled quality.\n\nRank 384 is comparatively high — high enough to capture most of the distillation behavior end-to-end without the parameter savings you'd see from a low-rank LoRA. The file is ~7.6 GB on disk, which is large for a LoRA but tiny next to the 42 GB base model it stacks on top of.\n\nThe rank-384 design lets Lightricks ship distillation as a swappable behavior change rather than a separate checkpoint — useful for training experiments where you want to compare dev + distill-LoRA against the standalone distilled model.",
+    whenToChoose:
+      "For most users, switch to ltx-2.3-22b-distilled-lora-384-1.1.safetensors — the v1.1 release of the same LoRA. v1.1 has measurable improvements in fast-motion stability and prompt adherence over v1.0, with identical file structure.\n\nThis v1.0 file is worth keeping when you need to reproduce results from older workflow JSONs that pin the v1.0 filename, or when you're A/B testing v1.0 vs v1.1 to evaluate the upgrade.\n\nFor 16 GB inference where memory matters more than reproducibility, the Kijai dynamic LoRA (ltx-2.3-22b-distilled-1.1_lora-dynamic_fro09_avg_rank_111_bf16.safetensors) is ~3× smaller and loads faster.",
+    knownIssues: [
+      {
+        error: "LoRA loads but generation looks identical to base model — no distillation happening",
+        cause: "Sampler is still configured for the dev model (30 steps, CFG > 1). Distillation LoRAs only show their effect with distilled sampling settings.",
+        fix: "Set sampler steps = 8 and CFG = 1 in the KSampler node. The LoRA's job is to make the dev model behave like the distilled model — it can't change the number of denoising steps for you.",
+      },
+      {
+        error: "Stacked this LoRA with the Kijai dynamic LoRA and got garbage output",
+        cause: "Both LoRAs cover the same task — converting dev behavior to distilled behavior. Stacking them double-applies the distillation and overshoots.",
+        fix: "Use exactly one distillation LoRA at a time. If you want to compose with content/style LoRAs, apply the distillation LoRA at full strength and other LoRAs at their normal weights.",
+      },
+      {
+        error: "Workflow expects the v1.1 file, but only the v1.0 is in models/loras/",
+        cause: "Workflow JSONs are filename-specific. v1.0 and v1.1 are not interchangeable by string.",
+        fix: "Either download ltx-2.3-22b-distilled-lora-384-1.1.safetensors (recommended), or edit the workflow's LoRA Loader node to point at the v1.0 file you have.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-03-04",
+      source: "Lightricks/LTX-2.3 (HuggingFace)",
+      notes: "Initial v1.0 distillation LoRA. Superseded by ltx-2.3-22b-distilled-lora-384-1.1.safetensors in the v1.1 release on 2026-04-13.",
+    },
   },
   {
     id: "ltx23-distilled-lora-dynamic",
@@ -382,6 +557,32 @@ export const MODELS: ModelVariant[] = [
     description: "VAE by Kijai. Required for all ComfyUI workflows. Place in models/vae/.",
     badge: "Required",
     recommendation: "Required for all setups. Download this first regardless of your VRAM.",
+    technicalNotes:
+      "taeltx2_3.safetensors is the Tiny AutoEncoder (TAE) for LTX 2.3 — a distilled, much smaller replacement for the original full VAE. The 'tae' prefix marks it as a tiny encoder/decoder pair shipped specifically for ComfyUI's pipeline; the file is around half a gigabyte versus several gigabytes for a full VAE.\n\nEvery LTX 2.3 ComfyUI workflow — T2V, I2V, two-stage, IC-LoRA — references this exact filename in its LoadVAE / VAELoader node. The string is hardcoded in published workflow JSONs, so the filename matters: do not rename, do not substitute, and do not move it out of models/vae/.\n\nThe TAE handles both the encoder (image → latents for I2V) and the decoder (latents → frames at the end of inference). Quality-wise it is calibrated against the full VAE so artifacts are minimal, but if you see banding or color drift on long clips, the standalone BF16 video VAE is the heavier alternative.",
+    whenToChoose:
+      "This is not an alternative — it is required. Every workflow on this site, every ComfyUI workflow shipped by Lightricks or the community, and every IC-LoRA pipeline loads taeltx2_3.safetensors. Download it first regardless of which transformer/quant you pick.\n\nThe one case where you would use something else is if a workflow explicitly references LTX23_video_vae_bf16.safetensors — that is the BF16 standalone video VAE, used by a small number of two-stage or HDR workflows that need the heavier decoder.",
+    knownIssues: [
+      {
+        error: "VAELoader: file not found / 'taeltx2_3.safetensors not in list'",
+        cause: "File placed in ComfyUI/models/ root, or in checkpoints/ instead of vae/.",
+        fix: "Move the file to ComfyUI/models/vae/taeltx2_3.safetensors. Click the refresh button on the VAELoader node so ComfyUI re-scans the directory.",
+      },
+      {
+        error: "VAE decoded image is solid green / black / corrupt",
+        cause: "Partial download — HF's xet protocol can leave a truncated file on flaky connections that still looks like a valid .safetensors header.",
+        fix: "Delete the file and redownload. If you used a browser, switch to `huggingface-cli download` or `aria2c` with retry. Verify by checking file size matches HuggingFace's reported size (~500 MB).",
+      },
+      {
+        error: "Workflow loads but VAE node is red after rename",
+        cause: "The filename is hardcoded in workflow JSONs as taeltx2_3.safetensors.",
+        fix: "Rename it back. If you have other VAE files in the directory, keep taeltx2_3.safetensors and let the others coexist.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-03",
+      source: "Kijai/LTX2.3_comfy (HuggingFace)",
+      notes: "Shipped alongside Kijai's initial LTX 2.3 ComfyUI port in March 2026.",
+    },
   },
   // ── Audio / Video VAE & Text Encoder components (Kijai) ──────────────────
   {

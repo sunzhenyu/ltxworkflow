@@ -108,11 +108,17 @@ export default async function ModelDetailPage({
     },
   ].filter((w) => w.compat);
 
-  // Common troubleshooting based on type/VRAM
-  const troubleshooting = buildTroubleshooting(model);
+  // Common troubleshooting based on type/VRAM, merged with model-specific knownIssues
+  const genericTroubleshooting = buildTroubleshooting(model);
+  const modelSpecificIssues = (model.knownIssues ?? []).map((issue) => ({
+    q: issue.error,
+    a: `${issue.cause}\n\nFix: ${issue.fix}`,
+  }));
+  // Model-specific issues first (more relevant), then generic type-level issues
+  const troubleshooting = [...modelSpecificIssues, ...genericTroubleshooting];
 
   // JSON-LD SoftwareApplication schema
-  const jsonLd = {
+  const jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     name: model.filename,
@@ -131,6 +137,9 @@ export default async function ModelDetailPage({
       availability: "https://schema.org/InStock",
     },
   };
+  if (model.releaseInfo?.released) {
+    jsonLd.datePublished = model.releaseInfo.released;
+  }
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-8 space-y-8">
@@ -166,6 +175,15 @@ export default async function ModelDetailPage({
           </h1>
           <p className="text-lg text-gray-300">{model.name}</p>
           <p className="text-gray-400 leading-relaxed">{model.description}</p>
+          {model.releaseInfo && (
+            <p className="text-xs text-gray-500">
+              Released {model.releaseInfo.released} · Source:{" "}
+              <span className="text-gray-400">{model.releaseInfo.source}</span>
+              {model.releaseInfo.notes && (
+                <span className="text-gray-500"> — {model.releaseInfo.notes}</span>
+              )}
+            </p>
+          )}
         </header>
 
         {/* Download CTA */}
@@ -217,6 +235,36 @@ export default async function ModelDetailPage({
             Try this model online — free →
           </Link>
         </section>
+
+        {/* Technical details — model-specific */}
+        {model.technicalNotes && (
+          <section className="space-y-3">
+            <h2 className="text-2xl font-bold text-gray-100">Technical details</h2>
+            <div className="bg-gray-900 rounded-xl p-5 space-y-3 text-sm text-gray-300 leading-relaxed">
+              {model.technicalNotes
+                .split(/\n\n+/)
+                .map((para, i) => (
+                  <p key={i}>{para}</p>
+                ))}
+            </div>
+          </section>
+        )}
+
+        {/* When to choose this over alternatives — model-specific */}
+        {model.whenToChoose && (
+          <section className="space-y-3">
+            <h2 className="text-2xl font-bold text-gray-100">
+              When to choose {model.filename}
+            </h2>
+            <div className="bg-gray-900 rounded-xl p-5 space-y-3 text-sm text-gray-300 leading-relaxed">
+              {model.whenToChoose
+                .split(/\n\n+/)
+                .map((para, i) => (
+                  <p key={i}>{para}</p>
+                ))}
+            </div>
+          </section>
+        )}
 
         {/* Will it run on my GPU */}
         <section className="space-y-3">

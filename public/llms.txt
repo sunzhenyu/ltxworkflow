@@ -102,6 +102,7 @@
 - [ltx-2.3-22b-dev-nvfp4.safetensors (Blackwell)](https://ltxworkflow.com/models/ltx23-dev-nvfp4)
 - [taeltx2_3.safetensors (VAE)](https://ltxworkflow.com/models/ltx23-vae)
 - [ltx-2.3-22b-distilled-lora-384-1.1.safetensors](https://ltxworkflow.com/models/ltx23-distilled-lora-384-11)
+- [ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors (TenStrip, I2V-tuned)](https://ltxworkflow.com/models/ltx23-distilled-condsafe-lora)
 - [ltx-2.3-spatial-upscaler-x2-1.1.safetensors](https://ltxworkflow.com/models/ltx23-spatial-upscaler-x2-11)
 - [LTX23_audio_vae_bf16.safetensors](https://ltxworkflow.com/models/ltx23-audio-vae)
 - [IC-LoRA Union Control](https://ltxworkflow.com/models/ltx23-ic-lora-union)

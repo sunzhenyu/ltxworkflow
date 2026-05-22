@@ -5,12 +5,12 @@ import Footer from "@/components/Footer";
 import { MODELS } from "@/lib/models";
 
 export const metadata: Metadata = {
-  title: "LTX 2.3 Model Downloads — taeltx2_3.safetensors, ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors, Direct Links",
-  description: "Direct HuggingFace download links for all LTX 2.3 ComfyUI models: taeltx2_3.safetensors (VAE), ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors (16GB), ltx-2.3-22b-dev-fp8.safetensors, ltx-2.3-22b-distilled-1.1.safetensors (32GB). Organized by VRAM with ComfyUI workflow generator.",
+  title: "LTX 2.3 ComfyUI Models — Choose by VRAM (16 / 24 / 32 GB)",
+  description: "Pick the right LTX 2.3 model for your GPU. Grouped by VRAM tier (16GB FP8/MXFP8, 24GB offloading, 32GB BF16), with IC-LoRAs, Gemma text encoders, and per-file install paths. Direct HuggingFace links on each model page.",
   alternates: { canonical: "https://ltxworkflow.com/models" },
   openGraph: {
-    title: "LTX 2.3 Model Downloads — taeltx2_3.safetensors & FP8 Direct Links",
-    description: "Direct HuggingFace links for taeltx2_3.safetensors, ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors, ltx-2.3-22b-dev-fp8.safetensors and all LTX 2.3 ComfyUI models.",
+    title: "LTX 2.3 ComfyUI Models — Choose by VRAM",
+    description: "Pick the right LTX 2.3 model for your GPU. 16 GB FP8/MXFP8, 24 GB with offloading, 32 GB BF16. Plus IC-LoRAs and Gemma text encoders.",
     url: "https://ltxworkflow.com/models",
     type: "website",
   },
@@ -31,6 +31,7 @@ const VRAM_GROUPS = [
       "ltx23-dev-nvfp4",
       "ltx23-distilled-lora-384-11",
       "ltx23-distilled-11-lora",
+      "ltx23-distilled-condsafe-lora",
       "ltx23-distilled-lora-dynamic",
     ],
     note: "FP8 scaled requires RTX 40-series or newer. MXFP8 block-32 is an alternative format for compatible GPUs. NVFP4 (21.7 GB) is the official Blackwell / RTX 50xx path. Use v1.1 FP8 Distilled for fastest generation; use Dev FP8 + LoRA v1.1 if applying LoRA weights.",
