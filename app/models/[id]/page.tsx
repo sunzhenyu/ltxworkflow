@@ -118,9 +118,9 @@ export default async function ModelDetailPage({
   const troubleshooting = [...modelSpecificIssues, ...genericTroubleshooting];
 
   // JSON-LD SoftwareApplication schema
-  const jsonLd: Record<string, unknown> = {
-    "@context": "https://schema.org",
+  const softwareSchema: Record<string, unknown> = {
     "@type": "SoftwareApplication",
+    "@id": `https://ltxworkflow.com/models/${model.id}#software`,
     name: model.filename,
     alternateName: model.name,
     description: model.description,
@@ -138,8 +138,47 @@ export default async function ModelDetailPage({
     },
   };
   if (model.releaseInfo?.released) {
-    jsonLd.datePublished = model.releaseInfo.released;
+    softwareSchema.datePublished = model.releaseInfo.released;
   }
+
+  // FAQPage schema — emit when we have at least one Q/A pair, exposing
+  // troubleshooting + path-variant fixes as Google rich-result candidates.
+  const faqEntities = troubleshooting.map((t) => ({
+    "@type": "Question",
+    name: t.q,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: t.a,
+    },
+  }));
+  if (model.pathVariants && model.pathVariants.length > 0) {
+    faqEntities.push({
+      "@type": "Question",
+      name: `Why does ComfyUI say it can't find ${model.filename}?`,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          `The workflow JSON references this file under a subdirectory prefix. ` +
+          `Observed variants in published workflows include: ${model.pathVariants.join(", ")}. ` +
+          `Either create the matching subdirectory inside ${installPath} and place the file there, ` +
+          `or edit the workflow JSON and remove the prefix so it references just ${model.filename}.`,
+      },
+    });
+  }
+
+  const graphNodes: Record<string, unknown>[] = [softwareSchema];
+  if (faqEntities.length > 0) {
+    graphNodes.push({
+      "@type": "FAQPage",
+      "@id": `https://ltxworkflow.com/models/${model.id}#faq`,
+      mainEntity: faqEntities,
+    });
+  }
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": graphNodes,
+  };
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
