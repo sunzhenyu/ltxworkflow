@@ -142,7 +142,7 @@ export default async function ModelDetailPage({
   }
 
   return (
-    <main className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+    <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
       <Nav activeHref="/models" />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
