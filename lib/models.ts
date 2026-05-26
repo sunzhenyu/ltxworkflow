@@ -100,6 +100,32 @@ export const MODELS: ModelVariant[] = [
     description: "Distilled LoRA v1.1 by Kijai. Use with the dev model for distilled-quality output on 16GB VRAM.",
     badge: "16GB LoRA",
     recommendation: "Pair with the dev FP8 model. Load as LoRA in ComfyUI models/loras/.",
+    technicalNotes:
+      "This is Kijai's v1.1 dynamic-rank distillation LoRA. Applied on top of the dev model, it converts dev-style behavior (30 steps, CFG > 1) into distilled-style behavior (8 steps, CFG = 1) — giving you fast inference without downloading a separate 25 GB distilled checkpoint.\n\n'Dynamic rank' means the LoRA matrices have variable rank per layer, averaging 111. Layers with higher information density (attention output projections, FFN gates) get more rank; less-critical layers get less. The 'fro09' in the filename references the Frobenius-norm target used during training (0.9 of the dev→distilled delta). The result is a 2.74 GB file that captures most of distilled quality at LoRA size.\n\nThe trick to using it is configuring the sampler correctly. Loading the LoRA without also switching to 8 steps + CFG=1 does nothing useful — the LoRA modifies the model's response to those specific sampler settings.",
+    whenToChoose:
+      "Use this LoRA when you want distilled-speed inference on the dev model — typically because you already have ltx-2.3-22b-dev-fp8.safetensors or the BF16 dev model and don't want to download a separate distilled checkpoint.\n\nFor straightforward distilled inference, ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors is more efficient — one file load, no LoRA composition overhead, identical quality.\n\nPick this LoRA over the r105 v1.0 dynamic LoRA (ltx-2.3-22b-distilled-lora-dynamic_fro09_avg_rank_105_bf16.safetensors) — v1.1 at rank 111 is the current best dynamic distillation LoRA.\n\nFor I2V workflows specifically, consider TenStrip's cond-safe LoRA instead — it zeroes the conditioning paths that standard distillation LoRAs disturb.",
+    knownIssues: [
+      {
+        error: "LoRA loads but inference is still 30 steps and slow",
+        cause: "Sampler still at dev defaults. The LoRA can't change step count for you — it only changes what the model produces given a specific sampler config.",
+        fix: "Set KSampler steps = 8 and CFG = 1. The LoRA is calibrated for these exact settings; deviating produces blurry or noisy output.",
+      },
+      {
+        error: "Output looks bad when stacked with a content/style LoRA",
+        cause: "Stacking the distillation LoRA at full strength with another LoRA at full strength composes their deltas — the distillation effect can drown out the style LoRA, or vice versa.",
+        fix: "Keep the distillation LoRA at strength 1.0 (it needs full strength to do its job) and reduce content LoRAs to 0.6-0.8 strength. Or train the style LoRA against the distilled base directly to avoid stacking.",
+      },
+      {
+        error: "Applied on top of the distilled FP8 file and output is overcooked",
+        cause: "Double-distillation. The distilled file is already distilled — this LoRA distills again, overshooting.",
+        fix: "Apply this LoRA only on dev-base files (ltx-2.3-22b-dev.safetensors, ltx-2.3-22b-dev-fp8.safetensors, ltx-2.3-22b-dev_transformer_only_*.safetensors). Never on a file with 'distilled' in the name.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-04-13",
+      source: "Kijai/LTX2.3_comfy (HuggingFace)",
+      notes: "v1.1 dynamic LoRA. Bumped average rank from 105 (v1.0) to 111 with refined Frobenius targets.",
+    },
     pathVariants: [
       "ltx2\\ltx-2.3-22b-distilled-1.1_lora-dynamic_fro09_avg_rank_111_bf16.safetensors",
       "ltx-2\\ltx-2.3-22b-distilled-1.1_lora-dynamic_fro09_avg_rank_111_bf16.safetensors",
@@ -177,6 +203,36 @@ export const MODELS: ModelVariant[] = [
     badge: "v1.1 MXFP8",
     recommendation: "RTX 30xx workaround — use this when your GPU lacks RTX 40xx-style FP8 matmul support. Same VRAM as fp8_scaled.",
     isNew: true,
+    technicalNotes:
+      "MXFP8 (Microscaling FP8, block-32) is a quantization format that stores 32-value blocks each sharing a single FP8 scale factor. The key property is that the matmul kernels work on standard BF16 tensor cores — you don't need the Ada / Hopper / Blackwell-specific FP8 matmul instructions that ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors requires.\n\nFile size matches the FP8 scaled variant at roughly 25 GB. Quality is also very close — the block-32 grouping preserves enough dynamic range that distilled output is visually indistinguishable from the FP8 scaled file in side-by-side comparisons on standard prompts.\n\n'transformer_only' means the file contains only the DiT weights. Pair it with taeltx2_3.safetensors (VAE) and a Gemma 3 12B text encoder (FP4 mixed on 16 GB, FP8 scaled or BF16 on more). All current ComfyUI workflows reference this filename verbatim from Kijai's repo.",
+    whenToChoose:
+      "Pick MXFP8 specifically if your GPU is RTX 30-series (3060 12GB, 3080 10/12GB, 3090 24GB) or older Ampere/Turing. Those cards lack native FP8 matmul tensor cores — running the fp8_scaled variant either crashes with an unsupported-dtype error or falls back to a slow emulation path that negates the speedup.\n\nOn RTX 40-series (Ada) or RTX 50-series (Blackwell), use the standard FP8 scaled variant instead — same VRAM, same quality, slightly faster because the matmul uses dedicated FP8 hardware.\n\nThis is the v1.1 release. The v1.0 MXFP8 (without -1.1 in the name) is older and worse for fast camera motion — switch up unless you're reproducing a specific v1.0 result.",
+    knownIssues: [
+      {
+        error: "Runs but is no faster than BF16 on my RTX 3090",
+        cause: "MXFP8 dequantizes to BF16 for the matmul itself — the speedup comes from halved memory bandwidth, not faster compute. On a 24 GB card with the full pipeline in memory, you're already mostly compute-bound, not memory-bound.",
+        fix: "This is expected. The win on RTX 30-series is fitting the model in VRAM at all — a BF16 transformer would be ~44 GB and OOM on 24 GB without sequential offloading. Use the FP8 scaled file on RTX 40xx+ for actual compute speedup.",
+      },
+      {
+        error: "ComfyUI 'Mismatched shapes' error when stacking with a LoRA",
+        cause: "Some older LoRA loaders don't understand MXFP8 weight layout and try to apply LoRA deltas in the wrong dtype.",
+        fix: "Update ComfyUI to a recent version (post-2026-04) and ensure you're using KJNodes if your workflow needs Kijai-specific loaders. Or apply the LoRA against the BF16 transformer instead and quantize after, if your trainer supports it.",
+      },
+      {
+        error: "Black or noisy first frame, rest of video looks fine",
+        cause: "Workflow loaded the MXFP8 file with a node configured for fp8_scaled or BF16 — internal scale tables aren't being applied to the first denoising step.",
+        fix: "Use ComfyUI's standard CheckpointLoaderSimple or the Kijai LTXVideoModelLoader from KJNodes. Avoid custom loaders that hard-assume a specific dtype.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-04-13",
+      source: "Kijai/LTX2.3_comfy (HuggingFace)",
+      notes: "v1.1 release. The v1.1 line improved fast-motion stability over v1.0 and dropped on the same date as the v1.1 FP8 scaled file.",
+    },
+    pathVariants: [
+      "ltx23\\ltx-2.3-22b-distilled-1.1_transformer_only_mxfp8_block32.safetensors",
+      "diffusion_models/ltx-2.3-22b-distilled-1.1_transformer_only_mxfp8_block32.safetensors",
+    ],
   },
   // ── v1.0 models (previous) ────────────────────────────────────────────────
   {
@@ -239,6 +295,36 @@ export const MODELS: ModelVariant[] = [
     hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy",
     description: "FP8 distilled v3 by Kijai. Previous version, superseded by v1.1 FP8.",
     recommendation: "Previous version. Use v1.1 FP8 for latest quality.",
+    technicalNotes:
+      "This is the third iteration of Kijai's FP8 input-scaled distilled quantization, before the v1.1 line existed. The 'v3' suffix tracks Kijai's own re-quantization passes — v1 and v2 had calibration issues that v3 fixed, making this the last and most refined v1.0-era distilled FP8.\n\n'fp8_input_scaled' applies the FP8 scale tables on the activation side rather than the weight side. In practice this preserves a bit more precision in the attention layers when prompts have unusual token distributions, at the cost of slightly more compute overhead at inference time.\n\nThe weights underneath are the v1.0 distilled checkpoint. That means 8-step sampling, CFG=1, fast inference — but without the fast-motion and consistency improvements that came in v1.1.",
+    whenToChoose:
+      "Worth keeping only if you're reproducing a specific result from a workflow JSON that hardcodes this exact filename, or doing a v1.0 → v1.1 quality comparison.\n\nFor everything else, switch to ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors. v1.1 is meaningfully better for fast camera motion, character consistency across frames, and prompt adherence. Same VRAM footprint, same inference speed.\n\nIf you specifically need the input-scaled style (instead of weight-scaled), there's currently no v1.1 input_scaled release — you'd stay on this file. But most workflows are equally happy with the v1.1 fp8_scaled variant.",
+    knownIssues: [
+      {
+        error: "Workflow JSON references the file without the _v3 suffix",
+        cause: "Older workflows targeted v1 or v2 — the filename string is hardcoded and not interchangeable across versions.",
+        fix: "Either rename the file to match the workflow's expected string (you'll lose the version tag) or edit the workflow JSON to use the _v3 filename. The latter is cleaner.",
+      },
+      {
+        error: "Output quality is lower than the v1.1 fp8_scaled file on the same prompt",
+        cause: "v3 is v1.0 weights. v1.1 trained on more data with better calibration.",
+        fix: "Switch to ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors. The quality delta is most visible in fast pan/zoom shots and character close-ups.",
+      },
+      {
+        error: "RuntimeError: fp8 matmul not supported (RTX 30-series)",
+        cause: "Ampere lacks FP8 tensor cores. Input scaling doesn't change this hardware requirement.",
+        fix: "There's no v1.0 MXFP8 distilled file that matches this exactly. Switch up to ltx-2.3-22b-distilled-1.1_transformer_only_mxfp8_block32.safetensors — v1.1 is better anyway.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-03",
+      source: "Kijai/LTX2.3_comfy (HuggingFace)",
+      notes: "Final v1.0-era distilled FP8 quantization. Superseded by the v1.1 line on 2026-04-13.",
+    },
+    pathVariants: [
+      "ltx\\ltx-2.3-22b-distilled_transformer_only_fp8_input_scaled_v3.safetensors",
+      "diffusion_models/ltx-2.3-22b-distilled_transformer_only_fp8_input_scaled_v3.safetensors",
+    ],
   },
   {
     id: "ltx23-dev-fp8",
@@ -293,6 +379,37 @@ export const MODELS: ModelVariant[] = [
     badge: "Dev FP8",
     recommendation: "Alternative FP8 quantization for dev. Use when fp8_input_scaled has compatibility issues.",
     isNew: false,
+    technicalNotes:
+      "FP8 scaled quantization stores transformer weights as 8-bit floats with per-channel scale tables. Compared to fp8_input_scaled, this variant applies scaling on the weight side rather than the input side — the result is slightly different numerical behavior in attention, with no consistent quality winner; both are very close to BF16 reference.\n\nThis is the dev (non-distilled) base model at FP8 size. That means 30-step sampling with CFG > 1 is the default, LoRA application works cleanly, and you have flexibility the distilled checkpoints don't give you. The file is ~25 GB and fits in 16 GB VRAM with the FP4 Gemma text encoder.\n\nKijai's transformer_only files like this one are designed for the standard ComfyUI workflow pattern: load the transformer, VAE, and text encoder as separate nodes. Lightricks' first-party FP8 files (Lightricks/LTX-2.3-fp8) are full checkpoints with everything bundled — they're a different shape entirely.",
+    whenToChoose:
+      "Use this when you want the dev model at FP8 size with hardware-accelerated matmul on RTX 40xx+ (Ada or Blackwell), and the standard fp8_input_scaled variant has caused issues for your workflow — typically when a LoRA loader complained about input scaling, or when output looked subtly off in I2V conditioning.\n\nFor most users, ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors is the better default — it's the distilled v1.1 (newer weights, 8-step inference, 4× faster). Pick this dev FP8 only when you need LoRA flexibility that the distilled path doesn't give cleanly, or when training-related work demands the dev base.\n\nOn RTX 30-series, switch to ltx-2.3-22b-dev_transformer_only_mxfp8_block32.safetensors — same role, format that runs on Ampere.",
+    knownIssues: [
+      {
+        error: "Output is subtly different from the same prompt with fp8_input_scaled",
+        cause: "Different scaling axis. fp8_scaled scales weights; fp8_input_scaled scales activations on the way in. Both are valid quantizations but produce slightly different attention numerics.",
+        fix: "Pick one and stick with it. Don't expect to swap between them mid-pipeline and get identical output. If you need exact reproducibility, the BF16 dev file is the only truly stable reference.",
+      },
+      {
+        error: "RuntimeError: fp8 matmul not supported on RTX 3090",
+        cause: "Ampere lacks native FP8 matmul tensor cores.",
+        fix: "Switch to ltx-2.3-22b-dev_transformer_only_mxfp8_block32.safetensors. Same VRAM, runs on RTX 30-series.",
+      },
+      {
+        error: "LoRA application produces visual artifacts (banding, color shift)",
+        cause: "Some LoRAs were trained against fp8_input_scaled and apply their deltas in a way that doesn't compose cleanly with weight-scaled FP8.",
+        fix: "Try the LoRA against the BF16 dev model first to confirm it works at all. If it's specifically tied to input-scaled, switch to the fp8_input_scaled variant. Or apply LoRA against BF16 and quantize after, if your tooling supports it.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-03",
+      source: "Kijai/LTX2.3_comfy (HuggingFace)",
+      notes: "Part of Kijai's initial LTX 2.3 ComfyUI port. The FP8 scaled and fp8_input_scaled variants shipped together as alternative quantization paths.",
+    },
+    pathVariants: [
+      "ltx\\ltx-2.3-22b-dev_transformer_only_fp8_scaled.safetensors",
+      "ltx-2\\ltx-2.3-22b-dev_transformer_only_fp8_scaled.safetensors",
+      "diffusion_models/ltx-2.3-22b-dev_transformer_only_fp8_scaled.safetensors",
+    ],
   },
   {
     id: "ltx23-dev-mxfp8",
@@ -333,6 +450,31 @@ export const MODELS: ModelVariant[] = [
     description: "FP8 distilled v1 by Kijai. Earliest FP8 release, superseded by v3.",
     recommendation: "Previous version. Use FP8 v3 or v1.1 FP8 for better quality.",
     isNew: false,
+    technicalNotes:
+      "The first FP8 input-scaled distilled quantization Kijai shipped — no version suffix in the filename because it predated the v2/v3 iterations. Same v1.0 distilled weights as v3, but with the initial calibration that v2 and v3 later refined.\n\n'input_scaled' applies FP8 scaling on activations entering each linear layer rather than on the weights themselves. This was Kijai's first FP8 attempt; calibration issues in v1 caused subtle quality regressions on certain prompt distributions, which v3 fixed by re-running calibration on a larger prompt set.\n\nFile size and inference profile match v3. The only meaningful difference is quality on edge-case prompts (very short prompts, prompts with unusual tokens, mixed-language prompts).",
+    whenToChoose:
+      "Almost never. This is the v1.0-era v1 calibration — older weights AND older calibration. It exists in GSC traffic because workflow JSONs from early ComfyUI ports still reference this exact filename.\n\nIf a workflow forces you to keep this file, fine — but for anything you control, switch to ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors (v1.1 weights, current calibration, weight-scaled instead of input-scaled, runs on the same RTX 40xx+ hardware).\n\nThe single use case for keeping v1: precisely reproducing output from a very old workflow that locks in the v1 calibration's quirks.",
+    knownIssues: [
+      {
+        error: "Output quality is noticeably worse than v3 or v1.1",
+        cause: "v1 calibration had under-coverage on certain prompt types. v2 partially fixed, v3 fully fixed.",
+        fix: "Switch to v3 (ltx-2.3-22b-distilled_transformer_only_fp8_input_scaled_v3.safetensors) or v1.1 (ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors). Both are strict upgrades.",
+      },
+      {
+        error: "Workflow references this exact filename — can I just rename v3 to match?",
+        cause: "ComfyUI matches by exact filename string.",
+        fix: "Yes, but you'll lose the version tag in your install. Better: edit the workflow JSON's loader string to point at the v3 or v1.1 file you actually want. Saves you from confusion later when you can't tell which version is which.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-03",
+      source: "Kijai/LTX2.3_comfy (HuggingFace)",
+      notes: "First FP8 input-scaled release for distilled. Superseded by v2, then v3 — all v1.0 weights — then by v1.1 line on 2026-04-13.",
+    },
+    pathVariants: [
+      "ltx\\ltx-2.3-22b-distilled_transformer_only_fp8_input_scaled.safetensors",
+      "diffusion_models/ltx-2.3-22b-distilled_transformer_only_fp8_input_scaled.safetensors",
+    ],
   },
   {
     id: "ltx23-distilled-fp8-v2",
@@ -359,6 +501,31 @@ export const MODELS: ModelVariant[] = [
     description: "FP8 scaled distilled by Kijai. Alternative FP8 quantization method.",
     recommendation: "Alternative FP8 quantization. Use v1.1 FP8 for latest quality.",
     isNew: false,
+    technicalNotes:
+      "This is the v1.0 distilled checkpoint quantized to FP8 with weight-side scaling (as opposed to fp8_input_scaled which scales activations). Same v1.0 weights, different quantization axis — and a different file from fp8_input_scaled_v3, despite the similar size.\n\nWeight-scaled FP8 is slightly faster at inference because the scale factors fold into the matmul kernel itself, no extra activation pass needed. Memory footprint is identical. Numerical behavior diverges slightly from input_scaled in attention layers; neither has a consistent quality advantage on standard prompts.\n\n'transformer_only' — pair with taeltx2_3.safetensors VAE and a Gemma 3 12B text encoder. Distilled inference settings: 8 steps, CFG=1.",
+    whenToChoose:
+      "Use this when you specifically need weight-scaled FP8 of the v1.0 distilled model — for reproducing a workflow JSON that hardcodes this filename, or running an experiment comparing scaling axes.\n\nFor day-to-day generation, ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors is strictly better: same scaling style, newer (v1.1) weights, better fast-motion handling. Same VRAM, same speed.\n\nOn RTX 30-series, switch to the MXFP8 distilled v1.1 file — Ampere can't do FP8 matmul natively.",
+    knownIssues: [
+      {
+        error: "I have both this file and fp8_input_scaled_v3 — which does ComfyUI pick?",
+        cause: "ComfyUI lists both in the loader dropdown. The workflow JSON's hardcoded string determines which one loads.",
+        fix: "Open the workflow JSON and look for the .safetensors filename — that's the one that'll load. Or in ComfyUI, manually select the file you want in the loader node.",
+      },
+      {
+        error: "Generation is the same speed as v1.1 fp8_scaled but output is worse",
+        cause: "This is v1.0 distilled. v1.1 trained on more data with refined distillation hyperparameters.",
+        fix: "Switch to ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors. The quality gap is small but consistent.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-03",
+      source: "Kijai/LTX2.3_comfy (HuggingFace)",
+      notes: "v1.0 weight-scaled FP8 distilled. Superseded by the v1.1 file on 2026-04-13.",
+    },
+    pathVariants: [
+      "ltx\\ltx-2.3-22b-distilled_transformer_only_fp8_scaled.safetensors",
+      "diffusion_models/ltx-2.3-22b-distilled_transformer_only_fp8_scaled.safetensors",
+    ],
   },
   {
     id: "ltx23-distilled-mxfp8",
