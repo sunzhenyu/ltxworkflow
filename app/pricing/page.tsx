@@ -3,8 +3,8 @@ import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import SubscribeButton from "@/components/SubscribeButton";
-import { auth } from "@/auth";
-import { getBalance, WELCOME_CREDITS } from "@/lib/credits";
+import PricingBalanceBanner from "@/components/PricingBalanceBanner";
+import { WELCOME_CREDITS } from "@/lib/credits";
 import {
   oneTimeTiers,
   pricePerCredit,
@@ -19,21 +19,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://ltxworkflow.com/pricing" },
 };
 
-export default async function PricingPage() {
-  const session = await auth();
+export default function PricingPage() {
   // Show all 6 tiers always — TierCard handles the "Coming soon" disabled state
   // for ones that don't have a Creem product id wired up yet.
   const subs = subscriptionTiers();
   const packs = oneTimeTiers();
-
-  let balance: number | null = null;
-  if (session?.user?.email) {
-    try {
-      balance = await getBalance(session.user.email);
-    } catch (e) {
-      console.error("[/pricing] balance load failed:", e);
-    }
-  }
 
   const hasAnyTier = subs.length + packs.length > 0;
 
@@ -104,16 +94,7 @@ export default async function PricingPage() {
           <strong className="text-white">{WELCOME_CREDITS} free credits</strong>. Subscriptions
           renew monthly with rollover blocked at the next cycle. Packs never expire.
         </p>
-        {balance !== null && (
-          <p className="text-sm text-emerald-300">
-            You currently have <strong>{balance}</strong>{" "}
-            {balance === 1 ? "credit" : "credits"}.{" "}
-            <Link href="/generate" className="underline hover:text-emerald-200">
-              Use them on /generate
-            </Link>
-            .
-          </p>
-        )}
+        <PricingBalanceBanner />
       </section>
 
       {!hasAnyTier && (

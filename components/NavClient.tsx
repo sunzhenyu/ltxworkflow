@@ -4,6 +4,7 @@ import Link from "next/link";
 import Logo from "./Logo";
 import UserMenu from "./UserMenu";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 export type NavLink =
   | { href: string; label: string; primary?: boolean }
@@ -12,14 +13,15 @@ export type NavLink =
 export default function NavClient({
   links,
   activeHref,
-  session,
 }: {
   links: NavLink[];
   activeHref?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  session: any;
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Client-side session fetch — keeps the surrounding page eligible for static
+  // prerendering. While loading, treat as unauthenticated (avoids flicker).
+  const { data: session, status } = useSession();
+  const sessionReady = status !== "loading";
 
   const isSubmenuActive = (submenu: { href: string; label: string }[]) =>
     submenu.some((sub) => activeHref?.startsWith(sub.href));
@@ -108,7 +110,7 @@ export default function NavClient({
               </Link>
             );
           })}
-          {session ? (
+          {sessionReady && session ? (
             <UserMenu
               email={session.user?.email || ""}
               name={session.user?.name}
@@ -219,7 +221,7 @@ export default function NavClient({
               </Link>
             );
           })}
-          {session ? (
+          {sessionReady && session ? (
             <div className="border-t border-gray-800 mt-2 pt-2">
               <UserMenu
                 email={session.user?.email || ""}

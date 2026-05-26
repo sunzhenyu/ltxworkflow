@@ -1,16 +1,13 @@
 import Logo from "@/components/Logo";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { auth } from "@/auth";
 import Link from "next/link";
 import ModelCards from "@/components/ModelCards";
 import VramMatcher from "@/components/VramMatcher";
 import WorkflowBuilder from "@/components/WorkflowBuilder";
 import EmailSubscribe from "@/components/EmailSubscribe";
-import UserMenu from "@/components/UserMenu";
 
-export default async function Home() {
-  const session = await auth();
+export default function Home() {
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">

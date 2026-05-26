@@ -1,5 +1,4 @@
 import Logo from "@/components/Logo";
-import { auth } from "@/auth";
 import NavClient, { type NavLink } from "@/components/NavClient";
 
 const links: NavLink[] = [
@@ -24,10 +23,9 @@ const links: NavLink[] = [
   // bookmarks; just no longer surfaced as a top-level destination.
 ];
 
-export default async function Nav({ activeHref }: { activeHref?: string }) {
+export default function Nav({ activeHref }: { activeHref?: string }) {
   // Logo import kept so layout-shared assets resolve at build time even though
   // it's used inside NavClient.
   void Logo;
-  const session = await auth();
-  return <NavClient links={links} activeHref={activeHref} session={session} />;
+  return <NavClient links={links} activeHref={activeHref} />;
 }
