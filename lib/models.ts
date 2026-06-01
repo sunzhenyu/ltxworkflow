@@ -176,6 +176,31 @@ export const MODELS: ModelVariant[] = [
       "loras/ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors",
     ],
   },
+  {
+    id: "ltx23-omninft-rl-lora",
+    name: "LTX 2.3 OmniNFT RL LoRA (Kijai)",
+    filename: "LTX-2.3-OmniNFT-RL-Lora_bf16.safetensors",
+    size: "617 MB",
+    vram: 16,
+    type: "lora",
+    hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy",
+    description:
+      "Reinforcement-learning quality LoRA for LTX 2.3 from the OmniNFT research line. Targets audio-video synchronization, lip-sync, motion coherence, and temporal stability rather than visual style — reported to cut audio-video DeSync from 0.569 to 0.269 on JavisBench. Place in models/loras/.",
+    badge: "Quality LoRA",
+    recommendation:
+      "Add on top of your LTX 2.3 base model to improve audio-video sync and motion stability, especially for audio-conditioned and talking-head workflows. 617 MB BF16. As a behavioral (RL) LoRA it does not change your sampler steps/CFG the way a distillation LoRA does.",
+    isNew: true,
+    releaseInfo: {
+      released: "2026-05-25",
+      source: "Kijai/LTX2.3_comfy (HuggingFace)",
+      notes:
+        "RL-based quality LoRA from the OmniNFT research line. Improves audio-video sync (JavisBench DeSync 0.569 → 0.269), lip-sync, and temporal stability.",
+    },
+    pathVariants: [
+      "loras/LTX-2.3-OmniNFT-RL-Lora_bf16.safetensors",
+      "ltx23\\LTX-2.3-OmniNFT-RL-Lora_bf16.safetensors",
+    ],
+  },
   // ── v1.1 BF16 / MXFP8 (Kijai) ───────────────────────────────────────────
   {
     id: "ltx23-distilled-11-bf16",

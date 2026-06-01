@@ -23,6 +23,13 @@ const entries = [
     ],
   },
   {
+    date: "2026-06-01",
+    title: "OmniNFT RL Quality LoRA",
+    items: [
+      "New: LTX 2.3 OmniNFT RL LoRA (Kijai, 617 MB) — reinforcement-learning LoRA that improves audio-video sync, lip-sync, and temporal stability (JavisBench DeSync 0.569 → 0.269)",
+    ],
+  },
+  {
     date: "2026-05-27",
     title: "17 New Model Variants — Audio VAE, MXFP8 & More",
     items: [
