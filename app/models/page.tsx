@@ -33,6 +33,7 @@ const VRAM_GROUPS = [
       "ltx23-distilled-11-lora",
       "ltx23-distilled-condsafe-lora",
       "ltx23-distilled-lora-dynamic",
+      "ltx23-omninft-rl-lora",
     ],
     note: "FP8 scaled requires RTX 40-series or newer. MXFP8 block-32 is an alternative format for compatible GPUs. NVFP4 (21.7 GB) is the official Blackwell / RTX 50xx path. Use v1.1 FP8 Distilled for fastest generation; use Dev FP8 + LoRA v1.1 if applying LoRA weights.",
   },

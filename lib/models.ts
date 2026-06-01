@@ -815,10 +815,40 @@ export const MODELS: ModelVariant[] = [
     vram: 2,
     type: "lora",
     hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy",
-    description: "Audio VAE for audio-conditioned video generation. Place in models/vae/. Enables audio-to-video workflows.",
+    description: "Audio VAE by Kijai for LTX 2.3's joint audio-video generation. Encodes/decodes the audio latent stream so a workflow can produce sound synchronized with the video. Place in models/vae/.",
     badge: "New: Audio",
-    recommendation: "Required for audio-conditioned workflows. Unlocks new audio-to-video capability.",
+    recommendation: "Required only for audio-conditioned / audio-to-video workflows. Pair it with the video VAE — the joint pipeline loads both. Not needed for silent T2V or I2V.",
     isNew: true,
+    technicalNotes:
+      "LTX23_audio_vae_bf16.safetensors is the audio half of LTX 2.3's audio-video pipeline. Where the video VAE handles visual latents, this VAE encodes and decodes the audio latent stream — it is what lets a workflow emit a soundtrack (speech, ambient, lip-synced dialogue) that is generated jointly with the frames rather than dubbed on afterward.\n\nIt is a BF16 component at roughly 1 GB and goes in ComfyUI/models/vae/ — the same directory as the video VAE and taeltx2_3, not a separate audio folder. Audio-video workflows reference both this file and a video VAE; loading only one leaves the other modality's node unsatisfied.\n\nThis is not a replacement for taeltx2_3.safetensors. taeltx2_3 (or the BF16 video VAE) still decodes the picture; the audio VAE only adds the sound path. A silent T2V/I2V workflow never loads it.",
+    whenToChoose:
+      "Download this only if your workflow generates audio — talking-head / lip-sync pipelines, audio-conditioned video, or any graph that has an audio VAE node. For those, it is required; without it the audio branch errors or produces silence.\n\nFor standard silent text-to-video or image-to-video, skip it entirely — taeltx2_3.safetensors is the only VAE you need. Adding the audio VAE to a silent workflow does nothing but consume disk.\n\nIf you are building audio workflows, pair this with LTX23_video_vae_bf16.safetensors (the joint pipeline expects the full BF16 video VAE alongside it) rather than the tiny taeltx2_3.",
+    knownIssues: [
+      {
+        error: "VAELoader / audio node: 'LTX23_audio_vae_bf16.safetensors not in list'",
+        cause: "File placed in ComfyUI/models/ root or in checkpoints/ instead of vae/.",
+        fix: "Move it to ComfyUI/models/vae/LTX23_audio_vae_bf16.safetensors and click refresh on the loader node so ComfyUI re-scans the directory.",
+      },
+      {
+        error: "Video generates but there is no sound / the audio track is silent",
+        cause: "The audio VAE is missing, or the workflow loaded a video-only VAE for both branches. Audio-video pipelines need this file specifically on the audio path.",
+        fix: "Confirm the audio VAE node points at LTX23_audio_vae_bf16.safetensors, and that the video path uses a video VAE. Both must be loaded for joint audio-video output.",
+      },
+      {
+        error: "Decoded audio is noise / garbled",
+        cause: "Partial download — HF's xet protocol can leave a truncated file that still has a valid .safetensors header.",
+        fix: "Delete and redownload. Prefer `huggingface-cli download` or `aria2c` with retry over a browser, and verify the size matches HuggingFace's reported ~1 GB.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-05-27",
+      source: "Kijai/LTX2.3_comfy (HuggingFace)",
+      notes: "Added in Kijai's late-May component batch to enable audio-conditioned video generation workflows.",
+    },
+    pathVariants: [
+      "vae/LTX23_audio_vae_bf16.safetensors",
+      "ltx23\\LTX23_audio_vae_bf16.safetensors",
+    ],
   },
   {
     id: "ltx23-video-vae",
@@ -828,9 +858,41 @@ export const MODELS: ModelVariant[] = [
     vram: 2,
     type: "lora",
     hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy",
-    description: "Standalone video VAE BF16 by Kijai. Alternative to taeltx2_3. Place in models/vae/.",
-    recommendation: "Alternative VAE option. Use in workflows that require the separate BF16 VAE component.",
+    description: "Full-precision BF16 video VAE by Kijai — the heavier, higher-fidelity alternative to the tiny taeltx2_3 decoder. Use it when a workflow asks for it or when you need the cleanest decode on long or HDR clips. Place in models/vae/.",
+    badge: "Full VAE",
+    recommendation: "Most setups only need taeltx2_3.safetensors. Download this full BF16 VAE only if a workflow references it by name, or if you see banding/color drift with the tiny VAE on long clips.",
     isNew: false,
+    technicalNotes:
+      "LTX23_video_vae_bf16.safetensors is the full BF16 video VAE for LTX 2.3, as opposed to taeltx2_3.safetensors which is the distilled Tiny AutoEncoder (TAE). Both decode latents to frames and encode frames to latents (for I2V); the difference is fidelity vs cost. The full VAE keeps more dynamic range and detail, which matters most on long sequences, high-contrast / HDR content, and two-stage upscale pipelines where decode artifacts compound.\n\nIt is roughly 1 GB BF16 and lives in ComfyUI/models/vae/ — the same folder as taeltx2_3 and the audio VAE. They coexist; you select which one a given workflow uses in its VAELoader node.\n\nIn audio-video pipelines this is the video-side VAE that pairs with LTX23_audio_vae_bf16.safetensors. For ordinary silent T2V/I2V it is optional — taeltx2_3 is the default and is what almost every published workflow references.",
+    whenToChoose:
+      "Pick the full video VAE in three cases: (1) a workflow JSON explicitly references LTX23_video_vae_bf16.safetensors and the node turns red with the tiny VAE; (2) you are running audio-video / talking-head workflows, where it pairs with the audio VAE; (3) you are getting visible banding, color drift, or mushy detail from taeltx2_3 on long or HDR clips and want a cleaner decode.\n\nFor everything else, use taeltx2_3.safetensors. It is smaller, faster, and is the filename hardcoded in the vast majority of community and official workflows. Downloading the full VAE 'just in case' is unnecessary.\n\nThe two are interchangeable at the node level — you can keep both in models/vae/ and switch per workflow without re-downloading.",
+    knownIssues: [
+      {
+        error: "VAELoader: 'LTX23_video_vae_bf16.safetensors not in list'",
+        cause: "File placed in ComfyUI/models/ root or in checkpoints/ instead of vae/.",
+        fix: "Move it to ComfyUI/models/vae/LTX23_video_vae_bf16.safetensors and click refresh on the VAELoader node so ComfyUI re-scans.",
+      },
+      {
+        error: "Workflow references 'ltx23_video_vae_bf16_kj.safetensors' but my file has a different name",
+        cause: "Some workflow authors rename the file with a '_kj' suffix to mark it as Kijai's. The file is identical; only the referenced string differs.",
+        fix: "Either rename your local copy to match the workflow, or edit the VAELoader node and reselect LTX23_video_vae_bf16.safetensors from the dropdown.",
+      },
+      {
+        error: "Decoded video is solid green / black / corrupt",
+        cause: "Partial download — HF's xet protocol can leave a truncated file that still presents a valid .safetensors header.",
+        fix: "Delete and redownload via `huggingface-cli download` or `aria2c` with retry; verify the size matches HuggingFace's reported ~1 GB.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-05-27",
+      source: "Kijai/LTX2.3_comfy (HuggingFace)",
+      notes: "Added in Kijai's late-May component batch alongside the audio VAE and text projection.",
+    },
+    pathVariants: [
+      "vae/LTX23_video_vae_bf16.safetensors",
+      "ltx23_video_vae_bf16_kj.safetensors",
+      "ltx23\\LTX23_video_vae_bf16.safetensors",
+    ],
   },
   {
     id: "ltx23-text-projection",
