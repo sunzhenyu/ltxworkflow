@@ -835,6 +835,11 @@ export const MODELS: ModelVariant[] = [
         fix: "Confirm the audio VAE node points at LTX23_audio_vae_bf16.safetensors, and that the video path uses a video VAE. Both must be loaded for joint audio-video output.",
       },
       {
+        error: "Workflow references 'ltx23_audio_vae_bf16_kj.safetensors' but my file has a different name",
+        cause: "Some workflow authors rename the file with a '_kj' suffix to mark it as Kijai's. The file is identical; only the referenced string differs.",
+        fix: "Either rename your local copy to match the workflow, or edit the audio VAE node and reselect LTX23_audio_vae_bf16.safetensors from the dropdown.",
+      },
+      {
         error: "Decoded audio is noise / garbled",
         cause: "Partial download — HF's xet protocol can leave a truncated file that still has a valid .safetensors header.",
         fix: "Delete and redownload. Prefer `huggingface-cli download` or `aria2c` with retry over a browser, and verify the size matches HuggingFace's reported ~1 GB.",
@@ -847,6 +852,7 @@ export const MODELS: ModelVariant[] = [
     },
     pathVariants: [
       "vae/LTX23_audio_vae_bf16.safetensors",
+      "ltx23_audio_vae_bf16_kj.safetensors",
       "ltx23\\LTX23_audio_vae_bf16.safetensors",
     ],
   },
