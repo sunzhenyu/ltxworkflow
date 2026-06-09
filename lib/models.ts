@@ -650,10 +650,41 @@ export const MODELS: ModelVariant[] = [
     vram: 16,
     type: "lora",
     hfUrl: "https://huggingface.co/Lightricks/LTX-2.3",
-    description: "Official distilled LoRA rank-384 v1.1. Use with dev model. Place in models/loras/.",
+    description: "Official Lightricks rank-384 distillation LoRA, v1.1. Applied on the dev model, it converts dev-style inference (many steps, CFG > 1) into distilled-style (8 steps, CFG = 1) — the official high-rank counterpart to Kijai's dynamic-rank LoRA. Place in models/loras/.",
     badge: "v1.1 LoRA",
-    recommendation: "Latest official LoRA. Pair with dev model for distilled-quality output.",
+    recommendation: "Pair with the dev model (dev FP8 on 16 GB, BF16 dev on 32 GB+) and set the sampler to 8 steps, CFG = 1. At rank 384 / 7.6 GB it is the heaviest, highest-fidelity distillation LoRA — prefer it when you want maximum distilled quality and have the VRAM headroom.",
     isNew: false,
+    technicalNotes:
+      "ltx-2.3-22b-distilled-lora-384-1.1.safetensors is Lightricks' official v1.1 distillation LoRA at a fixed rank of 384. 'Rank 384' is the LoRA's inner dimension applied uniformly across layers — much higher than Kijai's dynamic-rank LoRAs (which average ~105–111), which is why this file is ~7.6 GB versus their ~2.7 GB. The higher rank captures more of the dev→distilled transformation, trading file size and a little VRAM for fidelity.\n\nLike all distillation LoRAs, it is applied on top of the dev model and only does its job when the sampler is set to the distilled profile: 8 steps, CFG = 1. Loading it without changing the sampler produces nothing useful — the LoRA modifies how the model responds to those specific settings.\n\nThis is the official Lightricks LoRA. Kijai's dynamic-rank LoRA (ltx-2.3-22b-distilled-1.1_lora-dynamic_fro09_avg_rank_111_bf16.safetensors) is the lighter community alternative; both target the same v1.1 distilled behavior.",
+    whenToChoose:
+      "Pick the rank-384 official LoRA when you want the closest match to the official distilled checkpoint's quality via a LoRA, and you have VRAM to spare for a 7.6 GB adapter on top of the dev model. It is the highest-fidelity distillation LoRA available.\n\nIf VRAM is tight on a 16 GB card, use the Kijai dynamic-rank LoRA instead (~2.7 GB, rank ~111) — nearly the same speedup at a fraction of the footprint.\n\nIf you do not need LoRA flexibility at all, the standalone distilled FP8 checkpoint (ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors) is simpler — one file load, no LoRA composition.\n\nPrefer this v1.1 over the v1.0 rank-384 LoRA (without '-1.1') unless you are reproducing an older result.",
+    knownIssues: [
+      {
+        error: "LoRA loads but generation is still slow / many steps",
+        cause: "Sampler still at dev defaults. The LoRA cannot change step count on its own.",
+        fix: "Set KSampler steps = 8 and CFG = 1. The LoRA is calibrated for exactly these settings.",
+      },
+      {
+        error: "OOM after adding the LoRA on a 16 GB card",
+        cause: "At 7.6 GB this rank-384 LoRA plus the dev FP8 transformer, Gemma encoder, and VAE can exceed 16 GB.",
+        fix: "Use the lighter Kijai dynamic-rank LoRA (~2.7 GB) on 16 GB, or enable model offload. Reserve the rank-384 LoRA for 24 GB+.",
+      },
+      {
+        error: "Output overcooked when applied to a distilled file",
+        cause: "Double-distillation — the file already has 'distilled' baked in, and the LoRA distills again.",
+        fix: "Apply this LoRA only on dev-base files (ltx-2.3-22b-dev.safetensors or a dev transformer variant), never on a file with 'distilled' in the name.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-04-27",
+      source: "Lightricks/LTX-2.3 (HuggingFace)",
+      notes: "Official v1.1 rank-384 distillation LoRA. Higher-rank counterpart to Kijai's dynamic-rank LoRAs.",
+    },
+    pathVariants: [
+      "loras/ltx-2.3-22b-distilled-lora-384-1.1.safetensors",
+      "ltx\\ltx-2.3-22b-distilled-lora-384-1.1.safetensors",
+      "ltx23\\ltx-2.3-22b-distilled-lora-384-1.1.safetensors",
+    ],
   },
   // ── LoRA v1.0 ─────────────────────────────────────────────────────────────
   {
@@ -745,10 +776,40 @@ export const MODELS: ModelVariant[] = [
     vram: 4,
     type: "lora",
     hfUrl: "https://huggingface.co/Lightricks/LTX-2.3",
-    description: "Updated spatial upscaler x2 v1.1. Place in models/latent_upscale_models/.",
-    badge: "v1.1",
-    recommendation: "Updated upscaler. Prefer over v1.0 for better upscaling quality.",
+    description: "Official v1.1 latent spatial upscaler — doubles the spatial resolution of LTX 2.3 output inside a two-stage pipeline, working in latent space rather than on decoded pixels. Place in models/latent_upscale_models/.",
+    badge: "v1.1 Upscaler",
+    recommendation: "Optional. Generate at a lower base resolution for speed, then run this x2 latent upscaler as a second stage for a sharper final result. Prefer v1.1 over v1.0. Tiny (~1 GB) and light on VRAM.",
     isNew: false,
+    technicalNotes:
+      "ltx-2.3-spatial-upscaler-x2-1.1.safetensors is the official v1.1 latent spatial upscaler for LTX 2.3. It operates on latents, doubling spatial resolution (e.g. 768→1536 on the long edge) before the VAE decode, so detail is added by the model rather than interpolated by a pixel resizer. This is the spatial counterpart to the temporal upscaler (which adds frames); they can be combined in a two-stage graph.\n\nIt goes in ComfyUI/models/latent_upscale_models/ — not models/vae/ or models/loras/ — and is loaded by the LTX upscaler node, not a checkpoint or VAE loader. At ~1 GB and 4 GB VRAM it is cheap to add to any workflow.\n\nThe typical pattern: generate at a fast base resolution, apply this x2 upscaler as a second pass, then decode. This is faster and sharper than generating at full resolution directly.",
+    whenToChoose:
+      "Use the x2 v1.1 spatial upscaler when you want higher final resolution without paying the full cost of generating at that resolution from the start — generate small, upscale x2, decode. Prefer it over the v1.0 upscaler for better quality.\n\nUse the x1.5 upscaler instead if x2 overshoots your target resolution or pushes you into OOM at the decode stage — 1.5x is a gentler bump.\n\nUse the temporal upscaler (ltx-2.3-temporal-upscaler-x2-1.0.safetensors) instead — or in addition — when your problem is frame rate / motion smoothness rather than spatial sharpness. The two solve different axes and stack in a two-stage pipeline.\n\nSkip all upscalers entirely for quick drafts or if your base resolution is already where you want it.",
+    knownIssues: [
+      {
+        error: "Upscaler node: 'ltx-2.3-spatial-upscaler-x2-1.1.safetensors not in list'",
+        cause: "File placed in models/vae/, models/loras/, or the root instead of latent_upscale_models/.",
+        fix: "Move it to ComfyUI/models/latent_upscale_models/ and click refresh on the upscaler node so ComfyUI re-scans.",
+      },
+      {
+        error: "OOM at the upscale / decode stage even though base generation was fine",
+        cause: "Doubling spatial resolution quadruples the latent area; the VAE decode at 2x can spike VRAM well above the base pass.",
+        fix: "Switch to the x1.5 spatial upscaler, lower the base resolution, or enable tiled VAE decode in ComfyUI.",
+      },
+      {
+        error: "Upscaled result looks soft or introduces artifacts",
+        cause: "Using the v1.0 upscaler, or feeding it latents from a mismatched base resolution.",
+        fix: "Use this v1.1 file (improved over v1.0) and keep the base resolution within the range your workflow's upscaler node expects.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-05-27",
+      source: "Lightricks/LTX-2.3 (HuggingFace)",
+      notes: "Official v1.1 spatial upscaler. Improved quality over the v1.0 release.",
+    },
+    pathVariants: [
+      "latent_upscale_models/ltx-2.3-spatial-upscaler-x2-1.1.safetensors",
+      "ltx23\\ltx-2.3-spatial-upscaler-x2-1.1.safetensors",
+    ],
   },
   // ── required for all setups ───────────────────────────────────────────────
   {
@@ -908,9 +969,40 @@ export const MODELS: ModelVariant[] = [
     vram: 2,
     type: "lora",
     hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy",
-    description: "Text projection BF16 component by Kijai. Place in models/text_encoders/.",
-    recommendation: "Required for workflows using separate text encoder components.",
+    description: "Text projection layer (BF16) that maps the Gemma 3 text-encoder output into the dimension LTX 2.3's transformer expects. A small required component for ComfyUI workflows that wire the text encoder up as separate parts. Place in models/text_encoders/.",
+    badge: "Text Encoder Part",
+    recommendation: "Download alongside your Gemma 3 12B text encoder — workflows that load the encoder as separate components also load this projection file. About 0.5 GB. Not needed if your workflow uses an all-in-one text encoder node.",
     isNew: false,
+    technicalNotes:
+      "ltx-2.3_text_projection_bf16.safetensors is the projection layer that bridges the Gemma 3 12B text encoder and the LTX 2.3 DiT transformer. Gemma produces text embeddings in its own hidden dimension; the transformer's cross-attention expects a different dimension. This file is the learned linear projection that converts one to the other. Without it, the text path is dimensionally mismatched and the prompt never reaches the model.\n\nIt is a tiny BF16 component (~0.5 GB) and goes in ComfyUI/models/text_encoders/ — the same folder as the Gemma file (gemma_3_12B_it_fp4_mixed / fp8_scaled / comfy_gemma_3_12B_it). Kijai's ComfyUI port splits the text encoder into the Gemma weights plus this projection so each can be quantized and swapped independently.\n\nThis is not the text encoder itself and not a VAE. It carries no semantic knowledge — it is pure plumbing between two components. You still need a Gemma 3 12B file for the actual encoding.",
+    whenToChoose:
+      "Download this whenever your workflow loads the Gemma text encoder as separate components (the common Kijai ComfyUI setup). In that layout it is required — pair it with one Gemma 3 12B file: FP4 mixed on 16 GB, FP8 scaled on 24 GB, or the full BF16 on 32 GB+.\n\nYou can skip it only if your workflow uses a bundled/all-in-one text-encoder node that already contains the projection. If a text-encoder node turns red complaining about a missing projection or a shape mismatch, this is the file you are missing.\n\nThere is no quality choice to make here — it is BF16 only and the same file regardless of which Gemma quant you pair it with.",
+    knownIssues: [
+      {
+        error: "Text encoder node: 'ltx-2.3_text_projection_bf16.safetensors not in list'",
+        cause: "File placed in ComfyUI/models/ root, checkpoints/, or vae/ instead of text_encoders/.",
+        fix: "Move it to ComfyUI/models/text_encoders/ltx-2.3_text_projection_bf16.safetensors and click refresh on the loader node so ComfyUI re-scans.",
+      },
+      {
+        error: "Prompt seems ignored / output unrelated to the text, even though Gemma loaded",
+        cause: "The projection layer is missing or not wired into the text path, so embeddings reach the transformer in the wrong dimension and contribute nothing.",
+        fix: "Confirm the workflow loads ltx-2.3_text_projection_bf16.safetensors alongside the Gemma encoder and that both feed the same conditioning chain.",
+      },
+      {
+        error: "Tried to load it as the text encoder and got an error",
+        cause: "This is only the projection layer, not the encoder. It cannot encode text on its own.",
+        fix: "Load a Gemma 3 12B file (gemma_3_12B_it_fp4_mixed.safetensors on 16 GB) as the encoder, and use this file only in the projection slot.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-05-27",
+      source: "Kijai/LTX2.3_comfy (HuggingFace)",
+      notes: "Part of Kijai's late-May component split that separates the Gemma text encoder, projection, and VAEs into independently loadable files.",
+    },
+    pathVariants: [
+      "text_encoders/ltx-2.3_text_projection_bf16.safetensors",
+      "ltx23\\ltx-2.3_text_projection_bf16.safetensors",
+    ],
   },
   // ── 2026-05 additions: IC-LoRAs, NVFP4, Gemma 3 text encoder ─────────────
   {
