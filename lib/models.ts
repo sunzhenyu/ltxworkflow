@@ -865,6 +865,7 @@ export const MODELS: ModelVariant[] = [
       "ltx23\\taeltx2_3.safetensors",
       "ltx 2.3\\taeltx2_3.safetensors",
       "vae/taeltx2_3.safetensors",
+      "vae_approx\\taeltx2_3.safetensors",
     ],
   },
   // ── Audio / Video VAE & Text Encoder components (Kijai) ──────────────────

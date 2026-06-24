@@ -15,6 +15,76 @@ function findModel(id: string): ModelVariant | null {
   return MODELS.find((m) => m.id === id) ?? null;
 }
 
+type ModelCategory = "vae" | "text-encoder" | "upscaler" | "lora" | "checkpoint";
+
+function getModelCategory(model: ModelVariant): ModelCategory {
+  if (["ltx23-vae", "ltx23-audio-vae", "ltx23-video-vae"].includes(model.id))
+    return "vae";
+  if (model.id === "ltx23-text-projection" || model.id.includes("gemma"))
+    return "text-encoder";
+  if (model.id.includes("upscaler") || model.id.includes("temporal"))
+    return "upscaler";
+  if (model.type === "lora") return "lora";
+  return "checkpoint";
+}
+
+// ComfyUI install folder, single source of truth for both the page body and metadata.
+function getInstallFolder(category: ModelCategory): string {
+  switch (category) {
+    case "vae":
+      return "ComfyUI/models/vae/";
+    case "text-encoder":
+      return "ComfyUI/models/text_encoders/";
+    case "upscaler":
+      return "ComfyUI/models/latent_upscale_models/";
+    case "lora":
+      return "ComfyUI/models/loras/";
+    case "checkpoint":
+      return "ComfyUI/models/checkpoints/";
+  }
+}
+
+// Components (VAE / text-encoder / upscaler / distillation LoRA) are folder-led:
+// VRAM is noise for them, so titles/descriptions lead with the install folder and
+// what the file pairs with — the questions HuggingFace's bare file listing can't answer.
+function isFolderLed(category: ModelCategory): boolean {
+  return category !== "checkpoint";
+}
+
+function categoryLabel(model: ModelVariant, category: ModelCategory): string {
+  switch (category) {
+    case "vae":
+      return "VAE";
+    case "text-encoder":
+      return model.id === "ltx23-text-projection" ? "text encoder part" : "text encoder";
+    case "upscaler":
+      return "latent upscaler";
+    case "lora":
+      return "LoRA";
+    case "checkpoint":
+      return "checkpoint";
+  }
+}
+
+function categorySentence(model: ModelVariant, category: ModelCategory): string {
+  switch (category) {
+    case "vae":
+      return model.id === "ltx23-audio-vae"
+        ? "the audio VAE for LTX 2.3 audio-video generation."
+        : "the VAE that decodes LTX 2.3 latents into video frames.";
+    case "text-encoder":
+      return model.id === "ltx23-text-projection"
+        ? "the projection layer that connects the Gemma text encoder to LTX 2.3."
+        : "the Gemma 3 text encoder LTX 2.3 uses to read your prompt.";
+    case "upscaler":
+      return "the latent upscaler for two-stage LTX 2.3 pipelines.";
+    case "lora":
+      return "a distillation LoRA applied on the LTX 2.3 dev model.";
+    case "checkpoint":
+      return model.description;
+  }
+}
+
 function relatedModels(model: ModelVariant): ModelVariant[] {
   // Same type or matching VRAM tier, excluding self
   return MODELS.filter(
@@ -33,8 +103,23 @@ export async function generateMetadata({
   const model = findModel(id);
   if (!model) return { title: "Model Not Found" };
 
-  const title = `${model.filename} — ${model.name} Direct Download (${model.size}, ${model.vram}GB VRAM)`;
-  const description = `Download ${model.filename} for LTX 2.3 ComfyUI: ${model.size}, requires ${model.vram}GB VRAM. ${model.description} Direct HuggingFace link, install path, and ComfyUI workflow guide.`;
+  const category = getModelCategory(model);
+  const folder = getInstallFolder(category);
+  const shortFolder = folder.replace(/^ComfyUI\//, "");
+  const label = categoryLabel(model, category);
+
+  let title: string;
+  let description: string;
+
+  if (isFolderLed(category)) {
+    // VRAM is noise here. Lead with the install folder — the single answer searchers
+    // get wrong (the "not in list" red node) and that HuggingFace never shows.
+    title = `${model.filename} → ${shortFolder} · LTX 2.3 ${label} download`;
+    description = `${model.filename} goes in ${folder} — ${categorySentence(model, category)} Free direct download, what it pairs with, and the fix when ComfyUI says it can't find the file.`;
+  } else {
+    title = `${model.filename} — ${model.vram}GB VRAM · download + ComfyUI setup`;
+    description = `${model.filename}: ${model.size}, runs on ${model.vram}GB VRAM. ${model.description} Free direct download plus the install path, compatible workflows, and CFG/step settings.`;
+  }
 
   return {
     title,
@@ -61,16 +146,7 @@ export default async function ModelDetailPage({
   const related = relatedModels(model);
 
   // ComfyUI install location
-  const installPath =
-    ["ltx23-vae", "ltx23-audio-vae", "ltx23-video-vae"].includes(model.id)
-      ? "ComfyUI/models/vae/"
-      : model.id === "ltx23-text-projection"
-      ? "ComfyUI/models/text_encoders/"
-      : model.id.includes("upscaler") || model.id.includes("temporal")
-      ? "ComfyUI/models/latent_upscale_models/"
-      : model.type === "lora"
-      ? "ComfyUI/models/loras/"
-      : "ComfyUI/models/checkpoints/";
+  const installPath = getInstallFolder(getModelCategory(model));
 
   // Compatible workflows — all ICLoRA workflows are distilled-only
   const isDistilledModel =
@@ -574,16 +650,7 @@ function buildTroubleshooting(
 ): { q: string; a: string }[] {
   const list: { q: string; a: string }[] = [];
 
-  const installPathForTrouble =
-    ["ltx23-vae", "ltx23-audio-vae", "ltx23-video-vae"].includes(model.id)
-      ? "ComfyUI/models/vae/"
-      : model.id === "ltx23-text-projection"
-      ? "ComfyUI/models/text_encoders/"
-      : model.id.includes("upscaler") || model.id.includes("temporal")
-      ? "ComfyUI/models/latent_upscale_models/"
-      : model.type === "lora"
-      ? "ComfyUI/models/loras/"
-      : "ComfyUI/models/checkpoints/";
+  const installPathForTrouble = getInstallFolder(getModelCategory(model));
   list.push({
     q: "ComfyUI doesn't see the file after I downloaded it",
     a: `Make sure the file is in ${installPathForTrouble} (not a subfolder). Restart ComfyUI fully — the menu refresh sometimes misses new files. Filename must match exactly: ${model.filename}.`,
