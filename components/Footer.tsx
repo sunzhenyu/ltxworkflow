@@ -66,6 +66,7 @@ export default function Footer() {
       </div>
 
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
+        <Link href="/contact" className="hover:text-gray-400 transition-colors">Contact</Link>
         <Link href="/feedback" className="hover:text-gray-400 transition-colors">Feedback</Link>
         <Link href="/changelog" className="hover:text-gray-400 transition-colors">Changelog</Link>
         <Link href="/privacy" className="hover:text-gray-400 transition-colors">Privacy Policy</Link>

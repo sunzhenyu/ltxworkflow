@@ -63,6 +63,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           gtag('js', new Date());
           gtag('config', 'G-JM08TXQFMM');
         `}</Script>
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3423484889158695"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <Providers>{children}</Providers>
       </body>
     </html>
