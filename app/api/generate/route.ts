@@ -28,6 +28,12 @@ const ALLOWED_FPS: Fps[] = [24, 25, 48, 50];
 const VALID_MODEL_KEYS = new Set<string>(MODELS.map((m) => m.key));
 const MAX_PROMPT_CHARS = 1000;
 
+// One generation in flight per user at a time. Prevents a user who keeps
+// hitting a moderation/upstream rejection from spamming dozens of submits in a
+// minute — each of those still costs us an upstream call. A clip finishes in
+// ~30–90s, so this isn't a throughput limit in practice.
+const MAX_IN_FLIGHT_PER_USER = 1;
+
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.email) {
@@ -136,6 +142,26 @@ export async function POST(req: NextRequest) {
     fps,
     aspect: aspectRaw,
   });
+
+  // Concurrency guard — before deducting. A user with a clip still
+  // pending/running can't start another. Stale rows are swept by the
+  // watchdog in GET /api/generate/[id] (force-fails anything older than
+  // MAX_RUN_MINUTES), so this can't wedge permanently.
+  const { count: inFlight } = await supabase
+    .from("generations")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .in("status", ["pending", "running"]);
+  if ((inFlight ?? 0) >= MAX_IN_FLIGHT_PER_USER) {
+    return NextResponse.json(
+      {
+        error:
+          "You already have a video generating. Please wait for it to finish before starting another.",
+      },
+      { status: 429 },
+    );
+  }
+
   const deducted = await tryDeductCredits(userId, cost, "spend");
   if (!deducted.ok) {
     return NextResponse.json(
@@ -196,22 +222,37 @@ export async function POST(req: NextRequest) {
       endImageUrl: typeof endImageUrl === "string" ? endImageUrl : undefined,
     });
   } catch (err) {
-    console.error("[generate] fal submit error:", err);
+    const rawMessage = err instanceof Error ? err.message : "fal submission failed";
+    console.error("[generate] fal submit error:", rawMessage);
+
+    // Map upstream failures to a white-label, user-safe message. Never surface
+    // fal's raw error (it names the provider and, for billing, leaks that *our*
+    // account is the one out of funds). "User is locked / Exhausted balance" is
+    // an ops problem on our side — the user did nothing wrong.
+    const isOutOfFunds =
+      /user is locked|exhausted balance|insufficient.*balance/i.test(rawMessage);
+    const userMessage = isOutOfFunds
+      ? "Generation is temporarily unavailable. Your credits were not charged — please try again shortly."
+      : "Could not start generation. Your credits have been refunded.";
+    if (isOutOfFunds) {
+      console.error(
+        "[generate] UPSTREAM ACCOUNT OUT OF FUNDS — top up the provider balance. " +
+          "All generations will fail until resolved.",
+      );
+    }
+
     await supabase
       .from("generations")
       .update({
         status: "failed",
-        error_message: err instanceof Error ? err.message : "fal submission failed",
+        error_message: userMessage,
         completed_at: new Date().toISOString(),
       })
       .eq("id", gen.id);
     await grantCredits(userId, cost, "refund", gen.id).catch((refundErr) => {
       console.error("[generate] refund-after-submit-failure failed:", refundErr);
     });
-    return NextResponse.json(
-      { error: "Could not start generation. Credits refunded." },
-      { status: 502 },
-    );
+    return NextResponse.json({ error: userMessage }, { status: 502 });
   }
 
   const { error: runUpdateError } = await supabase

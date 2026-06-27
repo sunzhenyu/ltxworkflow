@@ -19,6 +19,21 @@ const FAL_URL_TTL_DAYS = 7;
 // indefinitely "Generating…" UI).
 const MAX_RUN_MINUTES = 10;
 
+// Convert an upstream (fal) error into a white-label, user-safe message. We
+// never surface fal's raw text: it names the provider and can leak that *our*
+// account is out of funds. Content-moderation rejections are the one case the
+// user can act on, so we keep a clear (but provider-agnostic) version.
+function userFacingError(raw: string): string {
+  const r = raw.toLowerCase();
+  if (/content checker|content moderation|flagged|moderation|nsfw|safety/.test(r)) {
+    return "Your image or prompt was flagged by our content filter and can't be processed. Try a different image or wording.";
+  }
+  if (/user is locked|exhausted balance|insufficient.*balance/.test(r)) {
+    return "Generation is temporarily unavailable. Your credits have been refunded — please try again shortly.";
+  }
+  return "Generation failed. Your credits have been refunded.";
+}
+
 // GET /api/generate/[id]
 // Returns the generation row, refreshing from fal if it's still in flight.
 export async function GET(
@@ -94,7 +109,7 @@ export async function GET(
         .from("generations")
         .update({
           status: "failed",
-          error_message: fetched.message.slice(0, 1000),
+          error_message: userFacingError(fetched.message),
           completed_at: new Date().toISOString(),
         })
         .eq("id", gen.id)
@@ -139,7 +154,7 @@ export async function GET(
           .from("generations")
           .update({
             status: "failed",
-            error_message: resultFetched.message.slice(0, 1000),
+            error_message: userFacingError(resultFetched.message),
             completed_at: new Date().toISOString(),
           })
           .eq("id", gen.id)
@@ -189,11 +204,12 @@ export async function GET(
     if (upper === "ERROR") {
       const errorMsg =
         status.logs?.map((l) => l.message).join(" | ") ?? "fal returned ERROR";
+      console.error(`[generate/status] gen=${gen.id} fal ERROR: ${errorMsg.slice(0, 500)}`);
       const { data: updated } = await supabase
         .from("generations")
         .update({
           status: "failed",
-          error_message: errorMsg.slice(0, 1000),
+          error_message: userFacingError(errorMsg),
           completed_at: new Date().toISOString(),
         })
         .eq("id", gen.id)
