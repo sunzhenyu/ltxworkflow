@@ -30,7 +30,9 @@ const UPSELL_HREF = SMALL_PACK?.creemProductId
 type ApiStatus = "pending" | "running" | "completed" | "failed";
 type UiStatus = "idle" | "submitting" | "running" | "completed" | "failed";
 
-const DEFAULT_MODEL: ModelKey = "ltx-2.3-fast";
+// Default to the cheapest model — MODELS is ordered by credit cost ascending,
+// so the first entry is always the lowest-cost option.
+const DEFAULT_MODEL: ModelKey = MODELS[0].key;
 const DEFAULT_RES: Resolution = "1080p";
 const DEFAULT_DURATION: Duration = 6;
 const DEFAULT_ASPECT: AspectRatio = "auto";

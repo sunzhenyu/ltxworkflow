@@ -36,23 +36,9 @@ export type ModelInfo = {
   badge?: string;
 };
 
+// Ordered cheapest → most expensive (by credit cost at the default 6s clip).
+// The UI defaults to the first entry, so the lowest-cost model is preselected.
 export const MODELS: ModelInfo[] = [
-  {
-    key: "ltx-2.3-fast",
-    label: "LTX 2.3 Fast",
-    shortDescription: "Fastest. Free trial credits work here.",
-    endpoint: "fal-ai/ltx-2.3/image-to-video/fast",
-    premium: false,
-    pricingType: "per_second",
-  },
-  {
-    key: "ltx-2.3-pro",
-    label: "LTX 2.3 Pro",
-    shortDescription: "Higher quality / finer motion. Slower.",
-    endpoint: "fal-ai/ltx-2.3/image-to-video",
-    premium: true,
-    pricingType: "per_second",
-  },
   {
     key: "ltx-2.3-22b-distilled",
     label: "LTX 2.3 22B Distilled",
@@ -70,6 +56,22 @@ export const MODELS: ModelInfo[] = [
     premium: true,
     pricingType: "per_megapixel",
     badge: "New",
+  },
+  {
+    key: "ltx-2.3-fast",
+    label: "LTX 2.3 Fast",
+    shortDescription: "Fastest. Free trial credits work here.",
+    endpoint: "fal-ai/ltx-2.3/image-to-video/fast",
+    premium: false,
+    pricingType: "per_second",
+  },
+  {
+    key: "ltx-2.3-pro",
+    label: "LTX 2.3 Pro",
+    shortDescription: "Higher quality / finer motion. Slower.",
+    endpoint: "fal-ai/ltx-2.3/image-to-video",
+    premium: true,
+    pricingType: "per_second",
   },
 ];
 
