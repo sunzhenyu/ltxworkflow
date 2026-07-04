@@ -100,9 +100,10 @@ function AnonymousSEOContent() {
         <h2 className="text-2xl font-bold text-white text-center">Frequently asked questions</h2>
         <div className="space-y-3">
           <Faq q="What do I get for signing up?">
-            {WELCOME_CREDITS} free credits, no card needed — enough to try a full
-            generation on the lowest-cost model. Credit cost scales with model,
-            resolution, and duration. After that, top up from $4.99.
+            {WELCOME_CREDITS} free credits to explore the generator, no card
+            needed. A clip starts at 6 credits (Fast, 6s), so top up from $4.99
+            when you&apos;re ready to generate — credit cost scales with model,
+            resolution, and duration.
           </Faq>
           <Faq q="How much will it cost after the free credits?">
             Pay-as-you-go credit packs starting at $4.99 (60 credits) or monthly subscriptions

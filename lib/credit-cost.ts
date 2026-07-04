@@ -36,9 +36,18 @@ export type ModelInfo = {
   badge?: string;
 };
 
-// Ordered cheapest → most expensive (by credit cost at the default 6s clip).
-// The UI defaults to the first entry, so the lowest-cost model is preselected.
+// Ordered cheapest → most expensive (by credit cost at the default 6s clip):
+// Fast 6cr < 22B Distilled 7cr < Pro 9cr = 22B Full 9cr. The UI defaults to
+// the first entry, so the lowest-cost model is preselected.
 export const MODELS: ModelInfo[] = [
+  {
+    key: "ltx-2.3-fast",
+    label: "LTX 2.3 Fast",
+    shortDescription: "Fastest and lowest cost. Great for quick tests.",
+    endpoint: "fal-ai/ltx-2.3/image-to-video/fast",
+    premium: false,
+    pricingType: "per_second",
+  },
   {
     key: "ltx-2.3-22b-distilled",
     label: "LTX 2.3 22B Distilled",
@@ -49,6 +58,14 @@ export const MODELS: ModelInfo[] = [
     badge: "New",
   },
   {
+    key: "ltx-2.3-pro",
+    label: "LTX 2.3 Pro",
+    shortDescription: "Higher quality / finer motion. Slower.",
+    endpoint: "fal-ai/ltx-2.3/image-to-video",
+    premium: true,
+    pricingType: "per_second",
+  },
+  {
     key: "ltx-2.3-22b",
     label: "LTX 2.3 22B Full",
     shortDescription: "Full 22B weights — highest fidelity, highest cost.",
@@ -56,22 +73,6 @@ export const MODELS: ModelInfo[] = [
     premium: true,
     pricingType: "per_megapixel",
     badge: "New",
-  },
-  {
-    key: "ltx-2.3-fast",
-    label: "LTX 2.3 Fast",
-    shortDescription: "Fastest. Free trial credits work here.",
-    endpoint: "fal-ai/ltx-2.3/image-to-video/fast",
-    premium: false,
-    pricingType: "per_second",
-  },
-  {
-    key: "ltx-2.3-pro",
-    label: "LTX 2.3 Pro",
-    shortDescription: "Higher quality / finer motion. Slower.",
-    endpoint: "fal-ai/ltx-2.3/image-to-video",
-    premium: true,
-    pricingType: "per_second",
   },
 ];
 
@@ -123,10 +124,13 @@ const PER_MP_USD: Record<"ltx-2.3-22b-distilled" | "ltx-2.3-22b", number> = {
   "ltx-2.3-22b": 0.001605,
 };
 
-// 22B's `video_size` enum maps to fixed pixel dimensions. Used for cost
-// estimation; real fal billing uses what fal actually generated.
-// Pixel numbers based on fal docs (Portrait 9:16 = 576×1024 confirmed;
-// 4:3 / 3:4 follow the 1024×768 / 768×1024 standard fal uses for image models).
+// 22B's `video_size` enum maps to fixed pixel dimensions, used for cost
+// estimation. These are CALIBRATED to what fal actually renders, not the
+// nominal enum size: fal upscales 22B output to a ~1080p tier. A measured
+// `auto` i2v request (022b-distilled, 6s @ 25fps = 150 frames) billed
+// 216 MP-frames → 1.44M px/frame, ~2.4× the old 1024×576 estimate. Under-
+// estimating here meant we were charging ~3cr for a clip that cost us $0.26.
+// Real fal billing uses whatever fal generated; these keep our estimate close.
 export type VideoSize22B =
   | "auto"
   | "landscape_16_9"
@@ -136,13 +140,13 @@ export type VideoSize22B =
   | "square_hd";
 
 const VIDEO_SIZE_22B_PIXELS: Record<VideoSize22B, number> = {
-  // `auto` lets fal infer from input image; estimate 16:9 landscape for cost preview.
-  auto: 1024 * 576,
-  landscape_16_9: 1024 * 576,
-  portrait_16_9: 576 * 1024,
-  landscape_4_3: 1024 * 768,
-  portrait_4_3: 768 * 1024,
-  square_hd: 1024 * 1024,
+  // `auto` lets fal infer from the input image; measured ≈1.44M px/frame.
+  auto: 1_440_000,
+  landscape_16_9: 1920 * 1080,
+  portrait_16_9: 1080 * 1920,
+  landscape_4_3: 1440 * 1080,
+  portrait_4_3: 1080 * 1440,
+  square_hd: 1440 * 1440,
 };
 
 /** Convert a UI aspect choice to the fal 22B `video_size` enum. */
