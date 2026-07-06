@@ -10,6 +10,14 @@ export const metadata: Metadata = {
 
 const entries = [
   {
+    date: "2026-06-15",
+    title: "INT8 convrot Variants for RTX 20xx / 30xx",
+    items: [
+      "New: LTX 2.3 Distilled 1.1 INT8 convrot (Kijai, ~21.5 GB) — rotation-based INT8 that runs on Ampere/Turing INT8 tensor cores, where FP8 matmul is unavailable and MXFP8 only gets BF16-fallback speed",
+      "New: LTX 2.3 Dev INT8 convrot (Kijai, ~21.5 GB) — same low-VRAM speedup for the dev/quality + LoRA path",
+    ],
+  },
+  {
     date: "2026-06-03",
     title: "IC-LoRA Family + NVFP4 + Gemma 3 Text Encoder",
     items: [

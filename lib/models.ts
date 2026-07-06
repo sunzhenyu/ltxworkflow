@@ -450,6 +450,60 @@ export const MODELS: ModelVariant[] = [
     recommendation: "RTX 30xx workaround for dev/quality path — use when standard FP8 matmul is unsupported. Supports LoRA.",
     isNew: false,
   },
+  // ── INT8 convrot variants (Kijai) ─────────────────────────────────────────
+  {
+    id: "ltx23-distilled-11-int8-convrot",
+    name: "LTX 2.3 Distilled 1.1 INT8 convrot (Kijai)",
+    filename: "ltx-2.3-22b-distilled-1.1_transformer_only_int8_convrot.safetensors",
+    size: "~21.5 GB",
+    vram: 16,
+    vramMax: 24,
+    type: "fp8",
+    hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy",
+    description: "INT8 convrot quantized distilled 1.1 by Kijai. Runs on RTX 30xx (Ampere INT8 tensor cores) — the smallest distilled transformer that keeps near-FP8 quality without needing FP8 matmul.",
+    badge: "v1.1 INT8",
+    recommendation: "Best low-VRAM distilled option for RTX 30xx. Smaller than MXFP8 (~21.5 GB) and runs on INT8 tensor cores every Ampere+ card has.",
+    isNew: true,
+    technicalNotes:
+      "INT8 convrot is a rotation-based INT8 quantization: the weights are multiplied by a learned/computed rotation ('convrot') before being cast to 8-bit integers, which spreads out the activation outliers that normally wreck naive INT8. The result is INT8 memory footprint with quality much closer to FP8/BF16 than plain per-tensor INT8 would give.\n\nThe practical win over ltx-2.3-22b-distilled-1.1_transformer_only_mxfp8_block32.safetensors is hardware reach: INT8 matmul tensor cores exist on every NVIDIA card since Turing (RTX 20xx) and Ampere (RTX 30xx), so you get real compute acceleration — not the BF16-fallback path MXFP8 takes on those GPUs. File size is also a bit smaller (~21.5 GB vs ~25 GB).\n\n'transformer_only' means DiT weights only. Pair it with taeltx2_3.safetensors (VAE) and a Gemma 3 12B text encoder (FP4 mixed on 16 GB, FP8 scaled or BF16 on more). Distilled inference settings: 8 steps, CFG=1.",
+    whenToChoose:
+      "Pick INT8 convrot on RTX 20-series or 30-series (2080 Ti, 3060 12GB, 3080, 3090) when you want the distilled path and want actual matmul speedup, not just a VRAM fit. Ampere lacks FP8 matmul, and MXFP8 falls back to BF16 compute there — INT8 convrot uses the INT8 tensor cores those cards do have.\n\nOn RTX 40-series (Ada) or 50-series (Blackwell), the standard ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors is still the default — native FP8 is marginally higher quality and equally fast. Reach for INT8 convrot on those cards only if you're memory-constrained and want the smaller file.\n\nRequires a recent ComfyUI + KJNodes that understands the convrot layout — older builds will error on load.",
+    knownIssues: [
+      {
+        error: "ComfyUI errors on load: unknown quantization / unexpected keys",
+        cause: "The convrot rotation tables are stored as extra tensors the loader must apply before matmul. Older ComfyUI or KJNodes builds don't recognize them.",
+        fix: "Update ComfyUI and KJNodes to a build from 2026-06 or later. Load with the Kijai LTXVideoModelLoader (KJNodes), not a custom loader that assumes plain INT8.",
+      },
+      {
+        error: "Output has color banding or blocky artifacts vs the FP8 file",
+        cause: "A LoRA or loader is applying deltas in the wrong dtype, bypassing the rotation.",
+        fix: "Confirm the base runs clean with no LoRA first. If a LoRA is required, apply it against the BF16 transformer and re-quantize, or use the fp8_scaled file on RTX 40xx+ where LoRA composition is best tested.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-06",
+      source: "Kijai/LTX2.3_comfy (HuggingFace)",
+      notes: "Added to bring hardware-accelerated low-VRAM inference to RTX 20xx/30xx, which can't use FP8 matmul and only get BF16-fallback speed from MXFP8.",
+    },
+    pathVariants: [
+      "ltx23\\ltx-2.3-22b-distilled-1.1_transformer_only_int8_convrot.safetensors",
+      "diffusion_models/ltx-2.3-22b-distilled-1.1_transformer_only_int8_convrot.safetensors",
+    ],
+  },
+  {
+    id: "ltx23-dev-int8-convrot",
+    name: "LTX 2.3 Dev INT8 convrot (Kijai)",
+    filename: "ltx-2.3-22b-dev_transformer_only_int8_convrot.safetensors",
+    size: "~21.5 GB",
+    vram: 16,
+    vramMax: 24,
+    type: "fp8",
+    hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy",
+    description: "INT8 convrot quantized dev model by Kijai. 16GB VRAM, supports LoRA, runs on RTX 20xx/30xx INT8 tensor cores. Place in models/checkpoints/.",
+    badge: "Dev INT8",
+    recommendation: "Low-VRAM dev/quality path for RTX 20xx/30xx — INT8 tensor cores give real speedup where FP8 matmul is unavailable and MXFP8 only falls back to BF16.",
+    isNew: true,
+  },
   // ── Distilled v1.0 additional variants (Kijai) ────────────────────────────
   {
     id: "ltx23-distilled-bf16",

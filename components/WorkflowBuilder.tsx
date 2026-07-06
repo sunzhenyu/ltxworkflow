@@ -142,12 +142,12 @@ export default function WorkflowBuilder() {
             </div>
             {config.vram === "16gb" && (
               <p className="text-xs text-amber-500 mt-1.5">
-                ⚠ RTX 30xx? The selected FP8 model needs RTX 40xx+ hardware. Use the <span className="font-mono">mxfp8_block32</span> variant or BF16 instead.
+                ⚠ RTX 30xx? The selected FP8 model needs RTX 40xx+ hardware. Use the <span className="font-mono">int8_convrot</span> variant (fastest on Ampere INT8 cores), or <span className="font-mono">mxfp8_block32</span> / BF16 instead.
               </p>
             )}
             {config.vram === "24gb" && (
               <p className="text-xs text-amber-500 mt-1.5">
-                ⚠ RTX 3090? FP8 scaled matmul requires RTX 40xx+. Use the <span className="font-mono">mxfp8_block32</span> or BF16 variant.
+                ⚠ RTX 3090? FP8 scaled matmul requires RTX 40xx+. Use the <span className="font-mono">int8_convrot</span> variant (fastest on Ampere INT8 cores), or <span className="font-mono">mxfp8_block32</span> / BF16.
               </p>
             )}
           </div>

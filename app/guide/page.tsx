@@ -33,7 +33,7 @@ const steps = [
     items: [
       { label: "16GB, RTX 40xx+", value: "ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors — v1.1 Distilled FP8 by Kijai (~25GB). Fastest, best quality for 16GB." },
       { label: "16GB + LoRA", value: "ltx-2.3-22b-dev_transformer_only_fp8_scaled.safetensors — Dev FP8 by Kijai (~25GB). Use this if you want to apply LoRA weights." },
-      { label: "16GB, older GPU", value: "ltx-2.3-22b-distilled-1.1_transformer_only_mxfp8_block32.safetensors — MXFP8 variant for GPUs without standard FP8 support." },
+      { label: "16GB, RTX 20xx/30xx", value: "ltx-2.3-22b-distilled-1.1_transformer_only_int8_convrot.safetensors — INT8 convrot (~21.5GB). Runs on Ampere/Turing INT8 tensor cores for real speedup where FP8 matmul is unavailable. MXFP8 (mxfp8_block32) is the BF16-fallback alternative." },
       { label: "16/24GB, RTX 50xx", value: "ltx-2.3-22b-dev-nvfp4.safetensors — Official NVFP4 dev model (21.7 GB). Native nvfp4 matmul on Blackwell. Falls back to slow paths on older GPUs." },
       { label: "24GB VRAM", value: "ltx-2.3-22b-distilled-1.1.safetensors — Official v1.1 with sequential offloading enabled in ComfyUI settings." },
       { label: "32GB+ VRAM", value: "ltx-2.3-22b-distilled-1.1.safetensors — Official v1.1 full bf16 precision. Best quality, recommended for 32GB." },
