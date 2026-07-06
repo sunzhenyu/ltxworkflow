@@ -17,6 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: "https://ltxworkflow.com/pricing", lastModified: new Date(), changeFrequency: "monthly", priority: 0.85 },
     { url: "https://ltxworkflow.com/models", lastModified: new Date(), changeFrequency: "monthly", priority: 0.85 },
     { url: "https://ltxworkflow.com/workflows", lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
+    { url: "https://ltxworkflow.com/resources", lastModified: new Date(), changeFrequency: "weekly", priority: 0.85 },
     { url: "https://ltxworkflow.com/changelog", lastModified: new Date(), changeFrequency: "weekly", priority: 0.6 },
     { url: "https://ltxworkflow.com/contact", lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
     // Legal — crawled but low priority

@@ -10,6 +10,7 @@ const links: NavLink[] = [
   {
     label: "Resources",
     submenu: [
+      { href: "/resources", label: "Overview" },
       { href: "/guide", label: "Guide" },
       { href: "/blog", label: "Blog" },
       { href: "/resources/tutorials", label: "Tutorials" },
