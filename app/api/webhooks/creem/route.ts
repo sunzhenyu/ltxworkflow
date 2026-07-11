@@ -9,21 +9,21 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
 );
 
-// Helper: derive a stable user id (we use email as the canonical id throughout).
-// Preference order:
-//   1. metadata.user_email — we explicitly set this in /api/checkout so it's the
-//      most trustworthy value: it's the email the user is signed in with on our
-//      site at the moment they clicked "Buy". Survives even if the buyer edits
-//      the email field on the Creem checkout form.
-//   2. customer_email — Creem-managed, usually matches but the buyer can change
-//      it on the Creem form, which would orphan the credits.
-//   3. customer_id — last resort for legacy events without an email.
-function userIdFromEvent(data: Record<string, unknown>): string | undefined {
-  const metadata = (data.metadata as Record<string, unknown> | undefined) || {};
+// Creem webhook payload structure:
+//   { id, eventType, created_at, object: { ... } }
+// Data lives in event.object, event type is event.eventType (not event.type/event.data).
+//
+// User id derivation — preference order:
+//   1. object.metadata.user_email — set at checkout creation, survives buyer editing the form email
+//   2. object.customer.email — Creem-managed customer email
+//   3. object.customer.id — last resort
+function userIdFromObject(obj: Record<string, unknown>): string | undefined {
+  const metadata = (obj.metadata as Record<string, unknown> | undefined) || {};
+  const customer = (obj.customer as Record<string, unknown> | undefined) || {};
   return (
     (metadata.user_email as string) ||
-    (data.customer_email as string) ||
-    (data.customer_id as string) ||
+    (customer.email as string) ||
+    (customer.id as string) ||
     undefined
   );
 }
@@ -45,41 +45,45 @@ export async function POST(request: NextRequest) {
     }
 
     const event = JSON.parse(body);
+    // Creem uses eventType + object, not type + data
+    const eventType: string = event.eventType ?? event.type ?? "";
+    const obj: Record<string, unknown> = event.object ?? event.data ?? {};
 
-    switch (event.type) {
+    console.log("[creem webhook] received eventType:", eventType);
+
+    switch (eventType) {
       // ── One-time payment OR subscription purchase ──────────────────────────
       case "checkout.completed": {
-        const productId = event.data.product_id as string | undefined;
-        const userId = userIdFromEvent(event.data);
-        const checkoutId =
-          (event.data.id as string) || (event.data.checkout_id as string) || undefined;
+        const product = (obj.product as Record<string, unknown> | undefined) || {};
+        const productId = (product.id as string) || (obj.product_id as string) || undefined;
+        const userId = userIdFromObject(obj);
+        const checkoutId = (obj.id as string) || undefined;
 
-        // Always upsert the subscription tracking row (existing behavior).
+        // Upsert subscription tracking row for lifetime/legacy one-time products.
         const lifetimeProductId = process.env.NEXT_PUBLIC_CREEM_LIFETIME_PRODUCT_ID;
         const legacyOneTimeProductId = process.env.NEXT_PUBLIC_CREEM_ONE_TIME_PRODUCT_ID;
         const isLifetime = !!lifetimeProductId && productId === lifetimeProductId;
-        const isLegacyOneTime =
-          !!legacyOneTimeProductId && productId === legacyOneTimeProductId;
+        const isLegacyOneTime = !!legacyOneTimeProductId && productId === legacyOneTimeProductId;
         const proUntil = isLifetime
           ? new Date(Date.now() + 100 * 365 * 24 * 60 * 60 * 1000).toISOString()
           : isLegacyOneTime
           ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
           : null;
 
+        const customer = (obj.customer as Record<string, unknown> | undefined) || {};
+
         if (userId) {
           await supabase.from("user_subscriptions").upsert({
             user_id: userId,
-            email: event.data.customer_email,
-            customer_id: event.data.customer_id,
+            email: customer.email,
+            customer_id: customer.id,
             product_id: productId,
             status: "active",
             ...(proUntil && { pro_until: proUntil }),
           });
         }
 
-        // Credit-pack grant: only for one-time tiers. Subscription tiers will
-        // get their credits via the `subscription.created` event to avoid
-        // double-counting (Creem fires both on a sub purchase).
+        // Credit grant: one_time tiers only (subscriptions handled by subscription.active).
         const tier = findTierByProductId(productId);
         if (tier && tier.type === "one_time" && userId && checkoutId) {
           const result = await grantPurchaseCreditsIdempotent(
@@ -88,28 +92,36 @@ export async function POST(request: NextRequest) {
             `creem-checkout-${checkoutId}`,
           );
           console.log(
-            `[creem webhook] one-time pack ${tier.id}: granted=${result.granted} balance=${result.balance}`,
+            `[creem webhook] one-time ${tier.id}: granted=${result.granted} balance=${result.balance}`,
+          );
+        } else {
+          console.log(
+            `[creem webhook] checkout.completed: productId=${productId} tier=${tier?.id ?? "none"} userId=${userId ?? "none"}`,
           );
         }
         break;
       }
 
-      // ── New subscription (first cycle) ────────────────────────────────────
+      // ── New subscription activated (first cycle) ───────────────────────────
+      // Creem fires "subscription.active" (not "subscription.created") on first activation.
+      case "subscription.active":
       case "subscription.created": {
-        const userId = userIdFromEvent(event.data);
-        const subId = event.data.id as string | undefined;
-        const productId = event.data.product_id as string | undefined;
+        const userId = userIdFromObject(obj);
+        const subId = obj.id as string | undefined;
+        const product = (obj.product as Record<string, unknown> | undefined) || {};
+        const productId = (product.id as string) || (obj.product_id as string) || undefined;
+        const customer = (obj.customer as Record<string, unknown> | undefined) || {};
 
         if (userId) {
           await supabase.from("user_subscriptions").upsert({
             user_id: userId,
-            email: event.data.customer_email,
-            customer_id: event.data.customer_id,
+            email: customer.email,
+            customer_id: customer.id,
             subscription_id: subId,
             product_id: productId,
             status: "active",
-            current_period_start: event.data.current_period_start,
-            current_period_end: event.data.current_period_end,
+            current_period_start: obj.current_period_start,
+            current_period_end: obj.current_period_end,
           });
         }
 
@@ -123,30 +135,35 @@ export async function POST(request: NextRequest) {
           console.log(
             `[creem webhook] sub initial ${tier.id}: granted=${result.granted} balance=${result.balance}`,
           );
+        } else {
+          console.log(
+            `[creem webhook] ${eventType}: productId=${productId} tier=${tier?.id ?? "none"} userId=${userId ?? "none"}`,
+          );
         }
         break;
       }
 
       // ── Subscription renewal — top up monthly credits ─────────────────────
+      case "subscription.paid":
       case "subscription.renewed": {
-        const userId = userIdFromEvent(event.data);
-        const subId = event.data.id as string | undefined;
-        const productId = event.data.product_id as string | undefined;
+        const userId = userIdFromObject(obj);
+        const subId = obj.id as string | undefined;
+        const product = (obj.product as Record<string, unknown> | undefined) || {};
+        const productId = (product.id as string) || (obj.product_id as string) || undefined;
 
         await supabase
           .from("user_subscriptions")
           .update({
             status: "active",
-            current_period_start: event.data.current_period_start,
-            current_period_end: event.data.current_period_end,
+            current_period_start: obj.current_period_start,
+            current_period_end: obj.current_period_end,
           })
           .eq("subscription_id", subId);
 
         const tier = findTierByProductId(productId);
         if (tier && tier.type === "subscription" && userId && subId) {
-          // ref_id includes the period_start so each renewal is a distinct grant.
           const periodKey =
-            (event.data.current_period_start as string) || String(Date.now());
+            (obj.current_period_start as string) || String(Date.now());
           const result = await grantPurchaseCreditsIdempotent(
             userId,
             tier.credits,
@@ -155,19 +172,24 @@ export async function POST(request: NextRequest) {
           console.log(
             `[creem webhook] sub renew ${tier.id}: granted=${result.granted} balance=${result.balance}`,
           );
+        } else {
+          console.log(
+            `[creem webhook] ${eventType}: productId=${productId} tier=${tier?.id ?? "none"} userId=${userId ?? "none"} subId=${subId ?? "none"}`,
+          );
         }
         break;
       }
 
       case "subscription.canceled":
+      case "subscription.expired":
         await supabase
           .from("user_subscriptions")
           .update({ status: "canceled" })
-          .eq("subscription_id", event.data.id);
+          .eq("subscription_id", obj.id);
         break;
 
       default:
-        console.log("[creem webhook] unhandled event type:", event.type);
+        console.log("[creem webhook] unhandled event type:", eventType, "raw keys:", Object.keys(event));
     }
 
     return NextResponse.json({ received: true });

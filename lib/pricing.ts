@@ -21,6 +21,8 @@ export type PricingTier = {
   creemProductId: string | undefined;
   highlight?: boolean;
   badge?: string;
+  /** true = webhook-only tier, not shown on /pricing page */
+  hidden?: boolean;
 };
 
 const tier = (
@@ -63,6 +65,18 @@ export const PRICING_TIERS: PricingTier[] = [
     credits: 1230,
     cadence: "monthly",
     creemProductId: process.env.NEXT_PUBLIC_CREEM_STUDIO_ID,
+  }),
+  // ── Lifetime access (legacy, webhook-only — not shown on pricing page) ──
+  tier({
+    id: "lifetime",
+    type: "one_time",
+    name: "Lifetime Access",
+    tagline: "One payment, access forever.",
+    priceUsd: 4.99,
+    credits: 60,
+    cadence: "one_time",
+    creemProductId: process.env.NEXT_PUBLIC_CREEM_LIFETIME_PRODUCT_ID,
+    hidden: true,
   }),
   // ── One-time credit packs ─────────────────────────────────────────────────
   tier({
@@ -111,7 +125,7 @@ export function subscriptionTiers(): PricingTier[] {
 
 /** All one-time pack tiers, regardless of whether their Creem product is configured. */
 export function oneTimeTiers(): PricingTier[] {
-  return PRICING_TIERS.filter((t) => t.type === "one_time");
+  return PRICING_TIERS.filter((t) => t.type === "one_time" && !t.hidden);
 }
 
 /** Subset that has a Creem product id wired in env — used for webhook validation. */
