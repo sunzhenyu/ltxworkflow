@@ -107,7 +107,7 @@ export default function WorkflowBuilder() {
   const isControlMode = config.controlMode !== "none";
 
   return (
-    <section className="bg-gray-900 rounded-xl p-6">
+    <section id="workflow" className="bg-gray-900 rounded-xl p-6 scroll-mt-24">
       <div className="mb-5 space-y-1">
         <h2 className="text-xl font-bold">ComfyUI Workflow Configurator</h2>
         <p className="text-sm text-gray-400">

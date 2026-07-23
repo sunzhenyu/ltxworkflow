@@ -88,7 +88,7 @@ export default function VramMatcher() {
   const required = MODELS.filter((m) => REQUIRED_IDS.includes(m.id));
 
   return (
-    <section className="bg-gray-900 rounded-xl p-6 space-y-5">
+    <section id="vram" className="bg-gray-900 rounded-xl p-6 space-y-5 scroll-mt-24">
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-xl font-bold mb-1">VRAM Adapter</h2>

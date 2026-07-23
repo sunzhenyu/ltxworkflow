@@ -26,13 +26,12 @@ export default function Home() {
 
       <section className="text-center space-y-4">
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-          <span className="text-violet-400">LTX 2.3</span>{" "}for ComfyUI — Model Downloads, Workflow Templates &amp; Online Image-to-Video
+          Run <span className="text-violet-400">LTX 2.3</span>{" "}in ComfyUI — Match Your VRAM, Fix Missing Files, Generate the Workflow
         </h1>
         <p className="text-gray-400 max-w-2xl mx-auto text-lg">
-          Download <strong className="text-gray-200">LTX 2.3</strong> models with direct links —{" "}
-          <strong className="text-gray-200">taeltx2_3.safetensors</strong> VAE, FP8 quantized (16GB VRAM), and official checkpoints (32GB).
-          Generate <strong className="text-gray-200">ComfyUI workflow JSON</strong> instantly.
-          Supports T2V, I2V, LoRA, and spatial upscaler.
+          Stuck on a missing <strong className="text-gray-200">taeltx2_3.safetensors</strong>, an out-of-memory error, or the wrong checkpoint for your GPU?
+          Pick your VRAM, get the exact FP8 (16GB) or full-precision (32GB) files LTX 2.3 needs, and generate a
+          ready-to-import <strong className="text-gray-200">ComfyUI workflow JSON</strong> in under 2 minutes. T2V, I2V, LoRA, and spatial upscaler all supported.
         </p>
 
         {/* Featured Badges */}
@@ -72,10 +71,16 @@ export default function Home() {
             ▶ Try LTX 2.3 Online — Free
           </Link>
           <Link
-            href="/models"
+            href="#vram"
+            className="bg-gray-800 hover:bg-gray-700 text-gray-100 font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors inline-flex items-center gap-2"
+          >
+            Match My VRAM →
+          </Link>
+          <Link
+            href="#workflow"
             className="bg-violet-600 hover:bg-violet-500 text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors inline-flex items-center gap-2"
           >
-            Download Models →
+            Generate Workflow JSON →
           </Link>
         </div>
       </section>
