@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "ltx workflow — LTX 2.3 ComfyUI Workflow Generator";
+export const alt = "ltx workflow — LTX 2.5 & LTX 2.3 ComfyUI Workflow Generator";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -28,7 +28,7 @@ export default function OGImage() {
           <span style={{ fontSize: 48, fontWeight: 800, color: "#a78bfa" }}>ltx workflow</span>
         </div>
         <p style={{ fontSize: 28, color: "#9ca3af", textAlign: "center", margin: 0 }}>
-          LTX 2.3 ComfyUI Workflow Generator & Model Download
+          LTX 2.5 & LTX 2.3 ComfyUI Workflow Generator & Model Download
         </p>
         <div style={{ display: "flex", gap: 16, marginTop: 8 }}>
           {["16GB–32GB VRAM", "ComfyUI JSON", "AI Prompt Enhancer"].map((tag) => (

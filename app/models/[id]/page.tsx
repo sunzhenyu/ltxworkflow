@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { MODELS, ModelVariant } from "@/lib/models";
+import { MODELS, ModelVariant, familyOf } from "@/lib/models";
 import EmailSubscribe from "@/components/EmailSubscribe";
 import CopyFilenameButton from "@/components/CopyFilenameButton";
 
@@ -15,13 +15,26 @@ function findModel(id: string): ModelVariant | null {
   return MODELS.find((m) => m.id === id) ?? null;
 }
 
-type ModelCategory = "vae" | "text-encoder" | "upscaler" | "lora" | "checkpoint";
+type ModelCategory = "vae" | "text-encoder" | "upscaler" | "lora" | "checkpoint" | "model-patch";
 
 function getModelCategory(model: ModelVariant): ModelCategory {
-  if (["ltx23-vae", "ltx23-audio-vae", "ltx23-video-vae"].includes(model.id))
+  if (
+    [
+      "ltx23-vae",
+      "ltx23-audio-vae",
+      "ltx23-video-vae",
+      "ltx25-video-vae",
+      "ltx25-video-vae-conv",
+      "ltx25-audio-vae",
+    ].includes(model.id)
+  )
     return "vae";
   if (model.id === "ltx23-text-projection" || model.id.includes("gemma"))
     return "text-encoder";
+  if (model.id === "ltx25-duration-head") return "model-patch";
+  // IC-LoRAs go in models/loras/ even when their id also happens to say
+  // "upscaler" (e.g. the pixel spatial upscaler IC-LoRA) — check this first.
+  if (model.id.includes("ic-lora")) return "lora";
   if (model.id.includes("upscaler") || model.id.includes("temporal"))
     return "upscaler";
   if (model.type === "lora") return "lora";
@@ -41,6 +54,8 @@ function getInstallFolder(category: ModelCategory): string {
       return "ComfyUI/models/loras/";
     case "checkpoint":
       return "ComfyUI/models/checkpoints/";
+    case "model-patch":
+      return "ComfyUI/models/model_patches/";
   }
 }
 
@@ -63,33 +78,41 @@ function categoryLabel(model: ModelVariant, category: ModelCategory): string {
       return "LoRA";
     case "checkpoint":
       return "checkpoint";
+    case "model-patch":
+      return "model patch";
   }
 }
 
 function categorySentence(model: ModelVariant, category: ModelCategory): string {
+  const family = familyOf(model);
   switch (category) {
     case "vae":
-      return model.id === "ltx23-audio-vae"
-        ? "the audio VAE for LTX 2.3 audio-video generation."
-        : "the VAE that decodes LTX 2.3 latents into video frames.";
-    case "text-encoder":
-      return model.id === "ltx23-text-projection"
-        ? "the projection layer that connects the Gemma text encoder to LTX 2.3."
-        : "the Gemma 3 text encoder LTX 2.3 uses to read your prompt.";
+      return model.id === "ltx23-audio-vae" || model.id === "ltx25-audio-vae"
+        ? `the audio VAE for LTX ${family} audio-video generation.`
+        : `the VAE that decodes LTX ${family} latents into video frames.`;
+    case "text-encoder": {
+      if (model.id === "ltx23-text-projection")
+        return "the projection layer that connects the Gemma text encoder to LTX 2.3.";
+      const gemmaGen = family === "2.5" ? "Gemma 4" : "Gemma 3";
+      return `the ${gemmaGen} text encoder LTX ${family} uses to read your prompt.`;
+    }
     case "upscaler":
-      return "the latent upscaler for two-stage LTX 2.3 pipelines.";
+      return `the latent upscaler for two-stage LTX ${family} pipelines.`;
     case "lora":
-      return "a distillation LoRA applied on the LTX 2.3 dev model.";
+      return `a LoRA that attaches to the LTX ${family} dev model.`;
     case "checkpoint":
       return model.description;
+    case "model-patch":
+      return `a small model patch bundled with LTX ${family}.`;
   }
 }
 
 function relatedModels(model: ModelVariant): ModelVariant[] {
-  // Same type or matching VRAM tier, excluding self
+  // Same family, and same type or matching VRAM tier, excluding self
   return MODELS.filter(
     (m) =>
       m.id !== model.id &&
+      familyOf(m) === familyOf(model) &&
       (m.type === model.type || (m.vram === model.vram && m.type !== "lora"))
   ).slice(0, 6);
 }
@@ -114,7 +137,7 @@ export async function generateMetadata({
   if (isFolderLed(category)) {
     // VRAM is noise here. Lead with the install folder — the single answer searchers
     // get wrong (the "not in list" red node) and that HuggingFace never shows.
-    title = `${model.filename} → ${shortFolder} · LTX 2.3 ${label} download`;
+    title = `${model.filename} → ${shortFolder} · LTX ${familyOf(model)} ${label} download`;
     description = `${model.filename} goes in ${folder} — ${categorySentence(model, category)} Free direct download, what it pairs with, and the fix when ComfyUI says it can't find the file.`;
   } else {
     title = `${model.filename} — ${model.vram}GB VRAM · download + ComfyUI setup`;
@@ -156,33 +179,40 @@ export default async function ModelDetailPage({
   const isVaeOrComponent = ["ltx23-vae", "ltx23-audio-vae", "ltx23-video-vae", "ltx23-text-projection"].includes(model.id);
   const isUpscaler = model.id.includes("upscaler") || model.id.includes("temporal");
 
-  const compatibleWorkflows = [
-    {
-      name: "T2V / I2V Single Stage Distilled",
-      file: "LTX-2.3_T2V_I2V_Single_Stage_Distilled_Full.json",
-      compat: isDistilledModel && !isVaeOrComponent && !isUpscaler,
-    },
-    {
-      name: "T2V / I2V Two Stage Distilled",
-      file: "LTX-2.3_T2V_I2V_Two_Stage_Distilled.json",
-      compat: (isDistilledModel || isUpscaler) && !isVaeOrComponent,
-    },
-    {
-      name: "ICLoRA Union Control Distilled",
-      file: "LTX-2.3_ICLoRA_Union_Control_Distilled.json",
-      compat: isDistilledModel && !isVaeOrComponent && !isUpscaler,
-    },
-    {
-      name: "ICLoRA Motion Track Distilled",
-      file: "LTX-2.3_ICLoRA_Motion_Track_Distilled.json",
-      compat: isDistilledModel && !isVaeOrComponent && !isUpscaler,
-    },
-    {
-      name: "ICLoRA HDR Distilled",
-      file: "LTX-2.3_ICLoRA_HDR_Distilled.json",
-      compat: isDistilledModel && !isVaeOrComponent && !isUpscaler,
-    },
-  ].filter((w) => w.compat);
+  // Every workflow name below is a verified LTX 2.3 official workflow JSON.
+  // LTX 2.5's official workflow graphs/node names aren't verifiable yet, so
+  // we don't fabricate an equivalent list for it — see the LTX 2.5 guide link
+  // rendered below instead.
+  const compatibleWorkflows =
+    familyOf(model) === "2.3"
+      ? [
+          {
+            name: "T2V / I2V Single Stage Distilled",
+            file: "LTX-2.3_T2V_I2V_Single_Stage_Distilled_Full.json",
+            compat: isDistilledModel && !isVaeOrComponent && !isUpscaler,
+          },
+          {
+            name: "T2V / I2V Two Stage Distilled",
+            file: "LTX-2.3_T2V_I2V_Two_Stage_Distilled.json",
+            compat: (isDistilledModel || isUpscaler) && !isVaeOrComponent,
+          },
+          {
+            name: "ICLoRA Union Control Distilled",
+            file: "LTX-2.3_ICLoRA_Union_Control_Distilled.json",
+            compat: isDistilledModel && !isVaeOrComponent && !isUpscaler,
+          },
+          {
+            name: "ICLoRA Motion Track Distilled",
+            file: "LTX-2.3_ICLoRA_Motion_Track_Distilled.json",
+            compat: isDistilledModel && !isVaeOrComponent && !isUpscaler,
+          },
+          {
+            name: "ICLoRA HDR Distilled",
+            file: "LTX-2.3_ICLoRA_HDR_Distilled.json",
+            compat: isDistilledModel && !isVaeOrComponent && !isUpscaler,
+          },
+        ].filter((w) => w.compat)
+      : [];
 
   // Common troubleshooting based on type/VRAM, merged with model-specific knownIssues
   const genericTroubleshooting = buildTroubleshooting(model);
@@ -284,6 +314,11 @@ export default async function ModelDetailPage({
             <span className="bg-gray-800 text-gray-300 text-xs px-2 py-0.5 rounded-full uppercase tracking-wide">
               {model.type}
             </span>
+            {model.gated && (
+              <span className="bg-gray-800 text-gray-300 text-xs px-2 py-0.5 rounded-full">
+                🔒 Gated — HF login required
+              </span>
+            )}
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold text-gray-100 break-all font-mono">
             {model.filename}
@@ -306,7 +341,9 @@ export default async function ModelDetailPage({
           <div className="space-y-1">
             <h2 className="text-xl font-bold text-white">Download {model.filename}</h2>
             <p className="text-sm text-violet-200">
-              Direct HuggingFace download. {model.size} · Free.
+              {model.gated
+                ? `Official HuggingFace repo — sign in and click "Agree and Access" to accept the LTX ${familyOf(model)} license before this downloads. ${model.size} · Free.`
+                : `Direct HuggingFace download. ${model.size} · Free.`}
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -449,6 +486,17 @@ export default async function ModelDetailPage({
                 </ul>
               </div>
             )}
+            {familyOf(model) === "2.5" && (
+              <div className="pt-3 border-t border-gray-800">
+                <p className="text-gray-400">
+                  See the{" "}
+                  <Link href="/guide/ltx-2-5-comfyui" className="text-violet-400 hover:text-violet-300 underline">
+                    LTX 2.5 ComfyUI setup guide
+                  </Link>{" "}
+                  for the full file list and install order.
+                </p>
+              </div>
+            )}
             <div className="pt-3 border-t border-gray-800">
               <p className="text-gray-400">
                 Don&apos;t want to run this locally? Try {model.filename} online with{" "}
@@ -543,7 +591,7 @@ export default async function ModelDetailPage({
 
         <EmailSubscribe
           headline={`Get notified when ${model.name} updates`}
-          subhead="Occasional updates on what's new in LTX 2.3 — new FP8 quants, LoRAs, IC-LoRA releases — with our hands-on verdict on whether they're worth re-downloading. No fixed cadence."
+          subhead={`Occasional updates on what's new in LTX ${familyOf(model)} — new quants, LoRAs, releases — with our hands-on verdict on whether they're worth re-downloading. No fixed cadence.`}
         />
 
         {/* Related models */}

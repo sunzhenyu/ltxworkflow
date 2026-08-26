@@ -117,6 +117,13 @@ export default async function GuidePage() {
       })}} />
       <Nav activeHref="/guide" />
 
+      <Link
+        href="/guide/ltx-2-5-comfyui"
+        className="block bg-violet-950/40 border border-violet-700/40 rounded-lg px-4 py-2.5 text-sm text-violet-300 hover:text-violet-200 hover:border-violet-600/60 transition-colors"
+      >
+        LTX 2.5 is out — gated repo, Gemma 4 encoder, new setup steps. See the LTX 2.5 ComfyUI guide →
+      </Link>
+
       <section className="space-y-2">
         <h1 className="text-3xl font-extrabold">LTX 2.3 ComfyUI Setup Guide</h1>
         <p className="text-gray-400">How to install LTX 2.3, download models, and generate AI videos with ComfyUI.</p>

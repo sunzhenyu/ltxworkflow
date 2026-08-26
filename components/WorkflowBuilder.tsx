@@ -109,9 +109,19 @@ export default function WorkflowBuilder() {
   return (
     <section id="workflow" className="bg-gray-900 rounded-xl p-6 scroll-mt-24">
       <div className="mb-5 space-y-1">
-        <h2 className="text-xl font-bold">ComfyUI Workflow Configurator</h2>
+        <div className="flex items-center gap-2 flex-wrap">
+          <h2 className="text-xl font-bold">LTX 2.3 Workflow Configurator</h2>
+          <span className="text-xs font-medium text-violet-300 bg-violet-950/50 border border-violet-700/40 rounded-full px-2 py-0.5">
+            LTX 2.3 only
+          </span>
+        </div>
         <p className="text-sm text-gray-400">
-          Answer a few questions — we&apos;ll pick the right workflow, model files, and node settings for your GPU.
+          Answer a few questions — we&apos;ll pick the right LTX 2.3 workflow, model files, and node settings for your GPU.
+          Looking for LTX 2.5? See the{" "}
+          <a href="/guide/ltx-2-5-comfyui" className="text-violet-400 hover:text-violet-300 underline">
+            LTX 2.5 setup guide
+          </a>{" "}
+          instead — its official workflow files aren&apos;t verified yet, so this builder doesn&apos;t cover it.
         </p>
       </div>
 

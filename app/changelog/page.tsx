@@ -3,12 +3,23 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Release Notes — LTX 2.3 Model & Tool Updates",
-  description: "Latest updates to ltx workflow: new LTX 2.3 model variants, ComfyUI node changes, and tool improvements.",
+  title: "Release Notes — LTX 2.5 & LTX 2.3 Model & Tool Updates",
+  description: "Latest updates to ltx workflow: new LTX 2.5 and LTX 2.3 model variants, ComfyUI node changes, and tool improvements.",
   alternates: { canonical: "https://ltxworkflow.com/changelog" },
 };
 
 const entries = [
+  {
+    date: "2026-08-26",
+    title: "LTX 2.5 Model Downloads + VRAM Guides",
+    items: [
+      "New: LTX 2.5 official transformer, Gemma 4 text encoder, VAEs, LoRA, upscalers, and duration-head patch — all from the gated Lightricks/LTX-2.5 repo",
+      "New: Community GGUF quants (Abiray, elix3r) for the only sub-24GB LTX 2.5 path",
+      "New: /guide/ltx-2-5-comfyui setup guide and /guide/ltx-2-5-vram-requirements VRAM guide",
+      "VRAM Adapter: added an LTX 2.5 / LTX 2.3 family toggle",
+      "Note: LTX 2.5's official files need 24GB+ VRAM combined (Gemma 4 encoder alone is 15.37GB+) — 16GB cards need the GGUF path",
+    ],
+  },
   {
     date: "2026-06-15",
     title: "INT8 convrot Variants for RTX 20xx / 30xx",

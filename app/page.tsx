@@ -14,9 +14,9 @@ export default function Home() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
-        "name": "LTX Workflow — ComfyUI Workflow Generator for LTX 2.3",
+        "name": "LTX Workflow — ComfyUI Workflow Generator for LTX 2.5 & LTX 2.3",
         "url": "https://ltxworkflow.com",
-        "description": "Generate ComfyUI workflow JSON for LTX 2.3 video model. Match GPU VRAM, download FP8 + taeltx2_3.safetensors + Gemma 3 text encoder, run image-to-video online.",
+        "description": "Download LTX 2.5 and LTX 2.3 models matched to your GPU VRAM, generate ComfyUI workflow JSON for LTX 2.3, or run image-to-video online with either model.",
         "applicationCategory": "MultimediaApplication",
         "operatingSystem": "Web",
         "featureList": ["T2V workflow generation", "I2V workflow generation", "FP8 model matching", "LoRA workflow support", "VRAM-based GPU matching", "ICLoRA Union Control", "ICLoRA Motion Track", "HDR workflow"],
@@ -26,12 +26,14 @@ export default function Home() {
 
       <section className="text-center space-y-4">
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-          Run <span className="text-violet-400">LTX 2.3</span>{" "}in ComfyUI — Match Your VRAM, Fix Missing Files, Generate the Workflow
+          Run <span className="text-violet-400">LTX 2.5</span> &{" "}
+          <span className="text-violet-400">LTX 2.3</span>{" "}in ComfyUI — Match Your VRAM, Fix Missing Files, Generate the Workflow
         </h1>
         <p className="text-gray-400 max-w-2xl mx-auto text-lg">
           Stuck on a missing <strong className="text-gray-200">taeltx2_3.safetensors</strong>, an out-of-memory error, or the wrong checkpoint for your GPU?
-          Pick your VRAM, get the exact FP8 (16GB) or full-precision (32GB) files LTX 2.3 needs, and generate a
-          ready-to-import <strong className="text-gray-200">ComfyUI workflow JSON</strong> in under 2 minutes. T2V, I2V, LoRA, and spatial upscaler all supported.
+          Pick a model family and your VRAM — LTX 2.5&apos;s gated Gemma 4 files need 24GB+ unless you use the GGUF
+          path, LTX 2.3&apos;s FP8 fits 16GB — get the exact files you need, and generate a
+          ready-to-import <strong className="text-gray-200">ComfyUI workflow JSON</strong> for LTX 2.3 in under 2 minutes. T2V, I2V, LoRA, and spatial upscaler all supported.
         </p>
 
         {/* Featured Badges */}
@@ -57,8 +59,8 @@ export default function Home() {
         </div>
 
         <div className="flex gap-3 justify-center flex-wrap text-sm text-gray-500">
-          <span className="bg-gray-800 px-3 py-1 rounded-full">✓ taeltx2_3.safetensors</span>
-          <span className="bg-gray-800 px-3 py-1 rounded-full">✓ FP8 16GB VRAM</span>
+          <span className="bg-gray-800 px-3 py-1 rounded-full">✓ LTX 2.5 & 2.3</span>
+          <span className="bg-gray-800 px-3 py-1 rounded-full">✓ VRAM Matched (16-32GB)</span>
           <span className="bg-gray-800 px-3 py-1 rounded-full">✓ Direct Links</span>
           <span className="bg-gray-800 px-3 py-1 rounded-full">✓ ComfyUI Ready</span>
         </div>
@@ -68,7 +70,7 @@ export default function Home() {
             href="/generate"
             className="bg-amber-500 hover:bg-amber-400 text-gray-950 font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors inline-flex items-center gap-2"
           >
-            ▶ Try LTX 2.3 Online — Free
+            ▶ Try LTX 2.5 & 2.3 Online — Free
           </Link>
           <Link
             href="#vram"
@@ -96,9 +98,11 @@ export default function Home() {
         <h2 className="text-lg font-bold mb-4">Official Resources</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {[
+            { label: "LTX 2.5 on HuggingFace", desc: "Official model weights by Lightricks (gated)", url: "https://huggingface.co/Lightricks/LTX-2.5" },
             { label: "LTX 2.3 on HuggingFace", desc: "Official model weights by Lightricks", url: "https://huggingface.co/Lightricks/LTX-2.3" },
             { label: "ComfyUI-LTXVideo", desc: "Official ComfyUI nodes & example workflows", url: "https://github.com/Lightricks/ComfyUI-LTXVideo" },
-            { label: "Kijai FP8 Models", desc: "FP8 quantized variants for 16GB VRAM", url: "https://huggingface.co/Kijai/LTX2.3_comfy" },
+            { label: "Kijai FP8 Models (LTX 2.3)", desc: "FP8 quantized variants for 16GB VRAM", url: "https://huggingface.co/Kijai/LTX2.3_comfy" },
+            { label: "Abiray GGUF Quants (LTX 2.5)", desc: "Community GGUF quants for 16GB+ VRAM", url: "https://huggingface.co/Abiray/LTX-2.5-Distilled-GGUF" },
             { label: "LTX-Video GitHub", desc: "Official LTX-Video model repository", url: "https://github.com/Lightricks/LTX-Video" },
             { label: "ComfyUI", desc: "Node-based UI for running diffusion models", url: "https://github.com/comfyanonymous/ComfyUI" },
             { label: "ComfyUI Manager", desc: "Install LTXVideo nodes via Manager", url: "https://github.com/ltdrdata/ComfyUI-Manager" },

@@ -4,8 +4,8 @@ import Providers from "@/components/Providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "LTX 2.3 ComfyUI: Model Downloads, Workflows & Online i2v",
-  description: "Match your VRAM, download LTX 2.3 FP8 + taeltx2_3.safetensors + Gemma 3 encoder, grab the right ComfyUI workflow JSON, or run i2v online — no GPU needed.",
+  title: "LTX 2.5 & LTX 2.3 ComfyUI: Model Downloads, Workflows & Online i2v",
+  description: "Match your VRAM, download LTX 2.5 (Gemma 4, gated) or LTX 2.3 (FP8 + taeltx2_3.safetensors + Gemma 3), grab the right ComfyUI workflow JSON, or run i2v online — no GPU needed.",
   metadataBase: new URL("https://ltxworkflow.com"),
   alternates: { canonical: "https://ltxworkflow.com" },
   icons: {
@@ -16,16 +16,16 @@ export const metadata: Metadata = {
     apple: [{ url: "/icon", type: "image/png", sizes: "32x32" }],
   },
   openGraph: {
-    title: "LTX 2.3 ComfyUI Hub — Models, Workflows & Online i2v",
-    description: "Free LTX 2.3 model downloads, ComfyUI workflow templates for every VRAM tier, and online image-to-video. No GPU required.",
+    title: "LTX 2.5 & LTX 2.3 ComfyUI Hub — Models, Workflows & Online i2v",
+    description: "Free LTX 2.5 and LTX 2.3 model downloads, ComfyUI workflow templates for every VRAM tier, and online image-to-video. No GPU required.",
     url: "https://ltxworkflow.com",
     siteName: "ltx workflow",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "LTX 2.3 ComfyUI Hub — Models, Workflows & Online i2v",
-    description: "Free LTX 2.3 model downloads, ComfyUI workflow templates for every VRAM tier, and online image-to-video. No GPU required.",
+    title: "LTX 2.5 & LTX 2.3 ComfyUI Hub — Models, Workflows & Online i2v",
+    description: "Free LTX 2.5 and LTX 2.3 model downloads, ComfyUI workflow templates for every VRAM tier, and online image-to-video. No GPU required.",
   },
 };
 
@@ -37,7 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     "url": "https://ltxworkflow.com",
     "logo": "https://ltxworkflow.com/logo-128.png",
     "sameAs": ["https://github.com/sunzhenyu/ltxworkflow"],
-    "description": "The definitive hub for LTX 2.3 ComfyUI model downloads, workflow templates, and online image-to-video generation.",
+    "description": "The definitive hub for LTX 2.5 and LTX 2.3 ComfyUI model downloads, workflow templates, and online image-to-video generation.",
   };
   const websiteSchema = {
     "@context": "https://schema.org",

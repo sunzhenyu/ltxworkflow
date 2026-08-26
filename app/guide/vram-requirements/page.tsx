@@ -148,6 +148,13 @@ export default function VramRequirementsPage() {
         <Link href="/guide" className="text-violet-400 hover:text-violet-300">← Setup Guide</Link>
       </nav>
 
+      <Link
+        href="/guide/ltx-2-5-vram-requirements"
+        className="block bg-violet-950/40 border border-violet-700/40 rounded-lg px-4 py-2.5 text-sm text-violet-300 hover:text-violet-200 hover:border-violet-600/60 transition-colors"
+      >
+        LTX 2.5 is out — official files need 24GB+, 16GB requires the GGUF path. See the LTX 2.5 VRAM guide →
+      </Link>
+
       <article className="space-y-6">
         <header className="space-y-3">
           <h1 className="text-3xl md:text-4xl font-extrabold">LTX 2.3 VRAM Requirements</h1>

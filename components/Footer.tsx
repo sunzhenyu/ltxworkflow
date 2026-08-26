@@ -4,10 +4,11 @@ export default function Footer() {
   return (
     <footer className="border-t border-gray-800 pt-8 pb-4 text-sm text-gray-500 space-y-4">
       <p>
-        Download <strong className="text-gray-400">LTX 2.3</strong> models for ComfyUI —{" "}
-        <strong className="text-gray-400">taeltx2_3.safetensors</strong> (VAE, required),{" "}
-        <strong className="text-gray-400">ltx-2.3-22b-distilled_transformer_only_fp8_input_scaled_v3.safetensors</strong> (16GB FP8),
-        and official full-precision checkpoints (32GB). Generate ComfyUI workflow JSON for LTX 2.3 text-to-video and image-to-video.
+        Download <strong className="text-gray-400">LTX 2.5</strong> and <strong className="text-gray-400">LTX 2.3</strong> models for ComfyUI —{" "}
+        <strong className="text-gray-400">taeltx2_3.safetensors</strong> (LTX 2.3 VAE, required),{" "}
+        <strong className="text-gray-400">ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled.safetensors</strong> (LTX 2.3, 16GB FP8),
+        LTX 2.5&apos;s gated Gemma 4 + INT8 convrot files (24GB+, or GGUF for 16GB), and official full-precision checkpoints (32GB+).
+        Generate ComfyUI workflow JSON for LTX 2.3 text-to-video and image-to-video.
       </p>
 
       {/* Featured Badges Marquee */}

@@ -12,7 +12,7 @@ const DEFAULT_BUTTON_LABEL: Record<Variant, string> = {
 export default function EmailSubscribe({
   variant = "card",
   headline = "LTX Insider",
-  subhead = "Occasional updates when notable LTX 2.3 models drop — Kijai FP8 quants, Lightricks releases, IC-LoRAs. No fixed cadence, no spam. Unsubscribe in one click.",
+  subhead = "Occasional updates when notable LTX 2.5 or LTX 2.3 models drop — new quants, Lightricks releases, IC-LoRAs. No fixed cadence, no spam. Unsubscribe in one click.",
   badge = "Free newsletter",
   buttonLabel,
   source,

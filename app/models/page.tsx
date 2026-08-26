@@ -5,21 +5,64 @@ import Footer from "@/components/Footer";
 import { MODELS } from "@/lib/models";
 
 export const metadata: Metadata = {
-  title: "LTX 2.3 ComfyUI Models — Choose by VRAM (16 / 24 / 32 GB)",
-  description: "Pick the right LTX 2.3 model for your GPU. Grouped by VRAM tier (16GB FP8/MXFP8, 24GB offloading, 32GB BF16), with IC-LoRAs, Gemma text encoders, and per-file install paths. Direct HuggingFace links on each model page.",
+  title: "LTX 2.5 & LTX 2.3 ComfyUI Models — Choose by VRAM (16 / 24 / 32 GB)",
+  description: "Pick the right LTX 2.5 or LTX 2.3 model for your GPU. Grouped by VRAM tier, with GGUF quants, IC-LoRAs, Gemma text encoders, and per-file install paths. Direct HuggingFace links on each model page.",
   alternates: { canonical: "https://ltxworkflow.com/models" },
   openGraph: {
-    title: "LTX 2.3 ComfyUI Models — Choose by VRAM",
-    description: "Pick the right LTX 2.3 model for your GPU. 16 GB FP8/MXFP8, 24 GB with offloading, 32 GB BF16. Plus IC-LoRAs and Gemma text encoders.",
+    title: "LTX 2.5 & LTX 2.3 ComfyUI Models — Choose by VRAM",
+    description: "Pick the right LTX 2.5 or LTX 2.3 model for your GPU. 16 GB GGUF/FP8, 24 GB, 32 GB BF16. Plus IC-LoRAs and Gemma text encoders.",
     url: "https://ltxworkflow.com/models",
     type: "website",
   },
 };
 
+const LTX_25_GROUPS = [
+  {
+    id: "25-16gb",
+    label: "LTX 2.5 · 16GB VRAM — Community GGUF (only path that fits)",
+    ids: ["ltx25-distilled-gguf-q3ks", "ltx25-distilled-gguf-q4km", "ltx25-gemma4-gguf-q5km"],
+    note: "The official LTX 2.5 files alone need 34GB+ combined (int8-convrot transformer + Gemma 4 text encoder), so 16GB cards must use community GGUF quants for both the transformer and the text encoder. Requires the ComfyUI-GGUF custom node.",
+  },
+  {
+    id: "25-24gb",
+    label: "LTX 2.5 · 24GB VRAM — Official INT8 / NVFP4 + Gemma 4 INT8",
+    ids: [
+      "ltx25-dev-int8",
+      "ltx25-distilled-int8",
+      "ltx25-distilled-nvfp4",
+      "ltx25-gemma4-int8",
+      "ltx25-distilled-gguf-q6k",
+      "ltx25-distilled-gguf-q8",
+    ],
+    note: "Smallest official LTX 2.5 quants. int8-convrot is the first-party ComfyUI format (there's no separate FP8 build and no Kijai fork for 2.5). NVFP4 needs a Blackwell (RTX 50xx) GPU for native matmul speed.",
+  },
+  {
+    id: "25-32gb",
+    label: "LTX 2.5 · 32GB VRAM — Official Full Precision (BF16)",
+    ids: ["ltx25-dev-bf16", "ltx25-distilled-bf16", "ltx25-gemma4-bf16"],
+    note: "Official Lightricks BF16 checkpoints and the full Gemma 4 12B text encoder (projection layer bundled in, unlike LTX 2.3's separate projection file).",
+  },
+  {
+    id: "25-components",
+    label: "LTX 2.5 · Required & Optional Components",
+    ids: [
+      "ltx25-video-vae",
+      "ltx25-video-vae-conv",
+      "ltx25-audio-vae",
+      "ltx25-distilled-lora-450",
+      "ltx25-spatial-upscaler-x2",
+      "ltx25-temporal-upscaler-x2",
+      "ltx25-duration-head",
+      "ltx25-ic-lora-pixel-upscaler-x2",
+    ],
+    note: "Video VAE is required for every setup. Duration head and video-vae-conv are new in 2.5, with no LTX 2.3 equivalent. All official LTX 2.5 repos are gated — sign in to HuggingFace and accept the license before downloading.",
+  },
+];
+
 const VRAM_GROUPS = [
   {
     id: "16gb",
-    label: "16GB VRAM — FP8 / MXFP8 Quantized (RTX 40xx+)",
+    label: "LTX 2.3 · 16GB VRAM — FP8 / MXFP8 Quantized (RTX 40xx+)",
     ids: [
       "ltx23-dev-fp8-official",
       "ltx23-distilled-fp8-official",
@@ -29,23 +72,25 @@ const VRAM_GROUPS = [
       "ltx23-dev-fp8-scaled",
       "ltx23-dev-mxfp8",
       "ltx23-dev-nvfp4",
+      "ltx23-distilled-11-int8-convrot",
+      "ltx23-dev-int8-convrot",
       "ltx23-distilled-lora-384-11",
       "ltx23-distilled-11-lora",
       "ltx23-distilled-condsafe-lora",
       "ltx23-distilled-lora-dynamic",
       "ltx23-omninft-rl-lora",
     ],
-    note: "FP8 scaled requires RTX 40-series or newer. MXFP8 block-32 is an alternative format for compatible GPUs. NVFP4 (21.7 GB) is the official Blackwell / RTX 50xx path. Use v1.1 FP8 Distilled for fastest generation; use Dev FP8 + LoRA v1.1 if applying LoRA weights.",
+    note: "FP8 scaled requires RTX 40-series or newer. MXFP8 block-32 is an alternative format for compatible GPUs. NVFP4 (21.7 GB) is the official Blackwell / RTX 50xx path. INT8 convrot (Kijai) runs on RTX 30xx Ampere tensor cores. Use v1.1 FP8 Distilled for fastest generation; use Dev FP8 + LoRA v1.1 if applying LoRA weights.",
   },
   {
     id: "24gb",
-    label: "24GB VRAM — Official + Sequential Offloading",
+    label: "LTX 2.3 · 24GB VRAM — Official + Sequential Offloading",
     ids: ["ltx23-distilled-fp8-24gb"],
     note: "Enable sequential offloading in ComfyUI settings (Model Offload or Sequential). Uses latest v1.1 official weights.",
   },
   {
     id: "32gb",
-    label: "32GB VRAM — Official Full Precision (BF16)",
+    label: "LTX 2.3 · 32GB VRAM — Official Full Precision (BF16)",
     ids: [
       "ltx23-distilled-11",
       "ltx23-distilled-11-bf16",
@@ -58,7 +103,7 @@ const VRAM_GROUPS = [
   },
   {
     id: "ic-lora",
-    label: "IC-LoRA Family — Control, HDR, LipDub (Official Lightricks)",
+    label: "LTX 2.3 · IC-LoRA Family — Control, HDR, LipDub (Official Lightricks)",
     ids: [
       "ltx23-ic-lora-union",
       "ltx23-ic-lora-motion-track",
@@ -70,7 +115,7 @@ const VRAM_GROUPS = [
   },
   {
     id: "text-encoders",
-    label: "Text Encoders — Gemma 3 12B IT (Required)",
+    label: "LTX 2.3 · Text Encoders — Gemma 3 12B IT (Required)",
     ids: [
       "ltx23-gemma-fp4",
       "ltx23-gemma-fp8",
@@ -81,7 +126,7 @@ const VRAM_GROUPS = [
   },
   {
     id: "previous",
-    label: "Previous Versions — v1.0 Models",
+    label: "LTX 2.3 · Previous Versions — v1.0 Models",
     ids: [
       "ltx23-distilled",
       "ltx23-distilled-fp8",
@@ -96,7 +141,7 @@ const VRAM_GROUPS = [
   },
   {
     id: "required",
-    label: "Required & Optional Components",
+    label: "LTX 2.3 · Required & Optional Components",
     ids: [
       "ltx23-vae",
       "ltx23-audio-vae",
@@ -118,7 +163,7 @@ export default function ModelsPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
-        "name": "LTX 2.3 Models",
+        "name": "LTX 2.5 & LTX 2.3 Models",
         "applicationCategory": "MultimediaApplication",
         "operatingSystem": "Windows, Linux",
         "offers": {
@@ -126,25 +171,29 @@ export default function ModelsPage() {
           "price": "0",
           "priceCurrency": "USD"
         },
-        "description": "LTX 2.3 AI video generation models for ComfyUI. Includes taeltx2_3.safetensors VAE, FP8 quantized models for 16GB VRAM, and official checkpoints.",
+        "description": "LTX 2.5 and LTX 2.3 AI video generation models for ComfyUI. Includes VAEs, GGUF/FP8 quantized models for 16GB VRAM, Gemma text encoders, and official checkpoints.",
         "downloadUrl": "https://ltxworkflow.com/models",
         "softwareRequirements": "ComfyUI, CUDA GPU with 16GB+ VRAM"
       })}} />
       <Nav activeHref="/models" />
 
       <section className="space-y-2">
-        <h1 className="text-3xl font-extrabold">LTX 2.3 Model Downloads</h1>
+        <h1 className="text-3xl font-extrabold">LTX 2.5 &amp; LTX 2.3 Model Downloads</h1>
         <p className="text-gray-400">
-          Download all LTX 2.3 model files for ComfyUI with direct HuggingFace links — organized by GPU VRAM.
-          Start with <strong className="text-gray-200">taeltx2_3.safetensors</strong> (VAE, required for all setups),
-          then choose a checkpoint: FP8 quantized for 16GB VRAM or official full precision for 32GB+.
+          Download LTX 2.5 and LTX 2.3 model files for ComfyUI with direct HuggingFace links — organized by GPU VRAM.
+          LTX 2.5&apos;s official files are gated (sign in to HuggingFace and accept the license) and need 24GB+ VRAM
+          for even the smallest quant plus text encoder; 16GB cards need the community GGUF path. LTX 2.3 stays fully
+          ungated and fits 16GB with FP8/MXFP8.
         </p>
         <div className="flex gap-3 pt-1 flex-wrap">
           <Link href="/generate" className="text-sm bg-amber-500 hover:bg-amber-400 text-gray-950 px-4 py-2 rounded-lg transition-colors font-semibold inline-flex items-center gap-1.5">
             ▶ Try Online — Free
           </Link>
+          <a href="#ltx25-downloads" className="text-sm bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg transition-colors font-medium">
+            LTX 2.5 Models ↓
+          </a>
           <a href="#downloads" className="text-sm bg-violet-700 hover:bg-violet-600 text-white px-4 py-2 rounded-lg transition-colors font-medium">
-            Download Models ↓
+            LTX 2.3 Models ↓
           </a>
           <a href="#guide" className="text-sm bg-gray-800 hover:bg-gray-700 text-gray-200 px-4 py-2 rounded-lg transition-colors font-medium">
             How to Choose ↓
@@ -189,8 +238,81 @@ export default function ModelsPage() {
         </ol>
       </div>
 
+      {/* LTX 2.5 downloads section */}
+      <div id="ltx25-downloads" className="scroll-mt-8 space-y-8">
+        <div className="flex items-center gap-2">
+          <span className="text-xs bg-amber-600 text-white px-2 py-0.5 rounded-full font-medium">Newest</span>
+          <h2 className="text-xl font-extrabold text-gray-100">LTX 2.5</h2>
+        </div>
+        {LTX_25_GROUPS.map((group) => {
+          const models = group.ids.map((id) => modelMap[id]).filter(Boolean);
+          return (
+            <section key={group.label} id={group.id} className="space-y-3 scroll-mt-8">
+              <div>
+                <h3 className="text-base font-bold text-gray-100">{group.label}</h3>
+                <p className="text-xs text-gray-500 mt-0.5">{group.note}</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {models.map((m) => (
+                  <div key={m.id} className="bg-gray-900 rounded-xl p-5 flex flex-col gap-2">
+                    <div className="flex items-start justify-between">
+                      <h3 className="font-semibold text-sm">{m.name}</h3>
+                      <div className="flex gap-1 shrink-0 ml-2">
+                        {m.isNew && (
+                          <span className="text-xs bg-orange-600 text-white px-2 py-0.5 rounded-full">🔥 New</span>
+                        )}
+                        {m.badge && (
+                          <span className="text-xs bg-violet-700 text-violet-100 px-2 py-0.5 rounded-full">{m.badge}</span>
+                        )}
+                        {m.gated && (
+                          <span className="text-xs bg-gray-700 text-gray-200 px-2 py-0.5 rounded-full">🔒 Gated</span>
+                        )}
+                      </div>
+                    </div>
+                    <Link
+                      href={`/models/${m.id}`}
+                      className="text-xs text-green-400 hover:text-green-300 bg-gray-800 hover:bg-gray-750 px-2 py-1 rounded font-mono break-all block transition-colors"
+                      title={`View details for ${m.filename}`}
+                    >
+                      {m.filename}
+                    </Link>
+                    {m.recommendation && (
+                      <p className="text-xs text-gray-300">{m.recommendation}</p>
+                    )}
+                    <p className="text-xs text-gray-500 flex-1">{m.description}</p>
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <span>{m.size}</span>
+                      <span className="text-violet-400">{m.vram}GB+ VRAM</span>
+                    </div>
+                    <div className="flex gap-2 mt-1">
+                      <a
+                        href={m.hfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 text-center text-xs bg-violet-700 hover:bg-violet-600 text-white py-2 rounded-lg transition-colors font-medium"
+                      >
+                        {m.gated ? "HF Page →" : "Download →"}
+                      </a>
+                      <Link
+                        href={`/models/${m.id}`}
+                        className="flex-1 text-center text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-2 rounded-lg transition-colors font-medium"
+                      >
+                        Details →
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          );
+        })}
+      </div>
+
       {/* Downloads section */}
       <div id="downloads" className="scroll-mt-8 space-y-8">
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-extrabold text-gray-100">LTX 2.3</h2>
+        </div>
         {VRAM_GROUPS.map((group) => {
           const models = group.ids.map((id) => modelMap[id]).filter(Boolean);
           return (
