@@ -6,7 +6,7 @@
 //   • per_second   — used by fal-ai/ltx-2.3 (Fast/Pro). Resolution preset → per-sec rate.
 //   • per_megapixel — used by fal-ai/ltx-2.3-22b. cost = W×H×frames / 1e6 × rate.
 
-export type Resolution = "1080p" | "1440p" | "2160p";
+export type Resolution = "720p" | "1080p" | "1440p" | "2160p";
 export type Fps = 24 | 25 | 48 | 50;
 
 // User-facing aspect ratios.
@@ -23,7 +23,9 @@ export type ModelKey =
   | "ltx-2.3-fast"
   | "ltx-2.3-pro"
   | "ltx-2.3-22b-distilled"
-  | "ltx-2.3-22b";
+  | "ltx-2.3-22b"
+  | "ltx-2.5-fast"
+  | "ltx-2.5-pro";
 
 export type ModelInfo = {
   key: ModelKey;
@@ -37,8 +39,9 @@ export type ModelInfo = {
 };
 
 // Ordered cheapest → most expensive (by credit cost at the default 6s clip):
-// Fast 6cr < 22B Distilled 7cr < Pro 9cr = 22B Full 9cr. The UI defaults to
-// the first entry, so the lowest-cost model is preselected.
+// Fast 6cr < 22B Distilled 7cr < Pro 9cr = 22B Full 9cr < 2.5 Fast/Pro (newer,
+// pricier per-second). The UI defaults to the first entry, so the
+// lowest-cost model is preselected.
 export const MODELS: ModelInfo[] = [
   {
     key: "ltx-2.3-fast",
@@ -74,6 +77,24 @@ export const MODELS: ModelInfo[] = [
     pricingType: "per_megapixel",
     badge: "New",
   },
+  {
+    key: "ltx-2.5-fast",
+    label: "LTX 2.5 Fast",
+    shortDescription: "Latest generation — native audio, sharper motion, up to 4K.",
+    endpoint: "lightricks/ltx-2.5/image-to-video/fast",
+    premium: false,
+    pricingType: "per_second",
+    badge: "New",
+  },
+  {
+    key: "ltx-2.5-pro",
+    label: "LTX 2.5 Pro",
+    shortDescription: "Latest generation, quality-optimized. Slower, highest fidelity.",
+    endpoint: "lightricks/ltx-2.5/image-to-video/pro",
+    premium: true,
+    pricingType: "per_second",
+    badge: "New",
+  },
 ];
 
 export function getModel(key: ModelKey): ModelInfo {
@@ -103,19 +124,47 @@ export function isAspectSupported(key: ModelKey, aspect: AspectRatio): boolean {
   return aspectsForModel(key).includes(aspect);
 }
 
+// ─── Resolution support per model ───────────────────────────────────────────
+// fal's LTX 2.5 endpoints support a different resolution set per variant
+// (Pro caps at 1080p; Fast goes up to 4K). 22B models take resolution from
+// the aspect-derived video_size instead, so they aren't listed here.
+const PER_SECOND_RESOLUTIONS: Record<"ltx-2.3-fast" | "ltx-2.3-pro" | "ltx-2.5-fast" | "ltx-2.5-pro", Resolution[]> = {
+  "ltx-2.3-fast": ["1080p", "1440p", "2160p"],
+  "ltx-2.3-pro": ["1080p", "1440p", "2160p"],
+  "ltx-2.5-fast": ["720p", "1080p", "1440p", "2160p"],
+  "ltx-2.5-pro": ["720p", "1080p"],
+};
+
+export function resolutionsForModel(key: ModelKey): Resolution[] {
+  const m = getModel(key);
+  if (m.pricingType === "per_megapixel") return ["1080p"];
+  return PER_SECOND_RESOLUTIONS[m.key as keyof typeof PER_SECOND_RESOLUTIONS];
+}
+
+export function isResolutionSupported(key: ModelKey, resolution: Resolution): boolean {
+  return resolutionsForModel(key).includes(resolution);
+}
+
 // ─── Pricing data ───────────────────────────────────────────────────────────
 
 // Pixel counts per per-second resolution preset.
 const RESOLUTION_PIXELS: Record<Resolution, number> = {
+  "720p": 1280 * 720,
   "1080p": 1920 * 1080,
   "1440p": 2560 * 1440,
   "2160p": 3840 * 2160,
 };
 
 // fal per-second rates ($USD) — keep in sync with fal pricing pages.
-const PER_SECOND_USD: Record<"ltx-2.3-fast" | "ltx-2.3-pro", Record<Resolution, number>> = {
+// LTX 2.5 Pro has no published 1440p/2160p rate (fal caps Pro i2v at 1080p).
+const PER_SECOND_USD: Record<
+  "ltx-2.3-fast" | "ltx-2.3-pro" | "ltx-2.5-fast" | "ltx-2.5-pro",
+  Partial<Record<Resolution, number>>
+> = {
   "ltx-2.3-fast": { "1080p": 0.04, "1440p": 0.08, "2160p": 0.16 },
   "ltx-2.3-pro": { "1080p": 0.06, "1440p": 0.12, "2160p": 0.24 },
+  "ltx-2.5-fast": { "720p": 0.09, "1080p": 0.13, "1440p": 0.19, "2160p": 0.3 },
+  "ltx-2.5-pro": { "720p": 0.12, "1080p": 0.17 },
 };
 
 // fal per-megapixel-frame rates ($USD).
@@ -185,7 +234,11 @@ export function falCostUsd(input: {
 }): number {
   const m = getModel(input.model);
   if (m.pricingType === "per_second") {
-    const rate = PER_SECOND_USD[m.key as "ltx-2.3-fast" | "ltx-2.3-pro"][input.resolution];
+    const rates = PER_SECOND_USD[m.key as keyof typeof PER_SECOND_USD];
+    // Fall back to the highest resolution this model publishes a rate for,
+    // in case the caller passes a resolution the model doesn't support
+    // (validation should prevent this, but never under-charge silently).
+    const rate = rates[input.resolution] ?? Math.max(...Object.values(rates));
     return Number((input.durationSeconds * rate).toFixed(4));
   }
   // 22B per-megapixel

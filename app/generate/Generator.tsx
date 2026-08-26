@@ -9,7 +9,9 @@ import {
   creditCostFor,
   getModel,
   isAspectSupported,
+  isResolutionSupported,
   MODELS,
+  resolutionsForModel,
   type AspectRatio,
   type Duration,
   type Fps,
@@ -38,8 +40,6 @@ const DEFAULT_DURATION: Duration = 6;
 const DEFAULT_ASPECT: AspectRatio = "auto";
 const DEFAULT_AUDIO = true;
 const DEFAULT_FPS: Fps = 25;
-
-const RESOLUTION_OPTIONS: Resolution[] = ["1080p", "1440p", "2160p"];
 
 const ASPECT_LABEL: Record<AspectRatio, string> = {
   auto: "Auto (match image)",
@@ -109,12 +109,21 @@ export default function Generator({
   const modelInfo = getModel(model);
   const isPerMegapixel = modelInfo.pricingType === "per_megapixel";
   const aspectOptionsForModel = aspectsForModel(model);
+  const resolutionOptionsForModel = resolutionsForModel(model);
 
   // If the user switches to a model that doesn't support the current aspect
   // (e.g. 1:1 selected then they pick LTX 2.3 Fast), snap back to "auto".
   useEffect(() => {
     if (!isAspectSupported(model, aspect)) setAspect("auto");
   }, [model, aspect]);
+
+  // Same for resolution — e.g. 2160p selected then switching to LTX 2.5 Pro
+  // (caps at 1080p) would otherwise silently submit an unsupported value.
+  useEffect(() => {
+    if (!isResolutionSupported(model, resolution)) {
+      setResolution(resolutionOptionsForModel[0]);
+    }
+  }, [model, resolution, resolutionOptionsForModel]);
 
   const cost = useMemo(
     () => creditCostFor({ model, durationSeconds: duration, resolution, fps, aspect }),
@@ -419,7 +428,7 @@ export default function Generator({
               <Chip
                 icon="🎬"
                 value={resolution}
-                options={RESOLUTION_OPTIONS.map((r) => ({ value: r, label: r }))}
+                options={resolutionOptionsForModel.map((r) => ({ value: r, label: r }))}
                 onChange={(v) => setResolution(v as Resolution)}
                 disabled={formDisabled}
               />
@@ -829,15 +838,17 @@ function ModelSelector({
         <div className="mt-2 space-y-1.5">
           {MODELS.map((m) => {
             const selected = m.key === model;
-            // Cost preview uses the aspect the caller already picked. If the
-            // current aspect isn't supported by this option (e.g. "1:1" but
-            // the option is Fast), fall back to "auto" so the preview stays
-            // sensible.
+            // Cost preview uses the aspect/resolution the caller already
+            // picked, falling back to a supported value if this option
+            // doesn't allow it (e.g. 2160p selected but option is LTX 2.5 Pro).
             const previewAspect = isAspectSupported(m.key, aspect) ? aspect : "auto";
+            const previewResolution = isResolutionSupported(m.key, resolution)
+              ? resolution
+              : resolutionsForModel(m.key)[0];
             const optionCost = creditCostFor({
               model: m.key,
               durationSeconds,
-              resolution,
+              resolution: previewResolution,
               fps,
               aspect: previewAspect,
             });

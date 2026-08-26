@@ -8,7 +8,9 @@ import {
   falCostUsd,
   getModel,
   grantCredits,
+  isResolutionSupported,
   MODELS,
+  resolutionsForModel,
   tryDeductCredits,
   type AspectRatio,
   type Duration,
@@ -23,7 +25,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
 );
 
-const ALLOWED_RES: Resolution[] = ["1080p", "1440p", "2160p"];
 const ALLOWED_FPS: Fps[] = [24, 25, 48, 50];
 const VALID_MODEL_KEYS = new Set<string>(MODELS.map((m) => m.key));
 const MAX_PROMPT_CHARS = 1000;
@@ -128,9 +129,19 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     );
   }
-  // Resolution only relevant for per_second models. For 22B, the param exists
-  // but is ignored at the fal layer — we still record it for bookkeeping.
-  const resolution: Resolution = ALLOWED_RES.includes(resolutionRaw) ? resolutionRaw : "1080p";
+  // Resolution must be supported by the chosen model (per_second families
+  // differ: LTX 2.5 Pro caps at 1080p, LTX 2.5 Fast goes up to 4K). 22B
+  // ignores resolution at the fal layer but we still validate for bookkeeping.
+  const allowedResolutions = resolutionsForModel(modelKey);
+  if (!isResolutionSupported(modelKey, resolutionRaw)) {
+    return NextResponse.json(
+      {
+        error: `Resolution '${resolutionRaw}' is not supported by ${modelKey}. Allowed: ${allowedResolutions.join(", ")}`,
+      },
+      { status: 400 },
+    );
+  }
+  const resolution: Resolution = resolutionRaw;
 
   // ── Cost + deduction ────────────────────────────────────────────────────
   // No premium gating — anyone with sufficient credits can use any model.

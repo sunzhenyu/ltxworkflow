@@ -15,6 +15,8 @@ export {
   MODELS,
   aspectsForModel,
   isAspectSupported,
+  resolutionsForModel,
+  isResolutionSupported,
   aspectTo22BVideoSize,
   type ModelKey,
   type Resolution,

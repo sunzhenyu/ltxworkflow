@@ -34,7 +34,9 @@ export type FalI2VModel =
   | "fal-ai/ltx-2.3/image-to-video"
   | "fal-ai/ltx-2.3/image-to-video/fast"
   | "fal-ai/ltx-2.3-22b/distilled/image-to-video"
-  | "fal-ai/ltx-2.3-22b/image-to-video";
+  | "fal-ai/ltx-2.3-22b/image-to-video"
+  | "lightricks/ltx-2.5/image-to-video/fast"
+  | "lightricks/ltx-2.5/image-to-video/pro";
 
 export type FalQueueStatus = "IN_QUEUE" | "IN_PROGRESS" | "COMPLETED" | "ERROR";
 
