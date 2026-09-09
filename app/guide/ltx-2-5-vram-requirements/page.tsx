@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
 };
 
-const LAST_UPDATED = "2026-08-26";
+const LAST_UPDATED = "2026-09-09";
 
 const officialCombos = [
   { transformer: "NVFP4 distilled — 18.72 GB", encoder: "INT8 convrot Gemma 4 — 15.37 GB", total: "≈ 34.09 GB", minVram: "24 GB (tight) / 32 GB comfortable" },
@@ -39,6 +39,8 @@ const ggufQuants = [
   { file: "LTX-2.5-Distilled-Q6_K.gguf", repo: "Abiray/LTX-2.5-Distilled-GGUF", size: "18.62 GB", onSite: "ltx25-distilled-gguf-q6k" },
   { file: "LTX-2.5-Distilled-Q8_0.gguf", repo: "Abiray/LTX-2.5-Distilled-GGUF", size: "23.60 GB", onSite: "ltx25-distilled-gguf-q8" },
   { file: "gemma4-12b-with-proj-ltx-2.5-Q5_K_M.gguf", repo: "elix3r/gemma4-12b-with-proj-ltx-2.5-GGUF", size: "9.51 GB", onSite: "ltx25-gemma4-gguf-q5km" },
+  { file: "gemma4-12b-with-proj-ltx-2.5-Q4_K_M.gguf", repo: "elix3r/gemma4-12b-with-proj-ltx-2.5-GGUF", size: "8.41 GB", onSite: "ltx25-gemma4-gguf-q4km" },
+  { file: "gemma4-12b-with-proj-ltx-2.5-Q2_K.gguf", repo: "elix3r/gemma4-12b-with-proj-ltx-2.5-GGUF", size: "5.96 GB", onSite: "ltx25-gemma4-gguf-q2k" },
 ];
 
 const faqSchema = {
@@ -50,7 +52,7 @@ const faqSchema = {
       name: "What is the minimum VRAM to run LTX 2.5?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "16 GB VRAM, but only via community GGUF quants — the LTX-2.5-Distilled-Q3_K_S/Q4_K_M GGUF transformer plus the gemma4-12b-with-proj-ltx-2.5-Q5_K_M GGUF text encoder (9.51 GB). None of the official Lightricks/LTX-2.5 files fit a 16 GB card once you add the required Gemma 4 encoder.",
+        text: "16 GB VRAM, but only via community GGUF quants — the LTX-2.5-Distilled-Q3_K_S/Q4_K_M GGUF transformer plus a gemma4-12b-with-proj-ltx-2.5 GGUF text encoder (Q5_K_M 9.51 GB or Q4_K_M 8.41 GB). None of the official Lightricks/LTX-2.5 files fit a 16 GB card once you add the required Gemma 4 encoder.",
       },
     },
     {

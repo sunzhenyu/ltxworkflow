@@ -10,6 +10,16 @@ export const metadata: Metadata = {
 
 const entries = [
   {
+    date: "2026-09-09",
+    title: "Pruna Fast VAE for LTX 2.3 + Smaller Gemma 4 GGUF Encoders",
+    items: [
+      "New: LTX 2.3 Pruna VAE (Kijai, 1.33 GB) — drop-in ComfyUI conversion of Pruna AI's PrunaVAED decoder; ~1.7× faster decode and ~50% lower peak decode VRAM, encoder and latents unchanged. Natively supported in current ComfyUI builds",
+      "New: Gemma 4 12B GGUF Q4_K_M (8.41 GB) and Q2_K (5.96 GB) text encoders for LTX 2.5 (elix3r) — 1.1 GB and 3.5 GB smaller than the Q5_K_M that was previously the only GGUF encoder option",
+      "LTX 2.5 guides: encoder tables and 16GB recommendations updated for the new quants",
+      "Online generator: page copy now reflects LTX 2.5 Fast/Pro alongside LTX 2.3",
+    ],
+  },
+  {
     date: "2026-08-26",
     title: "LTX 2.5 Model Downloads + VRAM Guides",
     items: [

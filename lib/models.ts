@@ -1028,6 +1028,44 @@ export const MODELS: ModelVariant[] = [
     ],
   },
   {
+    id: "ltx23-pruna-vae",
+    name: "LTX 2.3 Pruna VAE — Fast Decoder (Kijai)",
+    filename: "pruna_ltx2.3_vae_comfy_bf16.safetensors",
+    size: "1.33 GB",
+    vram: 2,
+    type: "lora",
+    hfUrl: "https://huggingface.co/Kijai/LTX2.3_comfy/blob/main/vae/pruna_ltx2.3_vae_comfy_bf16.safetensors",
+    description: "ComfyUI-format conversion of Pruna AI's PrunaVAED — a drop-in replacement video VAE for LTX 2.3 with a pruned, faster decoder. Kijai's one-line summary: 'Faster decode, unchanged encode.' Pruna reports ~1.7× faster decoding and ~50% lower peak decode VRAM versus the stock BF16 video VAE, with the encoder and latent format unchanged, so existing workflows need no graph edits. Video VAE only — keep using LTX23_audio_vae_bf16.safetensors for audio. Place in models/vae/.",
+    badge: "Fast Decode",
+    recommendation: "Worth it if VAE decode is your bottleneck — long clips, high resolution, or a 16GB card that OOMs at the decode step. Select it in the VAELoader node in place of LTX23_video_vae_bf16 or taeltx2_3; nothing else in the workflow changes.",
+    isNew: true,
+    technicalNotes:
+      "pruna_ltx2.3_vae_comfy_bf16.safetensors is Kijai's ComfyUI-layout conversion of PrunaVAED, Pruna AI's accelerated decoder for the LTX 2.3 video VAE. The decoder channel structure is pruned; the encoder side and the latent space are identical to the stock VAE, which is why it is a drop-in swap — the same latents decode through either file.\n\nNative support landed in ComfyUI core (commit c38171d, 'Support Pruna LTX VAE'), so on a current ComfyUI build the standard VAELoader node loads it directly. Older builds need the third-party ComfyUI-PrunaVAED custom node, which remaps the upstream Diffusers-style state dict to the native LTX VAE layout.\n\nIt is 1.33 GB BF16 — slightly smaller than the 1.45 GB stock BF16 video VAE — and lives in ComfyUI/models/vae/ alongside taeltx2_3 and the audio VAE. It replaces the video VAE only; audio pipelines still load LTX23_audio_vae_bf16.safetensors separately.",
+    whenToChoose:
+      "Choose the Pruna VAE when decode time or decode-step VRAM is the constraint: long or high-resolution clips where the final decode is a large share of total time, or a 16GB card that generates fine but OOMs when decoding. Pruna's headline numbers are ~1.7× faster decode and roughly half the peak decode VRAM against the stock BF16 VAE.\n\nStick with taeltx2_3.safetensors if you just want the smallest file that every published workflow already references — it is 23 MB and the default everywhere. Stick with LTX23_video_vae_bf16 if you want the unmodified full-fidelity decoder for HDR or archival output and don't care about decode speed.\n\nAll three coexist in models/vae/; switching is a dropdown change in the VAELoader node, not a workflow rebuild.",
+    knownIssues: [
+      {
+        error: "VAELoader: 'pruna_ltx2.3_vae_comfy_bf16.safetensors not in list'",
+        cause: "File placed in ComfyUI/models/ root or in checkpoints/ instead of vae/.",
+        fix: "Move it to ComfyUI/models/vae/pruna_ltx2.3_vae_comfy_bf16.safetensors and click refresh on the VAELoader node so ComfyUI re-scans.",
+      },
+      {
+        error: "VAE loads but decode errors with a state-dict / key mismatch",
+        cause: "ComfyUI build predates native Pruna LTX VAE support (commit c38171d).",
+        fix: "Update ComfyUI to a current build. If you can't update, install the ScryptHunter/ComfyUI-PrunaVAED custom node and use its dedicated loader instead of the stock VAELoader.",
+      },
+    ],
+    releaseInfo: {
+      released: "2026-07-28",
+      source: "Kijai/LTX2.3_comfy (HuggingFace)",
+      notes: "Uploaded by Kijai the same day Pruna AI announced PrunaVAED for LTX-2.3. Kijai's description in the HF discussion thread: 'Faster decode, unchanged encode.'",
+    },
+    pathVariants: [
+      "vae/pruna_ltx2.3_vae_comfy_bf16.safetensors",
+      "ltx23\\pruna_ltx2.3_vae_comfy_bf16.safetensors",
+    ],
+  },
+  {
     id: "ltx23-text-projection",
     name: "LTX 2.3 Text Projection (Kijai)",
     filename: "ltx-2.3_text_projection_bf16.safetensors",
@@ -1315,7 +1353,7 @@ export const MODELS: ModelVariant[] = [
     family: "2.5",
     gated: true,
     whenToChoose:
-      "Required alongside any official 2.5 transformer. If you're targeting 16GB total, this file alone plus the smallest official transformer (21.50GB) won't fit — use the GGUF Gemma 4 encoder (9.51GB) instead.",
+      "Required alongside any official 2.5 transformer. If you're targeting 16GB total, this file alone plus the smallest official transformer (21.50GB) won't fit — use a GGUF Gemma 4 encoder (Q5_K_M 9.51GB / Q4_K_M 8.41GB) instead.",
     pathVariants: ["text_encoders/gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors"],
   },
   {
@@ -1447,7 +1485,7 @@ export const MODELS: ModelVariant[] = [
     family: "2.5",
     gated: false,
     whenToChoose:
-      "Pick this over the official int8-convrot/nvfp4 checkpoints when your total VRAM budget (transformer + Gemma 4 encoder) can't clear 24GB+. Pair with the GGUF Gemma 4 Q5_K_M encoder to fit 16GB total.",
+      "Pick this over the official int8-convrot/nvfp4 checkpoints when your total VRAM budget (transformer + Gemma 4 encoder) can't clear 24GB+. Pair with a GGUF Gemma 4 encoder (Q5_K_M or Q4_K_M) to fit 16GB total.",
   },
   {
     id: "ltx25-distilled-gguf-q4km",
@@ -1499,13 +1537,55 @@ export const MODELS: ModelVariant[] = [
     vram: 8,
     type: "gguf",
     hfUrl: "https://huggingface.co/elix3r/gemma4-12b-with-proj-ltx-2.5-GGUF/blob/main/gemma4-12b-with-proj-ltx-2.5-Q5_K_M.gguf",
-    description: "Community Q5_K_M GGUF quantization of the Gemma 4 text encoder — at 9.51GB, roughly the same footprint as LTX 2.3's Gemma 3 FP4 encoder (9.5GB), which is what makes a 16GB LTX 2.5 setup possible at all. This is the only encoder that fits alongside a GGUF transformer on 16GB. The repo inherits LTX 2.5's gating — sign in and accept the license. Requires the ComfyUI-GGUF custom node to load. Place in models/text_encoders/.",
+    description: "Community Q5_K_M GGUF quantization of the Gemma 4 text encoder — at 9.51GB, roughly the same footprint as LTX 2.3's Gemma 3 FP4 encoder (9.5GB), which is what makes a 16GB LTX 2.5 setup possible at all. The highest-quality of the three GGUF encoder quants; Q4_K_M (8.41GB) and Q2_K (5.96GB) trade fidelity for more transformer headroom. The repo inherits LTX 2.5's gating — sign in and accept the license. Requires the ComfyUI-GGUF custom node to load. Place in models/text_encoders/.",
     badge: "16GB Encoder",
     isNew: true,
     family: "2.5",
     gated: true,
     whenToChoose:
-      "Required if you're building a 16GB LTX 2.5 setup — the official Gemma 4 encoders (15.37GB+) don't leave room for a transformer at that budget.",
+      "The default GGUF encoder for a 16GB LTX 2.5 setup — the official Gemma 4 encoders (15.37GB+) don't leave room for a transformer at that budget. Drop to Q4_K_M if you want to pair with a larger transformer quant (Q4_K_M/Q5_K_M) on 16GB, or Q2_K only when you need every last GB.",
+  },
+  {
+    id: "ltx25-gemma4-gguf-q4km",
+    name: "Gemma 4 12B with Projection GGUF Q4_K_M (Community)",
+    filename: "gemma4-12b-with-proj-ltx-2.5-Q4_K_M.gguf",
+    size: "8.41 GB",
+    vram: 8,
+    type: "gguf",
+    hfUrl: "https://huggingface.co/elix3r/gemma4-12b-with-proj-ltx-2.5-GGUF/blob/main/gemma4-12b-with-proj-ltx-2.5-Q4_K_M.gguf",
+    description: "Community Q4_K_M GGUF quantization of the Gemma 4 text encoder — 8.41GB, 1.1GB smaller than Q5_K_M. That headroom is what lets a 16GB card pair the encoder with a Q4_K_M or Q5_K_M transformer instead of being forced down to Q3_K_S. Projection layer is bundled, so no separate text-projection file. The repo inherits LTX 2.5's gating — sign in and accept the license. Requires the ComfyUI-GGUF custom node. Place in models/text_encoders/.",
+    badge: "16GB Encoder",
+    isNew: true,
+    family: "2.5",
+    gated: true,
+    whenToChoose:
+      "Pick Q4_K_M over Q5_K_M when the 1.1GB saved lets you step up a transformer quant on 16GB. Q4_K_M is the usual sweet spot for LLM-class GGUF quants; the prompt-understanding hit versus Q5_K_M is small relative to the transformer quality gain.",
+    releaseInfo: {
+      released: "2026-09-06",
+      source: "elix3r/gemma4-12b-with-proj-ltx-2.5-GGUF (HuggingFace)",
+      notes: "Added alongside Q2_K in the September update to the repo; Q5_K_M was the only quant available before.",
+    },
+  },
+  {
+    id: "ltx25-gemma4-gguf-q2k",
+    name: "Gemma 4 12B with Projection GGUF Q2_K (Community)",
+    filename: "gemma4-12b-with-proj-ltx-2.5-Q2_K.gguf",
+    size: "5.96 GB",
+    vram: 6,
+    type: "gguf",
+    hfUrl: "https://huggingface.co/elix3r/gemma4-12b-with-proj-ltx-2.5-GGUF/blob/main/gemma4-12b-with-proj-ltx-2.5-Q2_K.gguf",
+    description: "Community Q2_K GGUF quantization of the Gemma 4 text encoder — 5.96GB, the smallest Gemma 4 encoder available for LTX 2.5. Q2_K is an aggressive 2-bit quant; expect weaker prompt adherence than Q4_K_M/Q5_K_M. Use it only when the encoder must be as small as possible and Q4_K_M still doesn't fit your budget. Projection layer bundled. The repo inherits LTX 2.5's gating. Requires the ComfyUI-GGUF custom node. Place in models/text_encoders/.",
+    badge: "Smallest Encoder",
+    isNew: true,
+    family: "2.5",
+    gated: true,
+    whenToChoose:
+      "Last resort for VRAM — only when Q4_K_M (8.41GB) still doesn't fit your budget. Prompt understanding degrades noticeably at 2-bit, so on 16GB prefer Q4_K_M encoder + Q3_K_S/Q4_K_S transformer over Q2_K encoder + a larger transformer.",
+    releaseInfo: {
+      released: "2026-09-06",
+      source: "elix3r/gemma4-12b-with-proj-ltx-2.5-GGUF (HuggingFace)",
+      notes: "Added alongside Q4_K_M in the September update to the repo.",
+    },
   },
 ];
 

@@ -32,6 +32,8 @@ const FOLDER: Record<string, string> = {
   "ltx25-gemma4-bf16": "ComfyUI/models/text_encoders/",
   "ltx25-gemma4-int8": "ComfyUI/models/text_encoders/",
   "ltx25-gemma4-gguf-q5km": "ComfyUI/models/text_encoders/",
+  "ltx25-gemma4-gguf-q4km": "ComfyUI/models/text_encoders/",
+  "ltx25-gemma4-gguf-q2k": "ComfyUI/models/text_encoders/",
   "ltx25-distilled-lora-450": "ComfyUI/models/loras/",
   "ltx25-spatial-upscaler-x2": "ComfyUI/models/latent_upscale_models/",
   "ltx25-temporal-upscaler-x2": "ComfyUI/models/latent_upscale_models/",
@@ -54,7 +56,7 @@ const transformerIds = [
   "ltx25-distilled-gguf-q8",
 ];
 const vaeIds = ["ltx25-video-vae", "ltx25-video-vae-conv", "ltx25-audio-vae"];
-const encoderIds = ["ltx25-gemma4-bf16", "ltx25-gemma4-int8", "ltx25-gemma4-gguf-q5km"];
+const encoderIds = ["ltx25-gemma4-bf16", "ltx25-gemma4-int8", "ltx25-gemma4-gguf-q5km", "ltx25-gemma4-gguf-q4km", "ltx25-gemma4-gguf-q2k"];
 const optionalIds = [
   "ltx25-distilled-lora-450",
   "ltx25-spatial-upscaler-x2",
@@ -130,7 +132,7 @@ export default function LTX25ComfyUIGuidePage() {
               { "@type": "HowToStep", name: "Accept the LTX 2.5 license", text: "Sign in to HuggingFace and click Agree and Access on Lightricks/LTX-2.5." },
               { "@type": "HowToStep", name: "Download a transformer", text: "Pick BF16, INT8 convrot, NVFP4, or a community GGUF quant by VRAM." },
               { "@type": "HowToStep", name: "Download the required VAEs", text: "Video VAE, video VAE conv, and audio VAE go in models/vae/." },
-              { "@type": "HowToStep", name: "Download the Gemma 4 12B text encoder", text: "Pick BF16, INT8 convrot, or the community GGUF Q5_K_M by VRAM." },
+              { "@type": "HowToStep", name: "Download the Gemma 4 12B text encoder", text: "Pick BF16, INT8 convrot, or a community GGUF quant (Q5_K_M / Q4_K_M / Q2_K) by VRAM." },
               { "@type": "HowToStep", name: "Download optional components", text: "Distillation LoRA, spatial/temporal upscalers, duration-head patch, IC-LoRA upscaler." },
             ],
           }),
@@ -194,7 +196,8 @@ pip install -r requirements.txt`}
           <h2 className="font-bold text-lg">5. Download the Gemma 4 12B text encoder</h2>
           <p className="text-gray-400 text-sm">
             Every LTX 2.5 workflow needs one of these. The projection layer is bundled in, unlike LTX 2.3&apos;s
-            separate text-projection file. On 16GB, only the GGUF Q5_K_M fits alongside a GGUF transformer.
+            separate text-projection file. On 16GB, only the GGUF quants fit alongside a GGUF transformer — Q5_K_M (9.51GB) for
+            quality, Q4_K_M (8.41GB) when you want to step up the transformer quant, Q2_K (5.96GB) as a last resort.
           </p>
           <FileTable ids={encoderIds} />
         </div>

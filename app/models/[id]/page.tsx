@@ -23,6 +23,7 @@ function getModelCategory(model: ModelVariant): ModelCategory {
       "ltx23-vae",
       "ltx23-audio-vae",
       "ltx23-video-vae",
+      "ltx23-pruna-vae",
       "ltx25-video-vae",
       "ltx25-video-vae-conv",
       "ltx25-audio-vae",
@@ -176,7 +177,7 @@ export default async function ModelDetailPage({
     model.type === "distilled" ||
     (model.type === "fp8" && model.filename.includes("distilled")) ||
     (model.type === "lora" && model.id.includes("distilled"));
-  const isVaeOrComponent = ["ltx23-vae", "ltx23-audio-vae", "ltx23-video-vae", "ltx23-text-projection"].includes(model.id);
+  const isVaeOrComponent = ["ltx23-vae", "ltx23-audio-vae", "ltx23-video-vae", "ltx23-pruna-vae", "ltx23-text-projection"].includes(model.id);
   const isUpscaler = model.id.includes("upscaler") || model.id.includes("temporal");
 
   // Every workflow name below is a verified LTX 2.3 official workflow JSON.

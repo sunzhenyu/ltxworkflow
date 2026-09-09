@@ -20,7 +20,7 @@ const LTX_25_GROUPS = [
   {
     id: "25-16gb",
     label: "LTX 2.5 · 16GB VRAM — Community GGUF (only path that fits)",
-    ids: ["ltx25-distilled-gguf-q3ks", "ltx25-distilled-gguf-q4km", "ltx25-gemma4-gguf-q5km"],
+    ids: ["ltx25-distilled-gguf-q3ks", "ltx25-distilled-gguf-q4km", "ltx25-gemma4-gguf-q5km", "ltx25-gemma4-gguf-q4km", "ltx25-gemma4-gguf-q2k"],
     note: "The official LTX 2.5 files alone need 34GB+ combined (int8-convrot transformer + Gemma 4 text encoder), so 16GB cards must use community GGUF quants for both the transformer and the text encoder. Requires the ComfyUI-GGUF custom node.",
   },
   {
@@ -146,12 +146,13 @@ const VRAM_GROUPS = [
       "ltx23-vae",
       "ltx23-audio-vae",
       "ltx23-video-vae",
+      "ltx23-pruna-vae",
       "ltx23-spatial-upscaler-x2-11",
       "ltx23-spatial-upscaler",
       "ltx23-spatial-upscaler-x15",
       "ltx23-temporal-upscaler",
     ],
-    note: "taeltx2_3.safetensors (VAE) is required for all setups. Audio VAE enables audio-conditioned workflows. Upscalers are optional — place in models/latent_upscale_models/.",
+    note: "taeltx2_3.safetensors (VAE) is required for all setups. Audio VAE enables audio-conditioned workflows. The Pruna VAE is an optional drop-in faster decoder. Upscalers are optional — place in models/latent_upscale_models/.",
   },
 ];
 

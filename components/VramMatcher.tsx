@@ -15,6 +15,7 @@ const REQUIRED_IDS: Record<"2.3" | "2.5", string[]> = {
     // Optional / specialized components (audio support is the new LTX 2.3 feature)
     "ltx23-audio-vae",
     "ltx23-video-vae",
+    "ltx23-pruna-vae",
     "ltx23-text-projection",
     // IC-LoRAs (Lightricks official)
     "ltx23-ic-lora-union",
@@ -37,6 +38,8 @@ const REQUIRED_IDS: Record<"2.3" | "2.5", string[]> = {
     "ltx25-gemma4-bf16",
     "ltx25-gemma4-int8",
     "ltx25-gemma4-gguf-q5km",
+    "ltx25-gemma4-gguf-q4km",
+    "ltx25-gemma4-gguf-q2k",
     // Optional / specialized components
     "ltx25-distilled-lora-450",
     "ltx25-spatial-upscaler-x2",
